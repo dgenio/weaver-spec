@@ -342,6 +342,14 @@ class TestTraceEvent:
                 outcome="unknown",
             )
 
+    def test_invalid_event_type_raises(self):
+        with pytest.raises(ValueError, match="event_type must be one of"):
+            TraceEvent(
+                event_id="evt-3",
+                event_type="invalid_type",
+                timestamp=datetime.now(timezone.utc),
+            )
+
     def test_no_event_id_raises(self):
         with pytest.raises(ValueError, match="event_id must be non-empty"):
             TraceEvent(

@@ -277,6 +277,10 @@ class TraceEvent:
             raise ValueError("TraceEvent.event_id must be non-empty")
         if not self.event_type:
             raise ValueError("TraceEvent.event_type must be non-empty")
+        if self.event_type not in TRACE_EVENT_TYPES:
+            raise ValueError(
+                f"TraceEvent.event_type must be one of {TRACE_EVENT_TYPES}"
+            )
         if self.outcome is not None and self.outcome not in TRACE_EVENT_OUTCOMES:
             raise ValueError(
                 f"TraceEvent.outcome must be one of {TRACE_EVENT_OUTCOMES} or None"
