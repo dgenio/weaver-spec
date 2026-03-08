@@ -28,7 +28,7 @@
         "flow_completed",
         "flow_failed"
       ],
-      "description": "The type of event. Extended implementations may use additional values."
+      "description": "Core event types. Adding new types requires a spec update."
     },
     "timestamp": {
       "type": "string",
