@@ -15,7 +15,7 @@ applyTo: "contracts/json/**"
 ## Review cautions
 
 - **Description must not contradict structural constraints.** Do not say a field is "required" in a `description` if it is not in the `required` array. Do not claim extensibility ("additional values may be used") for a field with an `enum` constraint.
-- **Never weaken a constraint** (remove `minLength`, loosen an `enum`, drop a `required` entry) without an ADR. Weakening is always a breaking change.
+- **Never weaken a constraint** (remove `minLength`, loosen an `enum`, drop a `required` entry) without an ADR. Constraint loosening affects consumers even when existing payloads remain valid.
 - Every new schema must have a corresponding sample payload in `examples/sample_payloads/`.
 
 ## Change scope

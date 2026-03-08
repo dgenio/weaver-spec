@@ -22,11 +22,16 @@ After completing all six artifacts, run the local validation checks before submi
 
 ## Extended contract change workflow
 
-Extended contracts follow the same artifact pattern (schema + Python + test + CHANGELOG + version bump), but:
+Extended contracts do **not** currently have JSON Schemas; the `contracts/json/` directory is Core-only.
+When modifying an Extended contract, complete all of the following in a single PR:
 
-- Breaking changes are allowed in MINOR versions.
-- Extended types live in `contracts/python/src/weaver_contracts/extended.py`.
-- Sample payloads are still expected but may be lighter for optional metadata.
+1. **Update the Python dataclass** in `contracts/python/src/weaver_contracts/extended.py`.
+2. **Update or create a sample payload** in `examples/sample_payloads/`.
+3. **Add or update a roundtrip test** in `contracts/python/tests/test_roundtrip_examples.py`.
+4. **Add a CHANGELOG entry** under the appropriate version section.
+5. **Bump the version** in both `contracts/python/src/weaver_contracts/version.py` and `contracts/python/pyproject.toml`.
+
+Breaking changes are allowed in MINOR versions for Extended contracts.
 
 ---
 
@@ -71,7 +76,7 @@ cd ../..
 python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
 
 # 3. Markdown lint
-# Run markdownlint across all .md files in the repo
+# See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 ```
 
 ---

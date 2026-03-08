@@ -46,7 +46,9 @@ For JSON schema conventions specifically, `contracts/json/README.md` is authorit
 
 ## Source of truth: schemas lead
 
-JSON Schemas are the language-agnostic source of truth for all contract definitions. Python types must mirror them exactly — same field names, same types, same required/optional status. Zero divergence.
+JSON Schemas are the language-agnostic source of truth for all **Core** contract definitions. Python Core types must mirror them exactly — same field names, same types, same required/optional status. Zero divergence.
+
+Extended contracts currently have no JSON Schemas — the Python dataclasses in `extended.py` are the source of truth for Extended types.
 
 ---
 
@@ -90,7 +92,7 @@ See [docs/agent-context/invariants.md](docs/agent-context/invariants.md) for for
 ## Forbidden behaviors
 
 - **Never add a field to a Core contract** without confirming it is universally needed by all adopters. Proactively move non-universal fields to Extended contracts instead.
-- **Never weaken a schema constraint** (remove `minLength`, loosen an enum, drop a `required` entry) without an ADR — weakening constraints is always a breaking change.
+- **Never weaken a schema constraint** (remove `minLength`, loosen an enum, drop a `required` entry) without an ADR — constraint loosening affects consumers even when existing payloads remain valid.
 - **Never write a schema `description` that contradicts structural constraints** — do not say "required" for a field not in the `required` array, and do not claim extensibility for a field with an `enum` constraint.
 - **Never modify a Mermaid diagram without verifying it against the `BOUNDARIES.md` artifact ownership table** — the table is canonical; diagrams are derived.
 - **Never describe aspirational features as current** — if a capability (e.g., token signing) is not enforced by a schema constraint or code mechanism, do not assert it as fact.
@@ -117,7 +119,7 @@ Do not merge, collapse, or "simplify" these types without a spec-level ADR.
 
 **CapabilityToken:** Currently a plain data structure. The word "signed" in the Glossary and schema descriptions is aspirational. Signing is an agent-kernel implementation concern, not enforced in this spec. Do not add signature fields or cryptographic logic here.
 
-**ID format:** IDs are any non-empty string (`minLength: 1`). UUIDs are not required. Sample payloads use readable slug-style IDs (e.g., `rd-20260308-001`). Ignore the FAQ's imprecise "UUIDs or stable strings" claim — the JSON schemas are the authority.
+**ID format:** IDs are any non-empty string (`minLength: 1`). UUIDs are not required. Sample payloads use readable slug-style IDs (e.g., `rd-20260308-001`). If any other docs or examples ever conflict with this, treat the JSON Schemas as the authority.
 
 ---
 
@@ -162,7 +164,7 @@ cd ../..
 python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
 
 # 3. Markdown lint
-# Run markdownlint on all .md files
+# See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 ```
 
 ---

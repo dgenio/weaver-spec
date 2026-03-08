@@ -69,6 +69,7 @@ echo "All schemas are valid JSON"
 
 ```bash
 npm install -g markdownlint-cli
+cd ../..
 markdownlint --disable MD013 MD033 MD041 \
   README.md CONTRIBUTING.md CHANGELOG.md \
   docs/*.md contracts/**/*.md examples/*.md

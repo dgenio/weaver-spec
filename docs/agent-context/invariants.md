@@ -40,7 +40,7 @@ Any visual representation of data flow must match the artifact ownership table i
 
 ### Never weaken schema constraints without an ADR
 
-Removing a `minLength`, loosening an `enum`, dropping a `required` field, or widening a type — these are all breaking changes even when they look like cleanup. They require the ADR process.
+Removing a `minLength`, loosening an `enum`, dropping a `required` field, or widening a type — these are high-risk changes that affect consumers even when existing payloads remain valid. They require the ADR process regardless of whether they meet the formal "breaking change" definition in `CONTRIBUTING.md`.
 
 ### Never add non-universal fields to Core
 
@@ -65,7 +65,7 @@ These constraints must not be removed or weakened without an ADR:
 |---------------|-------|-----|
 | Add an optional field to a schema | Yes | `additionalProperties: true` makes additive changes backward-compatible |
 | Add a new enum value | Yes | Existing values remain valid |
-| Remove an optional field from a schema | **No** | Consumers may depend on it; requires ADR |
+| Remove an optional field from a schema | **No** | Affects Python API consumers and downstream readers; requires ADR even though payloads remain valid |
 | Remove a required field | **No** | Breaking change; requires ADR |
 | Change a field's type | **No** | Breaking change; requires ADR |
 | Refactor Python code without changing fields | Yes | As long as field names, types, and required status still match the schema |
