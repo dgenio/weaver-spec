@@ -1,0 +1,65 @@
+name: Link Checker
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  check-links:
+    name: Check Internal Document Links
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check internal Markdown links
+        run: |
+          python - << 'EOF'
+          import os
+          import re
+          import sys
+          from pathlib import Path
+
+          repo_root = Path(".")
+          md_files = list(repo_root.rglob("*.md"))
+          # Skip .git and node_modules
+          md_files = [f for f in md_files if ".git" not in f.parts and "node_modules" not in f.parts]
+
+          # Match [text](path) links — only relative, non-URL links
+          link_re = re.compile(r'\[([^\]]*)\]\(([^)]+)\)')
+          errors = []
+
+          for md_file in sorted(md_files):
+              content = md_file.read_text()
+              for match in link_re.finditer(content):
+                  link = match.group(2)
+                  # Skip external URLs, anchors-only, and mailto
+                  if link.startswith(("http://", "https://", "mailto:", "#")):
+                      continue
+                  # Strip anchor fragment
+                  path_part = link.split("#")[0]
+                  if not path_part:
+                      continue
+                  # Resolve relative to the file's directory
+                  resolved = (md_file.parent / path_part).resolve()
+                  if not resolved.exists():
+                      errors.append(f"{md_file}: broken link -> {link}")
+
+          if errors:
+              print("Broken internal links found:", file=sys.stderr)
+              for e in errors:
+                  print(f"  {e}", file=sys.stderr)
+              sys.exit(1)
+          else:
+              print(f"All internal links OK ({len(md_files)} files checked)")
+          EOF

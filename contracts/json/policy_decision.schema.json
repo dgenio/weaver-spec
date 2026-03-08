@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/policy_decision.schema.json",
+  "title": "PolicyDecision",
+  "description": "The authorization verdict produced by agent-kernel's policy engine for a capability invocation request.",
+  "type": "object",
+  "required": ["decision_id", "decision", "capability_id", "principal", "timestamp"],
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this policy decision. Used to correlate with TraceEvents."
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["allow", "deny"],
+      "description": "The authorization verdict."
+    },
+    "capability_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The capability ID that was evaluated."
+    },
+    "principal": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The principal whose authorization was evaluated."
+    },
+    "token_id": {
+      "type": ["string", "null"],
+      "description": "The CapabilityToken ID used in this evaluation, if any."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Human-readable explanation of the decision. Recommended for deny decisions."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this decision was made."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

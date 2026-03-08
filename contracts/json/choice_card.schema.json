@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/choice_card.schema.json",
+  "title": "ChoiceCard",
+  "description": "A curated, bounded set of SelectableItem objects presented to the LLM as a structured menu. The LLM selects from this card rather than an unbounded tool list.",
+  "type": "object",
+  "required": ["id", "items"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this ChoiceCard."
+    },
+    "items": {
+      "type": "array",
+      "description": "Ordered list of selectable options. Should contain 3–7 items for practical LLM selection.",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/selectable_item.schema.json"
+      },
+      "minItems": 1,
+      "maxItems": 20
+    },
+    "context_hint": {
+      "type": "string",
+      "description": "Optional guidance for the LLM about how to interpret this card (e.g., 'Select the most appropriate data retrieval action')."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

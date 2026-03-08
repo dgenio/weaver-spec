@@ -1,0 +1,33 @@
+{
+  "id": "rd-20260308-001",
+  "choice_cards": [
+    {
+      "id": "card-retrieval",
+      "context_hint": "Select the most appropriate document retrieval action for the user's query.",
+      "items": [
+        {
+          "id": "search-docs",
+          "label": "Search documentation",
+          "description": "Full-text search across the product documentation index.",
+          "capability_id": "org.myapp.search_docs"
+        },
+        {
+          "id": "fetch-page",
+          "label": "Fetch a specific page",
+          "description": "Retrieve a known documentation page by its slug.",
+          "capability_id": "org.myapp.fetch_doc_page"
+        },
+        {
+          "id": "list-recent",
+          "label": "List recently updated docs",
+          "description": "Retrieve the 10 most recently modified documentation articles.",
+          "capability_id": "org.myapp.list_recent_docs"
+        }
+      ]
+    }
+  ],
+  "selected_item_id": "search-docs",
+  "selected_card_id": "card-retrieval",
+  "timestamp": "2026-03-08T06:00:00Z",
+  "context_summary": "User asked: 'How do I configure retries?'. Routing to documentation retrieval."
+}

@@ -1,0 +1,28 @@
+{
+  "frame_id": "frame-20260308-001",
+  "capability_id": "org.myapp.search_docs",
+  "summary": "Found 3 documentation pages matching 'retry configuration': (1) Retry Policies Overview, (2) Configuring Exponential Backoff, (3) Dead Letter Queues. The most relevant is 'Retry Policies Overview' which describes the retry_policy field in the job configuration schema.",
+  "structured_data": {
+    "result_count": 3,
+    "top_results": [
+      {
+        "title": "Retry Policies Overview",
+        "slug": "docs/retry-policies",
+        "relevance_score": 0.97
+      },
+      {
+        "title": "Configuring Exponential Backoff",
+        "slug": "docs/exponential-backoff",
+        "relevance_score": 0.84
+      },
+      {
+        "title": "Dead Letter Queues",
+        "slug": "docs/dead-letter-queues",
+        "relevance_score": 0.71
+      }
+    ]
+  },
+  "handle_refs": ["handle-rawresult-20260308-001"],
+  "redaction_notes": "Raw search index response (including internal document IDs and ranking signals) stored as Handle. Only titles, slugs, and relevance scores included in structured_data.",
+  "created_at": "2026-03-08T06:00:05Z"
+}
