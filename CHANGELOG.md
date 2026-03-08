@@ -8,6 +8,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+### Added
+
+- Agent-facing documentation system:
+  - `AGENTS.md` — shared entrypoint for all coding agents (rules, repo map, authority hierarchy, forbidden behaviors, design decisions not to reopen).
+  - `docs/agent-context/architecture.md` — thin pointer to canonical architecture and boundary docs.
+  - `docs/agent-context/workflows.md` — contract change workflows, validation commands, commit conventions, documentation governance.
+  - `docs/agent-context/invariants.md` — forbidden shortcuts, must-preserve constraints, safe-vs-unsafe simplification table.
+  - `docs/agent-context/lessons-learned.md` — failure-capture workflow and known pattern index.
+  - `docs/agent-context/review-checklist.md` — self-review and maintainer-review checklist with checkbox items.
+- GitHub Copilot instructions:
+  - `.github/copilot-instructions.md` — compact review-priority entrypoint for GitHub code review.
+  - `.github/instructions/contracts-json.instructions.md` — path-scoped rules for `contracts/json/**`.
+  - `.github/instructions/contracts-python.instructions.md` — path-scoped rules for `contracts/python/**`.
+  - `.github/instructions/docs.instructions.md` — path-scoped rules for `docs/**`.
+- Claude Code instructions:
+  - `.claude/CLAUDE.md` — Claude-specific operating behavior, contradiction handling, lesson promotion workflow.
+
+### Fixed
+
+- `docs/FAQ.md` — corrected ID format claim from "UUIDs or stable strings" to "non-empty strings (`minLength: 1`)" to match JSON schema authority.
+- `CONTRIBUTING.md` — added missing Markdown Lint section with exact `markdownlint-cli` command matching CI configuration.
+
 ---
 
 ## [0.1.0] — 2026-03-08
