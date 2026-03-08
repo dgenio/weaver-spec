@@ -21,7 +21,7 @@ This repository is **documentation + contracts only**.
 |------|----------|-----------------|
 | `contracts/json/` | JSON Schemas (Draft 2020-12) | Adding or modifying contract definitions |
 | `contracts/python/src/weaver_contracts/core.py` | Core contract dataclasses (9 types) | When schemas change — must update in same PR |
-| `contracts/python/src/weaver_contracts/extended.py` | Extended metadata types (6 types) | Adding optional metadata contracts |
+| `contracts/python/src/weaver_contracts/extended.py` | Extended metadata types | Adding optional metadata contracts |
 | `contracts/python/src/weaver_contracts/version.py` | `CONTRACT_VERSION` constant | Every version bump |
 | `contracts/python/pyproject.toml` | Package build config | Every version bump |
 | `contracts/python/tests/` | Roundtrip + schema alignment tests | Every contract change |
