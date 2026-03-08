@@ -32,7 +32,7 @@
     },
     "reason": {
       "type": "string",
-      "description": "Human-readable explanation of the decision. Required for deny decisions."
+      "description": "Human-readable explanation of the decision. Recommended for deny decisions."
     },
     "timestamp": {
       "type": "string",
