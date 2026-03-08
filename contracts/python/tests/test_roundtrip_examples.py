@@ -143,8 +143,13 @@ class TestRoutingDecision:
             choice_cards=[card],
             timestamp=parse_dt(payload["timestamp"]),
             selected_item_id=payload.get("selected_item_id"),
+            selected_card_id=payload.get("selected_card_id"),
+            context_summary=payload.get("context_summary"),
         )
         assert rd.id == payload["id"]
+        assert rd.selected_item_id == payload.get("selected_item_id")
+        assert rd.selected_card_id == payload.get("selected_card_id")
+        assert rd.context_summary == payload.get("context_summary")
 
 
 # ---------------------------------------------------------------------------
