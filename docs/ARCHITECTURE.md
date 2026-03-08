@@ -36,8 +36,8 @@ graph TD
     D -->|authorized| E[Tool Executor]
     D -->|denied| F([PolicyDecision: deny])
     E -->|raw output| G[Firewall / Filter]
-    G -->|Frame + optional Handle| H[HandleStore]
-    H -->|Frame safe view| B
+    G -->|Frame| B
+    G -->|Handle| H[HandleStore]
     B -->|enriched context| A
     C -->|TraceEvent| I[(Audit Log)]
 
