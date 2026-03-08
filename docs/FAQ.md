@@ -27,7 +27,7 @@ Three overlaps are explicitly prohibited by the boundary decisions in [BOUNDARIE
 
 ## How strict are the contracts?
 
-**Core contracts are strict.** Every required field is required; types are precise; IDs must be non-empty UUIDs or stable strings.
+**Core contracts are strict.** Every required field is required; types are precise; IDs must be non-empty strings (`minLength: 1`).
 
 **Extended contracts are lenient.** Optional fields may be absent. New fields may be added in a minor version. Extended contracts are not required for spec compliance.
 

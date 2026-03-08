@@ -65,6 +65,15 @@ python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('co
 echo "All schemas are valid JSON"
 ```
 
+### Markdown Lint
+
+```bash
+npm install -g markdownlint-cli
+markdownlint --disable MD013 MD033 MD041 \
+  README.md CONTRIBUTING.md CHANGELOG.md \
+  docs/*.md contracts/**/*.md examples/*.md
+```
+
 ---
 
 ## Commit Messages
