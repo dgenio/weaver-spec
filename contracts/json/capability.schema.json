@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/capability.schema.json",
+  "title": "Capability",
+  "description": "A named, versioned unit of executable functionality registered in agent-kernel. Capabilities have stable IDs and declared input/output schema references.",
+  "type": "object",
+  "required": ["id", "name", "version", "description"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable, unique identifier for this capability. Should be namespaced (e.g., 'org.myapp.search_docs')."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable name for this capability."
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Semantic version of this capability (e.g., '1.0.0')."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concise description of what this capability does and when to use it."
+    },
+    "input_schema_ref": {
+      "type": "string",
+      "description": "Optional URI reference to the JSON Schema describing valid inputs for this capability."
+    },
+    "output_schema_ref": {
+      "type": "string",
+      "description": "Optional URI reference to the JSON Schema describing the output Frame content for this capability."
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Optional tags for categorization and discovery."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

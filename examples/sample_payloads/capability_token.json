@@ -1,0 +1,17 @@
+{
+  "token_id": "tok-20260308-abc123",
+  "principal": "agent-session-7f3a",
+  "scope": [
+    "org.myapp.search_docs",
+    "org.myapp.fetch_doc_page",
+    "org.myapp.list_recent_docs"
+  ],
+  "issued_at": "2026-03-08T06:00:00Z",
+  "expires_at": "2026-03-08T07:00:00Z",
+  "single_use": false,
+  "issuer": "agent-kernel-prod-1",
+  "metadata": {
+    "session_id": "sess-20260308-xyz",
+    "request_id": "req-20260308-001"
+  }
+}

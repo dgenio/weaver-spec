@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/selectable_item.schema.json",
+  "title": "SelectableItem",
+  "description": "A single option that can be presented to an LLM for selection within a ChoiceCard. Represents one possible action, tool, or capability.",
+  "type": "object",
+  "required": ["id", "label", "description"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this item within its ChoiceCard."
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short human-readable label. Safe to include in an LLM prompt."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concise description of what this item does. Must not include raw tool schema details."
+    },
+    "capability_id": {
+      "type": "string",
+      "description": "Optional reference to the Capability this item maps to. Used by agent-kernel to resolve the execution target."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional arbitrary key-value metadata for implementation-specific use.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/frame.schema.json",
+  "title": "Frame",
+  "description": "A safe, filtered view of a tool execution result. Produced by the agent-kernel firewall. This is what contextweaver and the LLM see. Never contains raw tool output.",
+  "type": "object",
+  "required": ["frame_id", "capability_id", "summary", "created_at"],
+  "properties": {
+    "frame_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this Frame."
+    },
+    "capability_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The capability that produced this Frame."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable, LLM-safe summary of the execution result. Must not contain raw tool output."
+    },
+    "structured_data": {
+      "type": ["object", "null"],
+      "description": "Optional structured subset of the result that has been reviewed and approved for LLM consumption. Must be firewall-filtered.",
+      "additionalProperties": true
+    },
+    "handle_refs": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "description": "List of Handle IDs referencing the full raw artifacts. Handles require authorization to resolve."
+    },
+    "redaction_notes": {
+      "type": "string",
+      "description": "Optional description of what was redacted or filtered from the raw output."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this Frame was created by the firewall."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

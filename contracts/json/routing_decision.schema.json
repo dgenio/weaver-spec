@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/routing_decision.schema.json",
+  "title": "RoutingDecision",
+  "description": "The output of the contextweaver routing phase. Contains one or more ChoiceCards and the selected item once the LLM has responded.",
+  "type": "object",
+  "required": ["id", "choice_cards", "timestamp"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this routing decision."
+    },
+    "choice_cards": {
+      "type": "array",
+      "description": "One or more ChoiceCards presented during this routing cycle.",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/choice_card.schema.json"
+      },
+      "minItems": 1
+    },
+    "selected_item_id": {
+      "type": ["string", "null"],
+      "description": "The ID of the SelectableItem chosen by the LLM. Null if the LLM response is still pending."
+    },
+    "selected_card_id": {
+      "type": ["string", "null"],
+      "description": "The ID of the ChoiceCard that contained the selected item. Null if no selection has been made."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this routing decision was created."
+    },
+    "context_summary": {
+      "type": "string",
+      "description": "Optional brief summary of the context that drove this routing decision. For debugging and audit purposes."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/trace_event.schema.json",
+  "title": "TraceEvent",
+  "description": "An immutable audit log entry recording a single significant event in the execution lifecycle. Produced by agent-kernel.",
+  "type": "object",
+  "required": ["event_id", "event_type", "timestamp"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this event."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "capability_authorized",
+        "capability_denied",
+        "capability_executed",
+        "firewall_applied",
+        "handle_created",
+        "handle_resolved",
+        "token_issued",
+        "token_invalidated",
+        "flow_started",
+        "flow_step_started",
+        "flow_step_completed",
+        "flow_completed",
+        "flow_failed"
+      ],
+      "description": "The type of event. Extended implementations may use additional values."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this event occurred."
+    },
+    "capability_id": {
+      "type": ["string", "null"],
+      "description": "The capability involved in this event, if applicable."
+    },
+    "principal": {
+      "type": ["string", "null"],
+      "description": "The principal involved in this event, if applicable."
+    },
+    "decision_id": {
+      "type": ["string", "null"],
+      "description": "The PolicyDecision ID associated with this event, if applicable."
+    },
+    "frame_id": {
+      "type": ["string", "null"],
+      "description": "The Frame ID associated with this event, if applicable."
+    },
+    "handle_id": {
+      "type": ["string", "null"],
+      "description": "The Handle ID associated with this event, if applicable."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["success", "failure", "partial"],
+      "description": "Optional high-level outcome of the event."
+    },
+    "error_message": {
+      "type": ["string", "null"],
+      "description": "Error message if the event represents a failure."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
