@@ -63,7 +63,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 ```
 contracts/
   json/          JSON Schemas (language-agnostic)
-  python/        weaver_contracts Python package (stdlib dataclasses + Protocols)
+  python/        weaver_contracts Python package (stdlib dataclasses)
 examples/
   sample_payloads/   Example JSON payloads validated against schemas
 ```
