@@ -47,5 +47,19 @@
       "additionalProperties": true
     }
   },
+  "anyOf": [
+    {
+      "properties": {
+        "single_use": { "const": true }
+      },
+      "required": ["single_use"]
+    },
+    {
+      "properties": {
+        "expires_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["expires_at"]
+    }
+  ],
   "additionalProperties": true
 }

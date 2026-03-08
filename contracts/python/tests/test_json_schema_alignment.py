@@ -133,3 +133,15 @@ class TestCapabilityTokenPayload:
         payload = load_payload("capability_token")
         scope = payload.get("scope", [])
         assert len(scope) > 0, "CapabilityToken.scope must not be empty (invariant I-06)"
+
+    def test_invariant_i06_no_expiry_no_single_use_fails(self):
+        """Invariant I-06: token without expires_at and without single_use must fail."""
+        schema = load_schema("capability_token")
+        invalid_payload = {
+            "token_id": "tok-invalid",
+            "principal": "agent-1",
+            "scope": ["cap.search"],
+            "issued_at": "2026-03-08T06:00:00Z",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(invalid_payload, schema)
