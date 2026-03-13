@@ -74,7 +74,7 @@ For Extended contract changes, the same pattern applies but with `extended.py` i
 ## Local validation
 
 - [ ] `pytest --cov` passes (`cd contracts/python && pip install -e ".[dev]" && pytest --cov --cov-report=term-missing`)
-- [ ] `mypy` passes (`cd contracts/python && mypy src/`)
+- [ ] `mypy` passes (`cd contracts/python && pip install -e ".[dev]" && mypy src/`)
 - [ ] JSON schemas parse without error
 - [ ] Markdownlint passes on all `.md` files
 
