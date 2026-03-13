@@ -24,6 +24,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   - `.github/instructions/docs.instructions.md` — path-scoped rules for `docs/**`.
 - Claude Code instructions:
   - `.claude/CLAUDE.md` — Claude-specific operating behavior, contradiction handling, lesson promotion workflow.
+- CI / process:
+  - `.github/pull_request_template.md` — PR checklist enforcing six-artifact rule, invariant verification, and cross-repo impact flagging.
+  - `.github/CODEOWNERS` — blanket auto-assignment (`* @dgenio`) for PR review.
 
 ### Fixed
 
