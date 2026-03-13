@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+---
+
+## [0.1.1] — 2026-03-13
+
 ### Added
 
 - `mypy --strict` type checking added to CI and dev workflow (closes #12).
@@ -60,4 +64,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - Sample payloads for `routing_decision`, `frame_with_handles`, and `capability_token`.
 - CI workflows: `ci.yml` (Python tests + schema lint) and `links.yml` (link checker).
 
+[0.1.1]: https://github.com/dgenio/weaver-spec/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/dgenio/weaver-spec/releases/tag/v0.1.0
