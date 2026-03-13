@@ -75,9 +75,13 @@ jobs:
         working-directory: contracts/python
         run: pip install -e ".[dev]"
 
-      - name: Run tests
+      - name: Run type checks
         working-directory: contracts/python
-        run: pytest -v
+        run: mypy src/
+
+      - name: Run tests with coverage
+        working-directory: contracts/python
+        run: pytest --cov --cov-report=term-missing -v
 
   markdown-lint:
     name: Markdown Lint

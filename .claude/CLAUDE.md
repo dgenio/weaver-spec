@@ -38,7 +38,7 @@ This file adds Claude-specific operating behavior only.
 Before proposing that work is done:
 
 1. Verify all required artifacts are updated (see definition of done in `AGENTS.md`).
-2. Run the local validation commands from `AGENTS.md`: pytest, JSON schema validation, markdownlint.
+2. Run the local validation commands from `AGENTS.md`: pytest (with coverage), mypy, JSON schema validation, markdownlint.
 3. Check whether the change triggers doc updates — consult the governance table in `docs/agent-context/workflows.md`.
 4. Check cross-file consistency: Python fields match JSON schema, sample payloads validate, tests cover changed fields.
 5. For Core contract changes, draft the cross-repo impact section for the PR description.

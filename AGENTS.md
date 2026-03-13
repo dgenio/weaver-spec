@@ -151,19 +151,22 @@ See [docs/agent-context/review-checklist.md](docs/agent-context/review-checklist
 
 ## Local validation
 
-Run all three checks before submitting a PR:
+Run all four checks before submitting a PR:
 
 ```bash
-# 1. Python tests
+# 1. Python tests (with coverage)
 cd contracts/python
 pip install -e ".[dev]"
-pytest
+pytest --cov --cov-report=term-missing
 
-# 2. JSON schema validation
+# 2. Type checking
+mypy src/
+
+# 3. JSON schema validation
 cd ../..
 python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
 
-# 3. Markdown lint
+# 4. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 ```
 
