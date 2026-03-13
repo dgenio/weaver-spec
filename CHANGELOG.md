@@ -10,6 +10,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- `mypy --strict` type checking added to CI and dev workflow (closes #12).
+- `pytest-cov` coverage tracking with 64% threshold (scope expansion of #12). Raise to 80% once Extended tests land (#17).
 - Agent-facing documentation system:
   - `AGENTS.md` — shared entrypoint for all coding agents (rules, repo map, authority hierarchy, forbidden behaviors, design decisions not to reopen).
   - `docs/agent-context/architecture.md` — thin pointer to canonical architecture and boundary docs.

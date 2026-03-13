@@ -15,10 +15,25 @@ dependencies = []
 dev = [
     "pytest>=7.4",
     "jsonschema>=4.17",
+    "mypy>=1.0",
+    "pytest-cov>=4.0",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.mypy]
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["weaver_contracts"]
+
+[tool.coverage.report]
+# Baseline: 64%. Raise to 80% once Extended contract tests land (#17).
+fail_under = 64
+show_missing = true

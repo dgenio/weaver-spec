@@ -68,7 +68,14 @@ A "breaking contract change" is any modification that would cause existing valid
 ```bash
 cd contracts/python
 pip install -e ".[dev]"
-pytest
+pytest --cov --cov-report=term-missing
+```
+
+### Type Checking
+
+```bash
+cd contracts/python
+mypy src/
 ```
 
 ### Validate JSON Schemas
