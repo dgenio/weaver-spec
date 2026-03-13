@@ -10,7 +10,7 @@
 
 - [ ] Docs only (no contract changes)
 - [ ] Additive contract change (new optional field or new type — non-breaking)
-- [ ] Breaking contract change (requires ADR — see [CONTRIBUTING.md](CONTRIBUTING.md))
+- [ ] Breaking contract change (requires ADR — see [CONTRIBUTING.md](../CONTRIBUTING.md))
 - [ ] CI / tooling change
 
 ---
@@ -47,4 +47,4 @@
 
 ## Process
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution process, including the ADR process for breaking changes.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution process, including the ADR process for breaking changes.
