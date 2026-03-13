@@ -63,6 +63,8 @@ A "breaking contract change" is any modification that would cause existing valid
 
 ## Local Development
 
+All commands below assume dev dependencies are installed (`pip install -e ".[dev]"` in `contracts/python/`).
+
 ### Python Package Tests
 
 ```bash
