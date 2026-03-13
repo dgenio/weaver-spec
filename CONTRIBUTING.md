@@ -4,6 +4,19 @@ Thank you for helping improve the Weaver specification. This repo is **documenta
 
 ---
 
+## Pull Request Template
+
+All PRs in this repository use a shared template (`.github/pull_request_template.md`) that includes:
+
+- **Type of change** checkboxes (docs only, additive contract, breaking contract, CI/tooling)
+- **Six-artifact checklist** — required for every Core contract change
+- **Invariant verification** checkbox (I-01 through I-07)
+- **Cross-repo impact** section (contextweaver, agent-kernel, ChainWeaver)
+
+The template is pre-filled automatically when you open a PR on GitHub.
+
+---
+
 ## Types of Changes
 
 | Change type | Process |
