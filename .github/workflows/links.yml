@@ -34,6 +34,9 @@ jobs:
           md_files = list(repo_root.rglob("*.md"))
           # Skip .git and node_modules
           md_files = [f for f in md_files if ".git" not in f.parts and "node_modules" not in f.parts]
+          # PR template links resolve repo-root-relative when GitHub populates the PR body,
+          # not file-relative, so skip it from file-system link checking.
+          md_files = [f for f in md_files if f.name != "pull_request_template.md"]
 
           # Match [text](path) links — only relative, non-URL links
           link_re = re.compile(r'\[([^\]]*)\]\(([^)]+)\)')
