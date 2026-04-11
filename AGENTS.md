@@ -30,6 +30,7 @@ This repository is **documentation + contracts only**.
 | `contracts/python/tests/` | Roundtrip + schema alignment tests | Every contract change |
 | `examples/sample_payloads/` | Example JSON payloads | Every new or changed schema |
 | `docs/` | Specification documents | When changing behavior, boundaries, or invariants |
+| `docs/adr/` | Architecture Decision Records for breaking changes | When proposing or reviewing a breaking Core contract change |
 | `docs/agent-context/` | Agent-oriented supporting docs | When you need workflow detail, invariant context, lessons learned, or a review checklist |
 
 ---

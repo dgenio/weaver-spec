@@ -32,6 +32,8 @@ The template is pre-filled automatically when you open a PR on GitHub.
 
 A "breaking contract change" is any modification that would cause existing valid payloads to become invalid, or that removes or renames a required field.
 
+Use the ADR template at [`docs/adr/template.md`](docs/adr/template.md) when documenting a breaking change. See [`docs/adr/README.md`](docs/adr/README.md) for the naming convention.
+
 **Steps:**
 
 1. **Open an issue** describing:
@@ -42,6 +44,7 @@ A "breaking contract change" is any modification that would cause existing valid
 2. **Discussion period** — at least 3 business days for feedback from the community.
 
 3. **Open a PR** that includes:
+   - An ADR file in `docs/adr/` (copied from `docs/adr/template.md`).
    - The contract change (JSON Schema and/or Python types).
    - Updated sample payloads that validate against the new schema.
    - A `CHANGELOG.md` entry under the new version.
