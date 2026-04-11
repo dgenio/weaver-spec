@@ -113,6 +113,7 @@ sequenceDiagram
 ```
 
 **Key observations:**
+
 - Raw output never leaves agent-kernel; only `Frame` and `Handle` references are returned.
 - Each step is independently authorized via a `CapabilityToken`.
 - contextweaver never interacts with agent-kernel directly; ChainWeaver mediates.

@@ -5,6 +5,7 @@
 A single repository would couple routing, execution, and orchestration into one release cycle. A team that only needs bounded tool routing would still depend on the execution and orchestration code. A team that only needs safe execution would be forced to adopt contextweaver's routing model.
 
 Separate repositories allow:
+
 - Independent versioning and release cadence.
 - Genuine partial adoption (each repo is usable alone).
 - Clean dependency graphs: contextweaver can depend on weaver-spec contracts without depending on agent-kernel's runtime.

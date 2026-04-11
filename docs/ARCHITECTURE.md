@@ -5,22 +5,22 @@
 The Weaver stack is divided into three independent layers. Each layer has a single, clear responsibility. They communicate through the contracts defined in this repository.
 
 | Layer | Repository | Responsibility |
-|-------|-----------|----------------|
+| ------- | ----------- | ---------------- |
 | **Routing** | contextweaver | Compiles context, selects tools as ChoiceCards, produces a RoutingDecision |
 | **Execution** | agent-kernel | Authorizes capabilities, executes tools, firewalls raw output, produces Frames + Handles |
 | **Orchestration** | ChainWeaver | Executes deterministic DAG flows; may expose flow steps as capability types |
 
 ### Layer Descriptions
 
-**contextweaver (Routing Layer)**
+#### contextweaver (Routing Layer)
 
 Receives the current conversation state and a set of candidate tools. Compiles a concise context window and selects a bounded number of tools as `ChoiceCard` objects. Returns a `RoutingDecision`. It never calls tools directly and never sees raw tool output.
 
-**agent-kernel (Execution Layer)**
+#### agent-kernel (Execution Layer)
 
 Receives a `RoutingDecision` and a `CapabilityToken`. Validates the token, authorizes the capability, executes the tool, and applies the firewall. The firewall transforms raw tool output into a `Frame` (safe summary) and optionally a `Handle` (opaque reference to the raw artifact). Only Frames and Handles leave the kernel.
 
-**ChainWeaver (Orchestration Layer)**
+#### ChainWeaver (Orchestration Layer)
 
 Executes multi-step flows defined as directed acyclic graphs. Each step can be a capability invocation (delegated to agent-kernel) or a pure transformation. ChainWeaver is optional; the stack is fully functional with just contextweaver + agent-kernel for single-step tool use.
 

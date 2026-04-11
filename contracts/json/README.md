@@ -5,7 +5,7 @@ This directory contains JSON Schema definitions for all Core Weaver contracts.
 ## Schema List
 
 | Schema | Description |
-|--------|-------------|
+| -------- | ------------- |
 | `selectable_item.schema.json` | A single option in a ChoiceCard |
 | `choice_card.schema.json` | A bounded set of SelectableItems for LLM selection |
 | `routing_decision.schema.json` | Output of contextweaver routing phase |

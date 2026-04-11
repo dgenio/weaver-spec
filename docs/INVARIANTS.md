@@ -21,6 +21,7 @@ The LLM context window must never receive raw tool output unless an explicit, au
 Every tool invocation must be preceded by a `PolicyDecision` (allow/deny) and followed by a `TraceEvent` entry in the audit log. There is no mechanism for "silent" execution.
 
 **Required for compliance:**
+
 - A `CapabilityToken` must be present and validated before execution.
 - The resulting `PolicyDecision` must be recorded.
 - The `TraceEvent` must include the capability ID, principal, timestamp, and outcome.
@@ -64,7 +65,7 @@ A ChainWeaver flow step that invokes a tool must delegate to agent-kernel (or a 
 ## Invariant Summary Table
 
 | ID | Invariant | Enforced at |
-|----|-----------|-------------|
+| ---- | ----------- | ------------- |
 | I-01 | LLM never sees raw tool output by default | agent-kernel firewall |
 | I-02 | Every execution is authorized and auditable | agent-kernel policy engine + audit log |
 | I-03 | Routing without full schema injection | contextweaver ChoiceCard design |
