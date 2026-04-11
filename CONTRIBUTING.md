@@ -98,7 +98,7 @@ Run from the repository root (not from `contracts/python/`):
 npm install -g markdownlint-cli
 markdownlint \
   README.md CONTRIBUTING.md CHANGELOG.md \
-  'docs/*.md' 'contracts/**/*.md' 'examples/*.md'
+  'docs/**/*.md' 'contracts/**/*.md' 'examples/*.md'
 ```
 
 Rules are configured in `.markdownlint.json` at the repo root.

@@ -66,7 +66,7 @@ An Architecture Decision Record. In weaver-spec, we use a lightweight form:
 2. A discussion period (minimum 3 business days).
 3. A PR that implements the change and includes a CHANGELOG entry and version bump.
 
-We do not require a separate ADR document file. The issue + PR history serves as the decision record.
+A separate ADR document file in `docs/adr/` is required for breaking Core contract changes. Copy the template from [`docs/adr/template.md`](adr/template.md) and follow the naming convention in [`docs/adr/README.md`](adr/README.md). The issue + PR history provides additional context, but the ADR file is the durable decision record.
 
 ---
 

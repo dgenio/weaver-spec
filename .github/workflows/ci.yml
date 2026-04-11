@@ -103,6 +103,6 @@ jobs:
         run: |
           markdownlint \
             README.md CONTRIBUTING.md CHANGELOG.md \
-            'docs/*.md' \
+            'docs/**/*.md' \
             'contracts/**/*.md' \
             'examples/*.md'

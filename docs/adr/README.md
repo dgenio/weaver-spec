@@ -4,7 +4,7 @@ This directory contains Architecture Decision Records (ADRs) for breaking change
 
 ## What is an ADR?
 
-An ADR is a short document that captures a significant architectural decision: what was decided, why, and what the consequences are. In weaver-spec, ADRs are required for any breaking change to a Core contract — a change that would cause existing valid payloads to become invalid, or that removes or renames a required field.
+An ADR is a short document that captures a significant architectural decision: what was decided, why, and what the consequences are. In weaver-spec, ADRs are required for Core contract changes that require architectural review, including breaking changes that would cause existing valid payloads to become invalid, changes that remove or rename a required field, and constraint-weakening changes that broaden what the contract accepts (for example, loosening an `enum` or removing a `minLength`) even if existing payloads remain valid.
 
 ## Why ADRs are required
 

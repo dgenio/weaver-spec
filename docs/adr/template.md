@@ -1,6 +1,6 @@
 # ADR NNN: Title
 
-**Status:** proposed <!-- proposed | accepted | rejected | superseded by [ADR NNN](NNN-title.md) -->
+**Status:** proposed <!-- proposed | accepted | rejected | superseded by [ADR NNN](NNN-short-title.md) -->
 
 ---
 
@@ -22,7 +22,7 @@ List positive and negative outcomes. Be specific about trade-offs. -->
 
 ## Affected Contracts
 
-<!-- Which Core or Extended contracts does this change touch?
+<!-- Which Core contracts does this change touch?
 List each contract by name and describe the nature of the change (e.g., field removed, field renamed, enum value added). -->
 
 | Contract | Change type | Description |
