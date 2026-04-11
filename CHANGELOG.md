@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+---
+
+## [0.2.0] — 2026-04-11
+
 ### Added
 
 - GitHub Issue Forms (`.github/ISSUE_TEMPLATE/`): structured intake for bug reports,
@@ -18,6 +22,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - `docs/adr/template.md` — Fillable ADR template with eight required sections (Status, Context, Decision, Consequences, Affected Contracts, Migration Path, Cross-Repo Impact).
 - `CONTRIBUTING.md` — ADR section now links to template and README; breaking-change PR checklist explicitly requires an ADR file.
 - `AGENTS.md` — Repo map updated with `docs/adr/` entry.
+- Extended contract sample payloads (`examples/sample_payloads/`): `extended_frame_metadata.json`, `extended_selectable_item_metadata.json`, `redaction_policy.json`, `risk_assessment.json`, `schema_fingerprint.json`, `telemetry_hint.json`, `ui_hint.json`.
+- `contracts/python/tests/test_extended.py` — unit tests covering all Extended contract types.
 
 ### Changed
 
@@ -27,6 +33,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 ### Fixed
 
 - Markdown lint violations corrected across all linted files (MD031, MD032, MD036, MD040, MD060).
+- Corrected SHA-256 `content_hash` length in Extended sample payloads (was 63 hex chars, now correct 64).
+- `pytest-cov` coverage threshold raised from 64% to 80% following Extended contract test additions.
 
 ---
 
@@ -84,5 +92,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - Sample payloads for `routing_decision`, `frame_with_handles`, and `capability_token`.
 - CI workflows: `ci.yml` (Python tests + schema lint) and `links.yml` (link checker).
 
+[0.2.0]: https://github.com/dgenio/weaver-spec/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/dgenio/weaver-spec/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/dgenio/weaver-spec/releases/tag/v0.1.0

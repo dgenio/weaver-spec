@@ -3,7 +3,7 @@ Contract version constants and compatibility helpers.
 """
 
 # The current contract version. Must match pyproject.toml [project] version.
-CONTRACT_VERSION = "0.1.1"
+CONTRACT_VERSION = "0.2.0"
 
 # The JSON Schema $id version prefix (corresponds to MAJOR version).
 SCHEMA_VERSION_PREFIX = "v0"
