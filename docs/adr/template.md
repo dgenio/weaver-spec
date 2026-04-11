@@ -1,6 +1,6 @@
 # ADR NNN: Title
 
-**Status:** proposed <!-- proposed | accepted | rejected | superseded by [ADR NNN](NNN-short-title.md) -->
+**Status:** proposed <!-- proposed | accepted | rejected | superseded by ADR NNN (NNN-short-title.md) -->
 
 ---
 
