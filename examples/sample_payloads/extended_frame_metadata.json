@@ -21,7 +21,7 @@
   "schema_fingerprint": {
     "schema_id": "https://weaver-spec.dev/contracts/v0/frame.schema.json",
     "schema_version": "0.1.1",
-    "content_hash": "1111222233334444555566667777888899990000",
+    "content_hash": "1111222233334444555566667777888899990000111122223333444455556666",
     "hash_algorithm": "sha256"
   },
   "confidence_score": 0.92,
