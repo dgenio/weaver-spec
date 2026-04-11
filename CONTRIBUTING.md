@@ -89,6 +89,8 @@ echo "All schemas are valid JSON"
 
 ### Markdown Lint
 
+Run from the repository root (not from `contracts/python/`):
+
 ```bash
 npm install -g markdownlint-cli
 markdownlint \
