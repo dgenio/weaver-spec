@@ -26,7 +26,7 @@ List positive and negative outcomes. Be specific about trade-offs. -->
 List each contract by name and describe the nature of the change (e.g., field removed, field renamed, enum value added). -->
 
 | Contract | Change type | Description |
-|----------|-------------|-------------|
+| ---------- | ------------- | ------------- |
 | <!-- e.g. frame.schema.json --> | <!-- e.g. field removed --> | <!-- e.g. `id` renamed to `frame_id` --> |
 
 ## Migration Path
@@ -41,7 +41,7 @@ If sample payloads must be updated, note that here. -->
 For each affected repo, describe what must change and whether it can be done independently or must be coordinated. -->
 
 | Repository | Impact | Coordination required? |
-|------------|--------|------------------------|
+| ------------ | -------- | ------------------------ |
 | contextweaver | <!-- describe or "none" --> | <!-- yes / no --> |
 | agent-kernel | <!-- describe or "none" --> | <!-- yes / no --> |
 | ChainWeaver | <!-- describe or "none" --> | <!-- yes / no --> |

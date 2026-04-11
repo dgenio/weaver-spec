@@ -19,10 +19,12 @@ When a mistake is identified (during review, from a reverted commit, or from a C
 ### Criteria for inclusion
 
 A lesson belongs here if:
+
 - The mistake pattern could realistically recur across different files or contexts.
 - Understanding the pattern helps prevent future occurrences.
 
 A lesson does **not** belong here if:
+
 - It was a one-time factual error.
 - It is already fully captured as a forbidden shortcut in [invariants.md](invariants.md).
 - It requires incident-specific context to be useful.
@@ -39,7 +41,7 @@ A lesson does **not** belong here if:
 
 ## How lessons get promoted
 
-```
+```text
 Incident → generalized lesson (this file) → forbidden shortcut (invariants.md) → rule (AGENTS.md)
 ```
 
@@ -50,6 +52,7 @@ Not all lessons become rules. A lesson becomes a forbidden shortcut when it repr
 ## Update triggers
 
 Update this file when:
+
 - A new reusable mistake pattern is discovered
 - An existing lesson is promoted to a forbidden shortcut in [invariants.md](invariants.md)
 - The failure-capture workflow itself changes

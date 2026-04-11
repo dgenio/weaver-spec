@@ -50,7 +50,7 @@ Breaking changes to Core contracts must not be submitted as direct PRs. Follow t
 
 For any Core contract change, add a section to the PR description:
 
-```
+```text
 ## Cross-repo impact
 - contextweaver: [describe impact or "none"]
 - agent-kernel: [describe impact or "none"]
@@ -87,7 +87,7 @@ python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('co
 ## Commit conventions
 
 | Prefix | When to use |
-|--------|-------------|
+| -------- | ------------- |
 | `docs:` | Documentation-only changes |
 | `contracts:` | Schema or Python type changes |
 | `ci:` | Workflow/CI changes |
@@ -102,7 +102,7 @@ python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('co
 ### When docs must be updated
 
 | Trigger | Docs to update |
-|---------|---------------|
+| --------- | --------------- |
 | New or changed Core contract | CHANGELOG, potentially GLOSSARY if term meaning changes |
 | New invariant or boundary change | INVARIANTS.md or BOUNDARIES.md (via ADR), then update AGENTS.md pointer |
 | New workflow or validation command | This file (`workflows.md`) |
@@ -122,6 +122,7 @@ python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('co
 ## Update triggers
 
 Update this file when:
+
 - A validation command changes
 - The commit convention or PR process changes
 - A new documentation governance rule is established

@@ -18,5 +18,6 @@ Consult these docs when scoping a change that might cross architectural boundari
 ## Update triggers
 
 Update this file when:
+
 - A new canonical architecture doc is added
 - The pointers above become stale
