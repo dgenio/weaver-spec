@@ -8,6 +8,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+### Added
+
+- GitHub Issue Forms (`.github/ISSUE_TEMPLATE/`): structured intake for bug reports,
+  feature requests, and ADR proposals (breaking contract changes). Blank issues
+  disabled; Discussions available as an escape hatch.
+
 ---
 
 ## [0.1.1] — 2026-03-13

@@ -50,7 +50,7 @@ body:
     id: cross_repo_impact
     attributes:
       label: Cross-repo impact
-      description: Which sibling repositories need a coordinated update?
+      description: Which sibling repositories need a coordinated update? Leave blank if none.
       options:
         - label: "contextweaver"
         - label: "agent-kernel"
