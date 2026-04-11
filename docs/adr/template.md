@@ -27,7 +27,7 @@ List each contract by name and describe the nature of the change (e.g., field re
 
 | Contract | Change type | Description |
 |----------|-------------|-------------|
-|          |             |             |
+| <!-- e.g. frame.schema.json --> | <!-- e.g. field removed --> | <!-- e.g. `id` renamed to `frame_id` --> |
 
 ## Migration Path
 

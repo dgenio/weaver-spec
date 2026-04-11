@@ -14,10 +14,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   feature requests, and ADR proposals (breaking contract changes). Blank issues
   disabled; Discussions available as an escape hatch.
 - `.markdownlint.json` config file at repo root (disables MD013, MD033, MD041; enables MD024 siblings-only for changelog headings).
+- `docs/adr/README.md` — ADR directory README: scope, naming convention (`NNN-short-title.md`), and link to `CONTRIBUTING.md` process.
+- `docs/adr/template.md` — Fillable ADR template with eight required sections (Status, Context, Decision, Consequences, Affected Contracts, Migration Path, Cross-Repo Impact).
+- `CONTRIBUTING.md` — ADR section now links to template and README; breaking-change PR checklist explicitly requires an ADR file.
+- `AGENTS.md` — Repo map updated with `docs/adr/` entry.
 
 ### Changed
 
 - CI Markdown lint job renamed and reconfigured: `markdown-lint` → `markdownlint` — inline `--disable` flags replaced by `.markdownlint.json`.
+- CI markdownlint glob widened from `docs/*.md` to `docs/**/*.md` to cover `docs/adr/` and `docs/agent-context/` subdirectories.
 
 ### Fixed
 

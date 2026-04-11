@@ -30,7 +30,7 @@ The template is pre-filled automatically when you open a PR on GitHub.
 
 ## ADR Process for Breaking Contract Changes
 
-A "breaking contract change" is any modification that would cause existing valid payloads to become invalid, or that removes or renames a required field.
+A "breaking contract change" is any modification that would cause existing valid payloads to become invalid, that removes or renames a required field, or that weakens an existing schema constraint (for example, loosening an `enum` or removing a `minLength`) even if existing payloads remain valid.
 
 Use the ADR template at [`docs/adr/template.md`](docs/adr/template.md) when documenting a breaking change. See [`docs/adr/README.md`](docs/adr/README.md) for the naming convention.
 

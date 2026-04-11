@@ -75,7 +75,7 @@ See [docs/agent-context/workflows.md](docs/agent-context/workflows.md) for detai
 
 ## Versioning rules
 
-- **Breaking changes** to Core contracts require the ADR process: issue → 3-day discussion → PR with version bump + CHANGELOG + compatibility matrix update. See `CONTRIBUTING.md`.
+- **Breaking changes** to Core contracts require the ADR process: issue → 3-day discussion → PR with version bump + CHANGELOG + compatibility matrix update. See `CONTRIBUTING.md` and [`docs/adr/README.md`](docs/adr/README.md).
 - **Extended contracts** may have breaking changes in a MINOR version — this is an intentional exception to standard semver. See `docs/VERSIONING.md`.
 
 ---
