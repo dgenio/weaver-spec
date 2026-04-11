@@ -7,7 +7,7 @@ body:
       value: |
         A **breaking contract change** is any modification that would cause existing valid payloads to become invalid, or that removes or renames a required field.
 
-        Opening this issue starts the **ADR process** described in [CONTRIBUTING.md](../CONTRIBUTING.md#adr-process-for-breaking-contract-changes):
+        Opening this issue starts the **ADR process** described in [CONTRIBUTING.md](CONTRIBUTING.md#adr-process-for-breaking-contract-changes):
         1. Open this issue and allow at least **3 business days** for community discussion.
         2. Open a PR that includes the contract change, updated sample payloads, a CHANGELOG entry, a version bump, and an updated compatibility matrix if needed.
         3. The PR merges after maintainer approval; this issue is closed and linked from the CHANGELOG entry.

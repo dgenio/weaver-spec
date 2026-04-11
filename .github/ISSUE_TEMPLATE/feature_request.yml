@@ -44,12 +44,11 @@ body:
     id: cross_repo_impact
     attributes:
       label: Cross-repo impact
-      description: Which sibling repositories would need coordinated updates?
+      description: Which sibling repositories would need coordinated updates? Leave blank if none.
       options:
         - label: "contextweaver"
         - label: "agent-kernel"
         - label: "ChainWeaver"
-        - label: "No cross-repo impact"
 
   - type: textarea
     id: proposal
