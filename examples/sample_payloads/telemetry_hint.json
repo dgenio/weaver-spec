@@ -1,0 +1,8 @@
+{
+  "trace_id": "trace-20260308-001",
+  "span_id": "span-20260308-001",
+  "baggage": {
+    "tenant": "acme",
+    "request_id": "req-20260308-001"
+  }
+}

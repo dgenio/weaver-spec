@@ -1,0 +1,13 @@
+{
+  "risk_level": "medium",
+  "risk_reasons": [
+    "writes external system",
+    "handles sensitive metadata"
+  ],
+  "requires_human_approval": true,
+  "approval_principal": "ops-reviewer",
+  "mitigations": [
+    "dry-run available",
+    "audit trail enabled"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "ui_hint": {
+    "icon": "rocket",
+    "color": "blue",
+    "priority": 5,
+    "group": "recommended",
+    "disabled": false,
+    "tooltip": "Fastest option for this context."
+  },
+  "risk_assessment": {
+    "risk_level": "low",
+    "risk_reasons": [
+      "read-only operation"
+    ],
+    "requires_human_approval": false,
+    "approval_principal": null,
+    "mitigations": [
+      "sandboxed execution"
+    ]
+  },
+  "estimated_duration_ms": 1500,
+  "requires_confirmation": true,
+  "extra": {
+    "runbook": "rbk-42",
+    "team": "platform"
+  }
+}

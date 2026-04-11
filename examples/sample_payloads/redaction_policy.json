@@ -1,0 +1,16 @@
+{
+  "policy_id": "rp-standard-001",
+  "redacted_fields": [
+    "ssn",
+    "api_key"
+  ],
+  "truncated_fields": [
+    "stack_trace"
+  ],
+  "redaction_reason": "PII and secret handling policy",
+  "pii_detected": true,
+  "pii_types": [
+    "person_name",
+    "credential"
+  ]
+}
