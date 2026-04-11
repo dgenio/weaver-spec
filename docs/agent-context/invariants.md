@@ -14,7 +14,7 @@ Invariants I-01 through I-07 in `docs/INVARIANTS.md` are non-negotiable. Violati
 The invariants most often relevant to contract changes:
 
 | Invariant | What it prevents |
-|-----------|-----------------|
+| ----------- | ----------------- |
 | **I-01 / I-05** — LLM and contextweaver never see raw tool output | Adding fields that expose unfiltered data |
 | **I-04** — Core contracts are minimal and stable | Adding implementation-specific fields to Core |
 | **I-06** — CapabilityTokens are scoped and time-limited | Removing `expires_at`/`single_use` constraints |
@@ -62,7 +62,7 @@ These constraints must not be removed or weakened without an ADR:
 ## Safe vs unsafe simplifications
 
 | Simplification | Safe? | Why |
-|---------------|-------|-----|
+| --------------- | ------- | --- |
 | Add an optional field to a schema | Yes | `additionalProperties: true` makes additive changes backward-compatible |
 | Add a new enum value | Yes | Existing values remain valid |
 | Remove an optional field from a schema | **No** | Affects Python API consumers and downstream readers; requires ADR even though payloads remain valid |
@@ -77,6 +77,7 @@ These constraints must not be removed or weakened without an ADR:
 ## Update triggers
 
 Update this file when:
+
 - A new invariant is added to `docs/INVARIANTS.md`
 - A new forbidden pattern is identified (see failure-capture workflow in `lessons-learned.md`)
 - The safe-vs-unsafe classification changes due to a versioning policy change

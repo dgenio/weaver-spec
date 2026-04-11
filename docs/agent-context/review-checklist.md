@@ -83,6 +83,7 @@ For Extended contract changes, the same pattern applies but with `extended.py` i
 ## Update triggers
 
 Update this checklist when:
+
 - A new artifact is added to the required-per-PR set
 - A new invariant is added
 - Review expectations or gates change

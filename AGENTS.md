@@ -30,6 +30,7 @@ This repository is **documentation + contracts only**.
 | `contracts/python/tests/` | Roundtrip + schema alignment tests | Every contract change |
 | `examples/sample_payloads/` | Example JSON payloads | Every new or changed schema |
 | `docs/` | Specification documents | When changing behavior, boundaries, or invariants |
+| `docs/adr/` | Architecture Decision Records for breaking changes | When proposing or reviewing a breaking Core contract change |
 | `docs/agent-context/` | Agent-oriented supporting docs | When you need workflow detail, invariant context, lessons learned, or a review checklist |
 
 ---
@@ -74,7 +75,7 @@ See [docs/agent-context/workflows.md](docs/agent-context/workflows.md) for detai
 
 ## Versioning rules
 
-- **Breaking changes** to Core contracts require the ADR process: issue → 3-day discussion → PR with version bump + CHANGELOG + compatibility matrix update. See `CONTRIBUTING.md`.
+- **Breaking changes** to Core contracts require the ADR process: issue → 3-day discussion → PR with version bump + CHANGELOG + compatibility matrix update. See `CONTRIBUTING.md` and [`docs/adr/README.md`](docs/adr/README.md).
 - **Extended contracts** may have breaking changes in a MINOR version — this is an intentional exception to standard semver. See `docs/VERSIONING.md`.
 
 ---
