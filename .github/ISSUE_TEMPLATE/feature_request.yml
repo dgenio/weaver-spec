@@ -1,0 +1,68 @@
+name: Feature Request
+description: Propose a new contract field, type, schema, or documentation improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, check whether this change is **breaking** (removes or renames a required field, or makes existing valid payloads invalid). Breaking changes require the ADR process — open an `adr_proposal` issue instead.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation / use case
+      description: Why is this change needed? What problem does it solve?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected_contracts
+    attributes:
+      label: Affected contracts
+      description: Which layer(s) does this change touch?
+      multiple: true
+      options:
+        - Core
+        - Extended
+        - Docs
+        - CI
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking_change
+    attributes:
+      label: Breaking change?
+      description: Would this change cause existing valid payloads to become invalid, or remove/rename a required field?
+      options:
+        - "No"
+        - "Yes — I will open an adr_proposal issue instead"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: cross_repo_impact
+    attributes:
+      label: Cross-repo impact
+      description: Which sibling repositories would need coordinated updates?
+      options:
+        - label: "contextweaver"
+        - label: "agent-kernel"
+        - label: "ChainWeaver"
+        - label: "No cross-repo impact"
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the change in detail. Include proposed field names, types, and schema snippets if applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Any other relevant context, links, or prior art.
+    validations:
+      required: false

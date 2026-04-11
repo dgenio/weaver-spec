@@ -1,0 +1,73 @@
+name: Bug Report
+description: Report a defect in a contract definition, JSON schema, Python type, or documentation.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in as much detail as possible so maintainers can reproduce and triage the issue quickly.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: What went wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_files
+    attributes:
+      label: Affected files / contracts
+      description: List the files, schemas, or Python types that are affected (e.g. `contracts/json/routing_decision.schema.json`, `core.py › RoutingDecision`).
+      placeholder: |
+        - contracts/json/routing_decision.schema.json
+        - contracts/python/src/weaver_contracts/core.py › RoutingDecision
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happens?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps that reproduce the issue.
+      placeholder: |
+        1. Load schema from `contracts/json/...`
+        2. Validate payload `examples/sample_payloads/...`
+        3. See error
+    validations:
+      required: true
+
+  - type: input
+    id: contract_version
+    attributes:
+      label: Contract version
+      description: The value of `CONTRACT_VERSION` from `contracts/python/src/weaver_contracts/version.py`.
+      placeholder: "0.1.1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Any other relevant context, links, or screenshots.
+    validations:
+      required: false
