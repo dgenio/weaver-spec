@@ -1,0 +1,73 @@
+name: ADR Proposal (Breaking Contract Change)
+description: Propose a breaking change to a Core contract following the ADR process in CONTRIBUTING.md.
+labels: ["adr", "breaking-change"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A **breaking contract change** is any modification that would cause existing valid payloads to become invalid, or that removes or renames a required field.
+
+        Opening this issue starts the **ADR process** described in [CONTRIBUTING.md](CONTRIBUTING.md#adr-process-for-breaking-contract-changes):
+        1. Open this issue and allow at least **3 business days** for community discussion.
+        2. Open a PR that includes the contract change, updated sample payloads, a CHANGELOG entry, a version bump, and an updated compatibility matrix if needed.
+        3. The PR merges after maintainer approval; this issue is closed and linked from the CHANGELOG entry.
+
+  - type: textarea
+    id: what_and_why
+    attributes:
+      label: What you want to change and why
+      description: Describe the proposed change and the motivation behind it.
+      placeholder: |
+        Change: Remove the `legacy_field` field from RoutingDecision.
+        Why: The field is no longer used by any known adopter and causes confusion.
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_contracts
+    attributes:
+      label: Which contracts are affected
+      description: List every JSON schema and Python type that would change (e.g. `routing_decision.schema.json`, `core.py › RoutingDecision`).
+      placeholder: |
+        - contracts/json/routing_decision.schema.json
+        - contracts/python/src/weaver_contracts/core.py › RoutingDecision
+    validations:
+      required: true
+
+  - type: textarea
+    id: migration_path
+    attributes:
+      label: Migration path for adopters
+      description: How should contextweaver, agent-kernel, and ChainWeaver (and any other adopters) migrate to the new contract?
+      placeholder: |
+        1. Remove all references to `legacy_field` from payload construction.
+        2. Update payload validation to use schema version 1.0.0.
+        3. No data migration needed — field was never persisted.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: cross_repo_impact
+    attributes:
+      label: Cross-repo impact
+      description: Which sibling repositories need a coordinated update? Leave blank if none.
+      options:
+        - label: "contextweaver"
+        - label: "agent-kernel"
+        - label: "ChainWeaver"
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider, and why did you choose this one?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Links to prior discussions, related issues, or supporting evidence.
+    validations:
+      required: false

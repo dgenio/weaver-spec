@@ -20,6 +20,7 @@ This repository is **documentation + contracts only**.
 | Path | Contains | When to consult |
 |------|----------|-----------------|
 | `.github/pull_request_template.md` | PR checklist (six-artifact rule, invariants, cross-repo impact) | Opening or reviewing any PR |
+| `.github/ISSUE_TEMPLATE/` | Issue forms (bug report, feature request, ADR proposal) | Triaging or filing issues; understanding required intake fields |
 | `.github/CODEOWNERS` | Auto-assignment rules for PR review | Adding new paths or reviewers |
 | `contracts/json/` | JSON Schemas (Draft 2020-12) | Adding or modifying contract definitions |
 | `contracts/python/src/weaver_contracts/core.py` | Core contract dataclasses (9 types) | When schemas change — must update in same PR |
