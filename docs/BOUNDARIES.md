@@ -25,7 +25,7 @@ This boundary exists for three reasons:
 ### What This Means Concretely
 
 | Artifact | Owned by | May cross to |
-|----------|----------|-------------|
+| ---------- | ---------- | ------------- |
 | Raw tool output | agent-kernel (internal only) | Nobody |
 | `Frame` (safe summary) | agent-kernel (produces) | contextweaver, caller |
 | `Handle` (opaque reference) | agent-kernel (produces) | HandleStore, caller with authorization |

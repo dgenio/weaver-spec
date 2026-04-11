@@ -14,12 +14,12 @@ This document defines the versioning rules for:
 
 All versioned artifacts follow [Semantic Versioning 2.0.0](https://semver.org/):
 
-```
+```text
 MAJOR.MINOR.PATCH
 ```
 
 | Increment | When |
-|-----------|------|
+| ----------- | ------ |
 | **MAJOR** | Breaking change: required field removed, field renamed, type changed, invariant altered. |
 | **MINOR** | Backward-compatible addition: new optional field, new contract type, new doc section. |
 | **PATCH** | Backward-compatible fix: typo, clarification, example update, non-schema doc change. |
@@ -91,7 +91,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full process. In summary:
 This table tracks which versions of the sibling repositories are known-compatible with each contract version.
 
 | Contract Version | contextweaver | agent-kernel | ChainWeaver |
-|-----------------|--------------|-------------|-------------|
+| ----------------- | -------------- | ------------- | ------------- |
 | 0.1.0 | — (TBD) | — (TBD) | — (TBD) |
 
 *Entries marked "—" indicate that the sibling repository has not yet declared compatibility. Maintainers should update this table when a sibling repository publishes a compatibility declaration.*

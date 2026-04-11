@@ -19,6 +19,7 @@ contextweaver receives the conversation state and the full capability registry. 
 **Payload produced:** [`routing_decision.json`](sample_payloads/routing_decision.json)
 
 Key properties:
+
 - Only 3 tools are presented to the LLM (not 1000+).
 - The LLM selects `search-docs` → `selected_item_id = "search-docs"`.
 - contextweaver does not execute anything.
@@ -32,6 +33,7 @@ agent-kernel receives the `RoutingDecision` and the `CapabilityToken` for the cu
 **Token used:** [`capability_token.json`](sample_payloads/capability_token.json)
 
 The policy engine checks:
+
 - Is `org.myapp.search_docs` in the token's scope? ✅
 - Is the token unexpired? ✅
 - Is the principal allowed to invoke this capability? ✅
@@ -47,6 +49,7 @@ A `TraceEvent` of type `capability_authorized` is appended to the audit log.
 agent-kernel invokes the `search_docs` tool with the query extracted from the routing context.
 
 **Raw output (stays inside agent-kernel, never exposed):**
+
 ```json
 {
   "hits": [
@@ -59,6 +62,7 @@ agent-kernel invokes the `search_docs` tool with the query extracted from the ro
 ```
 
 The firewall processes the raw output:
+
 - Strips internal IDs and ranking signals (sensitive).
 - Extracts titles, slugs, and relevance scores (safe).
 - Stores the full raw response as a Handle in the HandleStore.
@@ -79,6 +83,7 @@ The LLM sees:
 > "Found 3 documentation pages matching 'retry configuration': (1) Retry Policies Overview, ..."
 
 The LLM **never** sees:
+
 - Internal document IDs
 - Ranking signals
 - Raw search index metadata
@@ -88,7 +93,7 @@ The LLM **never** sees:
 ## Invariants Demonstrated
 
 | Invariant | How it's satisfied in this example |
-|-----------|-----------------------------------|
+| ----------- | ----------------------------------- |
 | I-01: LLM never sees raw tool output | Raw output stays in agent-kernel; only Frame reaches contextweaver |
 | I-02: Every execution authorized and auditable | PolicyDecision + 3 TraceEvents recorded |
 | I-03: Routing without full schema injection | Only 3 ChoiceCard items in the prompt, not 1000+ schemas |

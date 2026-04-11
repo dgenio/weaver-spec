@@ -20,7 +20,7 @@ The template is pre-filled automatically when you open a PR on GitHub.
 ## Types of Changes
 
 | Change type | Process |
-|-------------|---------|
+| ------------- | --------- |
 | Typo / clarification in docs | PR with description |
 | New doc section or additive contract field | PR with description + update CHANGELOG |
 | **Breaking contract change** | ADR process (see below) + major version bump |
@@ -89,13 +89,16 @@ echo "All schemas are valid JSON"
 
 ### Markdown Lint
 
+Run from the repository root (not from `contracts/python/`):
+
 ```bash
 npm install -g markdownlint-cli
-cd ../..
-markdownlint --disable MD013 MD033 MD041 \
+markdownlint \
   README.md CONTRIBUTING.md CHANGELOG.md \
-  docs/*.md contracts/**/*.md examples/*.md
+  'docs/*.md' 'contracts/**/*.md' 'examples/*.md'
 ```
+
+Rules are configured in `.markdownlint.json` at the repo root.
 
 ---
 

@@ -71,7 +71,7 @@ frame = Frame(
 ## Contract Tiers
 
 | Module | Contents | Stability |
-|--------|----------|-----------|
+| -------- | ---------- | ----------- |
 | `weaver_contracts.core` | Core contracts (all 9 types) | Stable within major version |
 | `weaver_contracts.extended` | Optional metadata types | May evolve in minor versions |
 | `weaver_contracts.version` | Version constants + `is_compatible()` | Stable |

@@ -11,7 +11,7 @@ This repository is the single source of truth for the vocabulary, invariants, re
 `weaver-spec` is **documentation + contracts**, not a runtime library. It defines the interfaces that three sibling repositories share:
 
 | Repo | Role |
-|------|------|
+| ------ | ------ |
 | **contextweaver** | Context compilation, tool routing, ChoiceCard generation |
 | **agent-kernel** | Capability authZ/authN, execution, firewalling, audit |
 | **ChainWeaver** | Deterministic DAG/flow orchestration |
@@ -23,7 +23,7 @@ Each repo can be adopted independently. `weaver-spec` defines the contracts that
 ## Quick Navigation
 
 | What you need | Where to look |
-|---------------|---------------|
+| --------------- | --------------- |
 | Ecosystem overview | [docs/VISION.md](docs/VISION.md) |
 | Layer architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Responsibility boundaries | [docs/BOUNDARIES.md](docs/BOUNDARIES.md) |
@@ -60,7 +60,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
 ## Where Contracts Live
 
-```
+```text
 contracts/
   json/          JSON Schemas (language-agnostic)
   python/        weaver_contracts Python package (stdlib dataclasses)

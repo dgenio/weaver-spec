@@ -13,6 +13,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - GitHub Issue Forms (`.github/ISSUE_TEMPLATE/`): structured intake for bug reports,
   feature requests, and ADR proposals (breaking contract changes). Blank issues
   disabled; Discussions available as an escape hatch.
+- `.markdownlint.json` config file at repo root (disables MD013, MD033, MD041; enables MD024 siblings-only for changelog headings).
+
+### Changed
+
+- CI Markdown lint job renamed and reconfigured: `markdown-lint` → `markdownlint` — inline `--disable` flags replaced by `.markdownlint.json`.
+
+### Fixed
+
+- Markdown lint violations corrected across all linted files (MD031, MD032, MD036, MD040, MD060).
 
 ---
 

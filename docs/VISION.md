@@ -14,7 +14,7 @@ Modern LLM-based agents face four compounding problems:
 A well-designed agent ecosystem satisfies four properties:
 
 | Property | Definition |
-|----------|-----------|
+| ---------- | ----------- |
 | **Bounded choices** | The LLM selects from a small, curated set of pre-screened options, not from an unbounded tool list. |
 | **Auditable execution** | Every tool invocation is authorized, recorded, and attributable to a specific request and principal. |
 | **Safe outputs** | The LLM never sees raw tool output by default. Outputs are firewalled, summarised, or redacted before entering the context. |

@@ -83,7 +83,7 @@ jobs:
         working-directory: contracts/python
         run: pytest --cov --cov-report=term-missing -v
 
-  markdown-lint:
+  markdownlint:
     name: Markdown Lint
     runs-on: ubuntu-latest
     permissions:
@@ -102,8 +102,7 @@ jobs:
       - name: Lint Markdown files
         run: |
           markdownlint \
-            --disable MD013 MD033 MD041 \
             README.md CONTRIBUTING.md CHANGELOG.md \
-            docs/*.md \
-            contracts/**/*.md \
-            examples/*.md
+            'docs/*.md' \
+            'contracts/**/*.md' \
+            'examples/*.md'
