@@ -126,6 +126,10 @@ class TestSchemaFingerprint:
         with pytest.raises(ValueError, match="schema_id must be non-empty"):
             SchemaFingerprint(schema_id="", schema_version="0.1.1")
 
+    def test_empty_schema_version_raises(self):
+        with pytest.raises(ValueError, match="schema_version must be non-empty"):
+            SchemaFingerprint(schema_id="s", schema_version="")
+
     def test_serialization(self):
         fp = SchemaFingerprint(schema_id="s", schema_version="1.0.0")
         data = asdict(fp)
