@@ -8,6 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+### Added
+
+- `examples/failure_scenarios.md` — three failure-path walkthroughs (routing failure, authorization denial, partial execution failure) with contract payloads at every boundary. Closes #18.
+- `examples/multi_agent_orchestration.md` — two-agent ChainWeaver-coordinated walkthrough showing the full `RoutingDecision` → `Frame` → re-routing cycle. Closes #22.
+- `examples/partial_capability_routing.md` — partial-match routing walkthrough with three overlapping candidates and a ranked `ChoiceCard`. Closes #26.
+- `docs/SEQUENCE_DIAGRAMS.md` — three new Mermaid sequence diagrams (sections 4 — 6) for the routing-failure, authorization-denial, and partial-execution-failure paths. Diagrams use the same scenarios as `examples/failure_scenarios.md`. Closes #25.
+- CI step in `.github/workflows/ci.yml` that extracts inline JSON payloads from the new walkthroughs (and `docs/SEQUENCE_DIAGRAMS.md`) and validates each against its declared schema in `contracts/json/` using `jsonschema`. Blocks merges on walkthrough/contract drift.
+
+**No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
+
 ---
 
 ## [0.2.0] — 2026-04-11
