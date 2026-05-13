@@ -82,7 +82,7 @@ contextweaver receives the conversation state plus the candidate capabilities re
   "selected_item_id": "search-docs",
   "selected_card_id": "card-research",
   "timestamp": "2026-05-13T11:02:00Z",
-  "context_summary": "ChainWeaver flow flow-20260513-001, step 1 of 2 (research). Routed to documentation search."
+  "context_summary": "ChainWeaver flow_id flow-20260513-001, step 1 of 2 (research). Routed to documentation search."
 }
 ```
 
@@ -247,7 +247,7 @@ contextweaver scores code-generation capabilities against the new intent ("produ
   "selected_item_id": "gen-yaml",
   "selected_card_id": "card-codegen",
   "timestamp": "2026-05-13T11:02:03Z",
-  "context_summary": "ChainWeaver flow flow-20260513-001, step 2 of 2 (codegen). Input: structured_data.recommended_values from frame-20260513-step1-001. Selected YAML output per caller's original phrasing ('config.yaml')."
+  "context_summary": "ChainWeaver flow_id flow-20260513-001, step 2 of 2 (codegen). Input: structured_data.recommended_values from frame-20260513-step1-001. Selected YAML output per caller's original phrasing ('config.yaml')."
 }
 ```
 

@@ -51,7 +51,7 @@ contextweaver emits a single `ChoiceCard` containing the top three candidates in
   "choice_cards": [
     {
       "id": "card-sales-by-region",
-      "context_hint": "Three capabilities partially match 'show me yesterday's sales by region'. They are listed in descending fit order; the first is the strongest match if a freshly-computed answer is acceptable.",
+      "context_hint": "Three capabilities partially match the request: show me yesterday's sales by region. They are listed in descending fit order; the first is the strongest match if a freshly-computed answer is acceptable.",
       "items": [
         {
           "id": "run-sql-query",
@@ -77,7 +77,7 @@ contextweaver emits a single `ChoiceCard` containing the top three candidates in
   "selected_item_id": "run-sql-query",
   "selected_card_id": "card-sales-by-region",
   "timestamp": "2026-05-13T13:45:00Z",
-  "context_summary": "Partial-match routing for 'Show me yesterday's sales by region'. Top 3 candidates by fit score: run_sql_query=0.81 (full semantic match, expressible filter), open_saved_dashboard=0.62 (named dashboard exists, timeframe mismatch), export_data=0.47 (rows available, no aggregation). Cut-off threshold=0.40; 244 lower-scoring capabilities filtered out before card assembly."
+  "context_summary": "Partial-match routing for the request: Show me yesterday's sales by region. Top 3 candidates by fit score: run_sql_query=0.81 (full semantic match, expressible filter), open_saved_dashboard=0.62 (named dashboard exists, timeframe mismatch), export_data=0.47 (rows available, no aggregation). Cut-off threshold=0.40; 244 lower-scoring capabilities filtered out before card assembly."
 }
 ```
 
