@@ -130,6 +130,9 @@ jobs:
               for line in failures:
                   print(f'FAIL: {line}', file=sys.stderr)
               sys.exit(1)
+          if total == 0:
+              print('FAIL: No <!-- schema: ... --> markers found in any Markdown file.', file=sys.stderr)
+              sys.exit(1)
           print('All inline payloads pass schema validation.')
           PYEOF
 

@@ -95,7 +95,7 @@ If the caller's selector picks a different ranked option (for example, `open-sav
 
 ## Why ChoiceCard and SelectableItem Are Separate
 
-This walkthrough makes the rationale concrete (the separation is also called out in [`AGENTS.md`](../AGENTS.md) — "Design decisions not to reopen"):
+[`AGENTS.md`](../AGENTS.md) — "Design decisions not to reopen" — calls out a parallel separation, **ChoiceCard vs RoutingDecision**, for the same reason: keep the LLM-facing surface lean. The ChoiceCard-vs-SelectableItem split below follows the same logic one level deeper:
 
 - A **`SelectableItem`** is the minimum information the LLM needs to pick one option: a label, a short description, and an opaque `capability_id`. Crucially it does **not** carry the capability's input schema, internal arg types, or implementation hints. If `SelectableItem` carried full tool schemas, every routing turn would re-inflate the prompt (the exact problem invariant I-03 prevents).
 
