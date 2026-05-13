@@ -54,6 +54,88 @@ jobs:
           print(f'Validated {len(files)} payload(s)')
           "
 
+  validate-walkthroughs:
+    name: Validate Walkthrough Payloads
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install jsonschema
+        run: pip install jsonschema
+
+      - name: Validate inline JSON payloads against schemas
+        run: |
+          python << 'PYEOF'
+          import glob, json, re, sys
+          from pathlib import Path
+          from jsonschema import Draft202012Validator
+          from referencing import Registry, Resource
+          from referencing.jsonschema import DRAFT202012
+
+          schemas_by_name = {}
+          registry = Registry()
+          for p in Path('contracts/json').glob('*.schema.json'):
+              name = p.stem.removesuffix('.schema')
+              schema = json.loads(p.read_text(encoding='utf-8'))
+              schemas_by_name[name] = schema
+              registry = registry.with_resource(
+                  uri=schema['$id'],
+                  resource=Resource(contents=schema, specification=DRAFT202012),
+              )
+
+          fence = chr(96) * 3
+          pattern = re.compile(
+              r'<!-- schema: (\S+) -->\s*' + fence + r'json\s*(.*?)\s*' + fence,
+              re.DOTALL,
+          )
+
+          md_files = sorted(
+              set(glob.glob('examples/**/*.md', recursive=True))
+              | set(glob.glob('docs/**/*.md', recursive=True))
+          )
+
+          failures = []
+          total = 0
+          for f in md_files:
+              text = Path(f).read_text(encoding='utf-8')
+              for m in pattern.finditer(text):
+                  total += 1
+                  schema_name, body = m.group(1), m.group(2)
+                  if schema_name not in schemas_by_name:
+                      failures.append(f'{f}: unknown schema {schema_name!r}')
+                      continue
+                  try:
+                      payload = json.loads(body)
+                  except json.JSONDecodeError as e:
+                      failures.append(f'{f} ({schema_name}): JSON parse error: {e}')
+                      continue
+                  v = Draft202012Validator(
+                      schemas_by_name[schema_name],
+                      registry=registry,
+                      format_checker=Draft202012Validator.FORMAT_CHECKER,
+                  )
+                  for err in sorted(v.iter_errors(payload), key=lambda e: list(e.absolute_path)):
+                      path = '/'.join(str(x) for x in err.absolute_path) or '<root>'
+                      failures.append(f'{f} ({schema_name}) at {path}: {err.message}')
+
+          print(f'Validated {total} inline payload(s) across {len(md_files)} Markdown file(s).')
+          if failures:
+              for line in failures:
+                  print(f'FAIL: {line}', file=sys.stderr)
+              sys.exit(1)
+          if total == 0:
+              print('FAIL: No <!-- schema: ... --> markers found in any Markdown file.', file=sys.stderr)
+              sys.exit(1)
+          print('All inline payloads pass schema validation.')
+          PYEOF
+
   python-tests:
     name: Python Package Tests
     runs-on: ubuntu-latest
