@@ -95,25 +95,40 @@ To deserialize, parse the JSON and re-hydrate the dataclasses by hand (or use yo
 
 ### Validate a payload against a JSON Schema
 
-The JSON Schemas in [`contracts/json/`](../contracts/json/) are the language-agnostic source of truth. Use any Draft 2020-12 validator:
+The JSON Schemas in [`contracts/json/`](../contracts/json/) are the language-agnostic source of truth. Use any Draft 2020-12 validator.
+
+`routing_decision.schema.json` `$ref`s `choice_card.schema.json`, which in turn `$ref`s `selectable_item.schema.json`. With a plain `jsonschema.validate(...)` call, those references would trigger remote URL resolution and fail offline. Pre-load every Core schema into a `referencing.Registry` so validation stays local — this is the same pattern the repository's CI uses (`Draft202012Validator` + `iter_errors`, with format checking enabled):
 
 ```python
 import json
-import jsonschema
+from pathlib import Path
 
-with open("contracts/json/routing_decision.schema.json") as fh:
-    schema = json.load(fh)
-with open("examples/sample_payloads/routing_decision.json") as fh:
-    payload = json.load(fh)
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
+from referencing.jsonschema import DRAFT202012
 
-jsonschema.validate(
-    payload,
+registry = Registry()
+for schema_path in Path("contracts/json").glob("*.schema.json"):
+    schema = json.loads(schema_path.read_text())
+    registry = registry.with_resource(
+        uri=schema["$id"],
+        resource=Resource(contents=schema, specification=DRAFT202012),
+    )
+
+schema = json.loads(Path("contracts/json/routing_decision.schema.json").read_text())
+payload = json.loads(Path("examples/sample_payloads/routing_decision.json").read_text())
+
+validator = Draft202012Validator(
     schema,
-    format_checker=jsonschema.Draft202012Validator.FORMAT_CHECKER,
+    registry=registry,
+    format_checker=Draft202012Validator.FORMAT_CHECKER,
 )
+errors = sorted(validator.iter_errors(payload), key=lambda e: list(e.absolute_path))
+if errors:
+    raise SystemExit("\n".join(f"{'/'.join(map(str, e.absolute_path)) or '<root>'}: {e.message}" for e in errors))
 ```
 
-The `format_checker` argument is what catches `date-time` violations on fields such as `timestamp`, `issued_at`, and `created_at`. The repository's CI uses the same call.
+The `format_checker` argument is what catches `date-time` violations on fields such as `timestamp`, `issued_at`, and `created_at`. CI enables the same Draft 2020-12 format checker — see [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (`validate-walkthroughs` job).
 
 ### Construct an Extended (optional) contract
 
@@ -228,7 +243,7 @@ def build_routing_decision(candidates, intent) -> RoutingDecision:
             description=cap.short_description,
             capability_id=cap.id,
         )
-        for cap in rank(candidates, intent)[:7]   # bounded list per I-03
+        for cap in rank(candidates, intent)[:7]   # 3-7 is the practical range; choice_card.schema.json caps at maxItems: 20
     ]
     card = ChoiceCard(id=f"card-{intent.slug}", items=items)
     return RoutingDecision(

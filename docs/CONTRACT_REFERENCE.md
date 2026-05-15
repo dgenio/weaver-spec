@@ -19,7 +19,7 @@ If this document ever disagrees with a schema or dataclass, the schema or datacl
 
 - **Required** means listed in the JSON Schema's `required` array (Core) or has no default in the Python dataclass (Extended).
 - **Type** uses JSON Schema vocabulary for Core (`string`, `object`, `array<X>`, `string | null`, `enum{…}`, `date-time` for ISO 8601) and Python typing vocabulary for Extended (`str`, `Optional[X]`, `List[X]`, `Dict[str, str]`).
-- ID fields require `minLength: 1` (non-empty strings). IDs are not required to be UUIDs; slug-style identifiers are common in sample payloads.
+- Required ID fields (e.g., `SelectableItem.id`, `ChoiceCard.id`, `RoutingDecision.id`, `Capability.id`, `CapabilityToken.token_id`, `PolicyDecision.decision_id`, `Frame.frame_id`, `Handle.handle_id`, `TraceEvent.event_id`) carry `minLength: 1`. Optional ID-like fields (e.g., `SelectableItem.capability_id`, `RoutingDecision.selected_item_id`, `TraceEvent.capability_id`) are plain `string` or `string | null` without `minLength`. IDs are not required to be UUIDs; slug-style identifiers are common in sample payloads.
 - All Core schemas set `additionalProperties: true`, so adopters may add namespaced fields (e.g., `x_myorg_*`) without breaking validation.
 
 ---
