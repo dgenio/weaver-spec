@@ -15,6 +15,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - `examples/partial_capability_routing.md` — partial-match routing walkthrough with three overlapping candidates and a ranked `ChoiceCard`. Closes #26.
 - `docs/SEQUENCE_DIAGRAMS.md` — three new Mermaid sequence diagrams (sections 4 — 6) for the routing-failure, authorization-denial, and partial-execution-failure paths. Diagrams use the same scenarios as `examples/failure_scenarios.md`. Closes #25.
 - CI step in `.github/workflows/ci.yml` that extracts inline JSON payloads from the new walkthroughs (and `docs/SEQUENCE_DIAGRAMS.md`) and validates each against its declared schema in `contracts/json/` using `jsonschema`, with `format`-keyword enforcement (e.g., `date-time`) and a non-zero-marker guard to fail loud on accidental marker removal. Blocks merges on walkthrough/contract drift.
+- `docs/QUICKSTART.md` — quick-start integration guide with Python and JS/TS code, schema validation patterns, and one integration snippet per sibling repo (contextweaver, agent-kernel, ChainWeaver). No runtime dependencies added. Closes #19.
+- `docs/CONTRACT_REFERENCE.md` — single-page field reference for all 16 contract types (9 Core + 7 Extended) with per-field type/required/description tables, source-of-truth links, and per-Extended-type usage guidance, Core relationship, and inline JSON example. Supersedes #21. Closes #20.
+- `docs/FAQ.md` — eight new task-oriented entries covering capability registration, Extended metadata composition, language-agnostic schema validation, version-mismatch handling, telemetry, the Core-field proposal workflow, the Frame-vs-Handle distinction, and spec-conformance testing. Closes #23.
+- `README.md` — Quick Navigation table now links to `docs/QUICKSTART.md` and `docs/CONTRACT_REFERENCE.md`.
 
 **No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
 
