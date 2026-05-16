@@ -11,7 +11,8 @@ This repository is **documentation + contracts only**.
 
 - It defines the shared interfaces for three sibling repositories: **contextweaver** (routing), **agent-kernel** (execution), and **ChainWeaver** (orchestration).
 - It contains JSON Schemas (language-agnostic source of truth), a Python `weaver_contracts` package (stdlib dataclasses mirroring the schemas), specification docs, and examples.
-- **Never add runtime logic, CLI tools, helper utilities, or business logic to this repository.** Validation is limited to construction-time checks in dataclass `__post_init__`.
+- **Never add runtime logic, adopter-facing CLI tools, adopter-facing helper utilities, or business logic to this repository.** Validation is limited to construction-time checks in dataclass `__post_init__`.
+- **Build-time spec-maintenance tooling is permitted** under `scripts/`, narrowly scoped: stdlib-only Python that consumes the spec and emits or validates artifacts checked into this repo (e.g., the content-addressed schema index). Such tooling must not be imported by `weaver_contracts` and must not be published to PyPI. Any new script must be added to the repo map below with that scope explicitly stated.
 
 ---
 
@@ -160,7 +161,7 @@ See [docs/agent-context/review-checklist.md](docs/agent-context/review-checklist
 
 ## Local validation
 
-Run all four checks before submitting a PR:
+Run all five checks before submitting a PR:
 
 ```bash
 # 1. Python tests (with coverage)
@@ -175,7 +176,10 @@ mypy src/
 cd ../..
 python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
 
-# 4. Markdown lint
+# 4. Contracts index freshness — regenerate first if any contracts/json/ file changed
+python scripts/generate_contracts_index.py --check
+
+# 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 ```
 

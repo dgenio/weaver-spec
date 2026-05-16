@@ -15,8 +15,8 @@ The repository enforces the following deprecation rules:
 3. **Removal requires an ADR.** Removing a deprecated item is a breaking Core contract change and must follow the ADR process documented in [CONTRIBUTING.md](../CONTRIBUTING.md#adr-process-for-breaking-contract-changes).
 4. **The removal PR must update the register row.** Set `Removed in` to the actual removed-in version and move the row to the "Removed" section. PRs that remove a registered item without updating the register fail review.
 5. **Adding a row also requires updates.** The same PR that deprecates an item must also update:
-   - The relevant JSON Schema (`description` notes the deprecation).
-   - The relevant Python type (`# Deprecated in X.Y.Z; remove in N.0.0` comment).
+   - The relevant JSON Schema — mark the field with `"deprecated": true` and add a deprecation note in its `description`, per [`docs/VERSIONING.md`](VERSIONING.md#deprecation-policy).
+   - The relevant Python type — add a `# Deprecated in X.Y.Z; remove in N.0.0` comment, per [`docs/VERSIONING.md`](VERSIONING.md#deprecation-policy).
    - `CHANGELOG.md` under the version that deprecates the item.
 
 ---
@@ -49,7 +49,7 @@ Items that were deprecated and have since been removed. Kept here as an audit re
    - Sets `Deprecated in` to the version that the PR will release.
    - Sets `Eligible to remove` to the next MAJOR boundary at minimum (e.g., a `0.x` deprecation gets `Eligible to remove: 1.0.0`).
    - Adds a one-sentence migration step.
-   - Marks the JSON Schema field (where applicable) with a deprecation note in its `description`.
+   - Marks the JSON Schema field (where applicable) with `"deprecated": true` and a deprecation note in its `description`.
    - Marks the Python type (where applicable) with a `# Deprecated in X.Y.Z; remove in N.0.0` comment.
    - Adds a CHANGELOG entry.
    - Links the relevant issue or ADR.

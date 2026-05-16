@@ -63,7 +63,7 @@ If the change affects a contract that a sibling repo produces or consumes, coord
 
 ## Local validation commands
 
-Run all four before submitting any PR. CI enforces all four.
+Run all five before submitting any PR. CI enforces all five.
 
 ```bash
 # 1. Python tests (with coverage)
@@ -78,8 +78,17 @@ mypy src/
 cd ../..
 python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
 
-# 4. Markdown lint
+# 4. Contracts index freshness (regenerate first if you changed any schema)
+python scripts/generate_contracts_index.py --check
+
+# 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
+```
+
+If step 4 fails, regenerate the index and commit the result:
+
+```bash
+python scripts/generate_contracts_index.py
 ```
 
 ---
