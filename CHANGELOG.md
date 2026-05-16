@@ -15,6 +15,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - `examples/partial_capability_routing.md` — partial-match routing walkthrough with three overlapping candidates and a ranked `ChoiceCard`. Closes #26.
 - `docs/SEQUENCE_DIAGRAMS.md` — three new Mermaid sequence diagrams (sections 4 — 6) for the routing-failure, authorization-denial, and partial-execution-failure paths. Diagrams use the same scenarios as `examples/failure_scenarios.md`. Closes #25.
 - CI step in `.github/workflows/ci.yml` that extracts inline JSON payloads from the new walkthroughs (and `docs/SEQUENCE_DIAGRAMS.md`) and validates each against its declared schema in `contracts/json/` using `jsonschema`, with `format`-keyword enforcement (e.g., `date-time`) and a non-zero-marker guard to fail loud on accidental marker removal. Blocks merges on walkthrough/contract drift.
+- `CHARTER.md` — governance roles (Contributor / Reviewer / Maintainer / Core Maintainer), decision flow, Working Group lifecycle, and current maintainer roster. Linked from `README.md` and `AGENTS.md`. Closes #42.
+- `docs/SECURITY_MAPPING.md` — alignment map between invariants `I-01`–`I-07` and OWASP LLM Top 10 (2025), MITRE ATLAS, and NIST AI RMF 1.0. Uses "aligned with" wording only. Linked from `SECURITY.md` and `README.md`. Closes #39.
+- `docs/DEPRECATIONS.md` — deprecation register and removal policy (≥1 MAJOR retention rule, removal requires ADR). Referenced from `.github/pull_request_template.md` and `CONTRIBUTING.md`. Closes #40.
+- `docs/SCHEMA_HOSTING.md` — JSON Schema `$id` URL pattern, current hosting status, immutability rule, and content-addressed index policy.
+- `well-known/contracts.json` — content-addressed index of the 9 Core JSON Schemas with SHA-256 per file.
+- `scripts/generate_contracts_index.py` — stdlib-only generator for `well-known/contracts.json`. `--check` mode used in CI to fail on stale index.
+- CI job `validate-contracts-index` in `.github/workflows/ci.yml` that runs `python scripts/generate_contracts_index.py --check`. Closes #41.
+
+### Changed
+
+- `.github/workflows/publish.yml` — adds `attestations: true` to the PyPI publish step and `attestations: write` permission, so each release emits a PEP 740 Sigstore-signed SLSA build provenance attestation. `SECURITY.md` and `contracts/python/README.md` document the `sigstore verify` flow for adopters. Closes #38.
+- `.github/pull_request_template.md` — adds a Deprecations section linking to `docs/DEPRECATIONS.md`.
+- `.github/workflows/ci.yml` and `CONTRIBUTING.md` — markdownlint command extended to lint `CHARTER.md`.
 
 **No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
 

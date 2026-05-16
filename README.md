@@ -33,6 +33,11 @@ Each repo can be adopted independently. `weaver-spec` defines the contracts that
 | Versioning rules | [docs/VERSIONING.md](docs/VERSIONING.md) |
 | Adoption guide | [docs/ADOPTION_GUIDE.md](docs/ADOPTION_GUIDE.md) |
 | FAQ | [docs/FAQ.md](docs/FAQ.md) |
+| Governance and roles | [CHARTER.md](CHARTER.md) |
+| Security framework alignment | [docs/SECURITY_MAPPING.md](docs/SECURITY_MAPPING.md) |
+| Deprecation register | [docs/DEPRECATIONS.md](docs/DEPRECATIONS.md) |
+| Schema hosting policy | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) |
+| Content-addressed schema index | [well-known/contracts.json](well-known/contracts.json) |
 | JSON Schemas | [contracts/json/](contracts/json/) |
 | Python package | [contracts/python/](contracts/python/) |
 | End-to-end examples | [examples/](examples/) |

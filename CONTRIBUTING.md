@@ -53,6 +53,14 @@ Use the ADR template at [`docs/adr/template.md`](docs/adr/template.md) when docu
 
 4. **PR merges** after maintainer approval. The issue is closed and linked from the CHANGELOG entry.
 
+### Deprecating or removing a field
+
+Deprecations and removals are governed by [`docs/DEPRECATIONS.md`](docs/DEPRECATIONS.md):
+
+- A deprecated field, type, or constraint must remain in Core for **at least one full MAJOR version** before it may be removed.
+- A PR that deprecates an item must add a row to the register in the same PR.
+- A PR that removes a deprecated item must reference the existing register row and move it to the **Removed** section in the same PR. Removals are otherwise blocked.
+
 ---
 
 ## Style Guidelines
@@ -97,7 +105,7 @@ Run from the repository root (not from `contracts/python/`):
 ```bash
 npm install -g markdownlint-cli
 markdownlint \
-  README.md CONTRIBUTING.md CHANGELOG.md \
+  README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
   'docs/**/*.md' 'contracts/**/*.md' 'examples/*.md'
 ```
 

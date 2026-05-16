@@ -32,6 +32,11 @@ This repository is **documentation + contracts only**.
 | `docs/` | Specification documents | When changing behavior, boundaries, or invariants |
 | `docs/adr/` | Architecture Decision Records for breaking changes | When proposing or reviewing a breaking Core contract change |
 | `docs/agent-context/` | Agent-oriented supporting docs | When you need workflow detail, invariant context, lessons learned, or a review checklist |
+| `docs/DEPRECATIONS.md` | Deprecation register (≥1 MAJOR retention rule) | Any PR that deprecates or removes a field, type, or constraint |
+| `docs/SCHEMA_HOSTING.md` | `$id` URL policy and content-addressed index policy | When changing schema `$id` URIs or the index format |
+| `well-known/contracts.json` | Generated content-addressed schema index (SHA-256 per file) | Regenerate via `scripts/generate_contracts_index.py` after any `contracts/json/` change |
+| `scripts/` | Build-time, stdlib-only utilities (e.g., index generator). Not runtime code. | When the build-time tooling itself changes |
+| `CHARTER.md` | Governance roles, decision flow, Working Groups | When governance roles or process change |
 
 ---
 
@@ -189,6 +194,10 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | File | Scope |
 |------|-------|
 | `AGENTS.md` *(this file)* | Primary agent entrypoint — rules, navigation, authority |
+| [CHARTER.md](CHARTER.md) | Governance roles, decision flow, Working Groups |
+| [docs/SECURITY_MAPPING.md](docs/SECURITY_MAPPING.md) | Alignment map between invariants and OWASP / MITRE ATLAS / NIST AI RMF |
+| [docs/DEPRECATIONS.md](docs/DEPRECATIONS.md) | Deprecation register and removal policy |
+| [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) | `$id` URL pattern, immutability rule, content-addressed index |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |
 | [docs/agent-context/invariants.md](docs/agent-context/invariants.md) | Hard constraints, forbidden shortcuts, safe-vs-unsafe changes |

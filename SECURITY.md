@@ -37,3 +37,22 @@ It does **not** cover the sibling runtime repositories (`contextweaver`, `agent-
 - The `weaver_contracts` package has **no runtime dependencies** beyond the Python standard library. This minimises supply chain risk.
 - JSON Schemas should be loaded from trusted sources; do not load schemas from untrusted user input without validation.
 - Contract tokens (`CapabilityToken`) contain authorization scope. Treat them with the same care as bearer tokens.
+
+### Framework alignment
+
+For an alignment map between the Weaver invariants `I-01`–`I-07` and external security frameworks (OWASP LLM Top 10 2025, MITRE ATLAS, NIST AI RMF 1.0), see [`docs/SECURITY_MAPPING.md`](docs/SECURITY_MAPPING.md). The mapping documents **alignment**, not certification.
+
+### Verifying SLSA build provenance
+
+The `weaver_contracts` package on PyPI is published with [PEP 740](https://peps.python.org/pep-0740/) Sigstore-signed SLSA build provenance attestations. Verify a downloaded distribution with the [`sigstore`](https://pypi.org/project/sigstore/) CLI:
+
+```bash
+pip install sigstore
+pip download weaver_contracts==0.2.0 --no-deps -d ./dist
+sigstore verify identity \
+  --cert-identity-regexp '^https://github.com/dgenio/weaver-spec/' \
+  --cert-oidc-issuer 'https://token.actions.githubusercontent.com' \
+  ./dist/weaver_contracts-*.whl
+```
+
+A successful verification proves the artifact was built by this repository's `publish.yml` workflow via PyPI's OIDC Trusted Publisher.
