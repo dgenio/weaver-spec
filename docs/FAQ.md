@@ -160,7 +160,7 @@ Two versions are compatible when they share the same MAJOR version. The Python p
 ```python
 from weaver_contracts.version import CONTRACT_VERSION, is_compatible
 
-assert is_compatible(peer_version)   # raises if MAJOR differs
+assert is_compatible(peer_version)   # returns False if MAJOR differs; assert raises AssertionError
 ```
 
 In languages other than Python, do the same MAJOR-version comparison yourself. The compatibility table in [VERSIONING.md](VERSIONING.md) tracks which sibling-repo versions are known to interoperate with which contract versions. If you publish your service, declare your supported contract MAJOR(s) explicitly so consumers know which payloads to send.
