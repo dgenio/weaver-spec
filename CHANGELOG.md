@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+---
+
+## [0.3.0] — 2026-05-19
+
 ### Added
 
 - `examples/failure_scenarios.md` — three failure-path walkthroughs (routing failure, authorization denial, partial execution failure) with contract payloads at every boundary. Closes #18.
@@ -106,6 +110,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - Sample payloads for `routing_decision`, `frame_with_handles`, and `capability_token`.
 - CI workflows: `ci.yml` (Python tests + schema lint) and `links.yml` (link checker).
 
+[Unreleased]: https://github.com/dgenio/weaver-spec/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/dgenio/weaver-spec/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dgenio/weaver-spec/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/dgenio/weaver-spec/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/dgenio/weaver-spec/releases/tag/v0.1.0
