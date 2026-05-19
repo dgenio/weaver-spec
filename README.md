@@ -25,6 +25,8 @@ Each repo can be adopted independently. `weaver-spec` defines the contracts that
 | What you need | Where to look |
 | --------------- | --------------- |
 | Ecosystem overview | [docs/VISION.md](docs/VISION.md) |
+| Quick-start (Python + JS/TS) | [docs/QUICKSTART.md](docs/QUICKSTART.md) |
+| Contract field reference | [docs/CONTRACT_REFERENCE.md](docs/CONTRACT_REFERENCE.md) |
 | Layer architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Responsibility boundaries | [docs/BOUNDARIES.md](docs/BOUNDARIES.md) |
 | Non-negotiable invariants | [docs/INVARIANTS.md](docs/INVARIANTS.md) |
