@@ -8,6 +8,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+### Added
+
+- `.pre-commit-config.yaml` — pre-commit hook bundle mirroring the CI gates: `pre-commit-hooks` (trailing whitespace, end-of-file, large file guard, JSON/YAML/TOML/merge-conflict checks), `yamllint`, `markdownlint-cli2`, a local hook running `scripts/check_schema_fields.py`, a local hook running `scripts/generate_contracts_index.py --check`, and a `pre-push`-staged hook that runs the `weaver_contracts` pytest suite. Setup instructions added to `CONTRIBUTING.md`. `pre-commit` and `yamllint` added to `[project.optional-dependencies] dev` in `contracts/python/pyproject.toml`. Closes #14.
+- `.yamllint.yml` — yamllint config tuned for GitHub-flavored YAML (relaxed line length, `truthy.check-keys: false` to permit `on:` in workflows).
+- CI job `yamllint` in `.github/workflows/ci.yml` — lints `.github/ISSUE_TEMPLATE/`, `.github/workflows/`, `.yamllint.yml`, and `.pre-commit-config.yaml` via `yamllint==1.35.1` so malformed templates fail in CI rather than at GitHub form-render time. Closes #35.
+- `.github/prompts/add-contract-field.prompt.md` and `.github/prompts/add-new-schema.prompt.md` — VS Code `.prompt.md` workflow templates encoding the six-artifact rule and the `INVARIANTS.md → BOUNDARIES.md → ARCHITECTURE.md` authority hierarchy for two common Core contract workflows. Referenced from the `AGENTS.md` repo map. Closes #13.
+- `docs/DOCS_CONVENTIONS.md` — markup convention distinguishing **normative** (`> [!IMPORTANT]`), **informative** (`> [!NOTE]`), and **example** (fenced code block) content. Conservative initial application to `docs/INVARIANTS.md` and `docs/BOUNDARIES.md`. Linked from `README.md`, `CONTRIBUTING.md` Style Guidelines, and the `AGENTS.md` documentation map. Closes #58.
+- `scripts/check_schema_fields.py` — stdlib-only validator that enforces `$id`/`title`/`description` on every `contracts/json/*.schema.json`. Used by both CI (`validate-schemas` job) and the new pre-commit hook so the two stay in sync.
+
+### Changed
+
+- `.github/workflows/ci.yml` — the `validate-schemas` job now calls `scripts/check_schema_fields.py` instead of an inline `python -c` block (single source of truth for the schema-required-fields check; no behavior change).
+
+**No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
+
 ---
 
 ## [0.4.0] — 2026-05-20
