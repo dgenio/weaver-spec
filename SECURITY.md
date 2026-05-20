@@ -44,9 +44,9 @@ For an alignment map between the Weaver invariants `I-01`–`I-07` and external 
 
 ### Verifying SLSA build provenance
 
-Starting with the first release published after the `publish.yml` workflow change documented in `CHANGELOG.md`, the `weaver_contracts` PyPI package ships with a [PEP 740](https://peps.python.org/pep-0740/) Sigstore-signed SLSA build provenance attestation. Releases published before that change (e.g., `0.2.0` and earlier) do **not** carry attestations and cannot be verified this way.
+Starting with version **0.3.0**, the `weaver_contracts` PyPI package ships with a [PEP 740](https://peps.python.org/pep-0740/) Sigstore-signed SLSA build provenance attestation. Releases before 0.3.0 (e.g., `0.2.0` and earlier) do **not** carry attestations and cannot be verified this way.
 
-Verify a downloaded distribution with the [`sigstore`](https://pypi.org/project/sigstore/) CLI (substitute `<VERSION>` with a release published after the workflow change):
+Verify a downloaded distribution with the [`sigstore`](https://pypi.org/project/sigstore/) CLI:
 
 ```bash
 pip install sigstore

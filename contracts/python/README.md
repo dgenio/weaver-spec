@@ -20,7 +20,7 @@ pip install "weaver_contracts[dev]"
 
 ### Verifying SLSA build provenance
 
-Releases published after the `publish.yml` attestation change (recorded in `CHANGELOG.md`) ship with a [PEP 740](https://peps.python.org/pep-0740/) Sigstore-signed SLSA build provenance attestation. Earlier releases (`0.2.0` and below) do **not** carry an attestation. For a supported release, verify a downloaded wheel before installing in production (substitute `<VERSION>` with a post-attestation release):
+Starting with version **0.3.0**, releases ship with a [PEP 740](https://peps.python.org/pep-0740/) Sigstore-signed SLSA build provenance attestation. Earlier releases (`0.2.0` and below) do **not** carry an attestation. Verify a downloaded wheel before installing in production:
 
 ```bash
 pip install sigstore
