@@ -20,24 +20,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Validate schemas are valid JSON
-        run: |
-          python -c "
-          import json, glob, sys
-          files = glob.glob('contracts/json/*.schema.json')
-          if not files:
-              print('ERROR: No schema files found', file=sys.stderr)
-              sys.exit(1)
-          for f in sorted(files):
-              with open(f) as fh:
-                  data = json.load(fh)
-              for field in ['\$id', 'title', 'description']:
-                  if field not in data:
-                      print(f'ERROR: {f} missing {field}', file=sys.stderr)
-                      sys.exit(1)
-              print(f'OK: {f}')
-          print(f'Validated {len(files)} schema(s)')
-          "
+      - name: Validate schema required fields
+        run: python scripts/check_schema_fields.py
 
       - name: Validate sample payloads are valid JSON
         run: |
@@ -204,3 +188,27 @@ jobs:
             'docs/**/*.md' \
             'contracts/**/*.md' \
             'examples/*.md'
+
+  yamllint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install yamllint
+        run: pip install yamllint==1.35.1
+
+      - name: Lint issue templates and workflows
+        run: |
+          yamllint -c .yamllint.yml \
+            .github/ISSUE_TEMPLATE/ \
+            .github/workflows/ \
+            .yamllint.yml \
+            .pre-commit-config.yaml
