@@ -28,6 +28,14 @@
 
 ---
 
+## Deprecations
+
+<!-- If this PR deprecates or removes a field, type, schema, or constraint, update the deprecation register. See docs/DEPRECATIONS.md for the policy (≥1 MAJOR retention rule, removal requires ADR). -->
+
+- [ ] `docs/DEPRECATIONS.md` updated — or N/A (no deprecation in this PR)
+
+---
+
 ## Invariants
 
 - [ ] I have verified that invariants I-01 through I-07 in `docs/INVARIANTS.md` are not violated by this change.
