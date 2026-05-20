@@ -1,0 +1,13 @@
+{
+  "decision_id": "pd-20260308-001",
+  "decision": "allow",
+  "capability_id": "org.myapp.search_docs",
+  "principal": "agent-session-7f3a",
+  "token_id": "tok-20260308-abc123",
+  "reason": "Token scope includes org.myapp.search_docs; token unexpired; principal authorized for documentation retrieval.",
+  "timestamp": "2026-03-08T06:00:01Z",
+  "metadata": {
+    "policy_engine_version": "agent-kernel@1.4.0",
+    "evaluated_rules": ["scope-check", "expiry-check", "principal-allowlist"]
+  }
+}

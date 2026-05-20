@@ -145,3 +145,115 @@ class TestCapabilityTokenPayload:
         }
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(invalid_payload, schema)
+
+
+class TestSelectableItemPayload:
+    """selectable_item.json validates against selectable_item schema."""
+
+    def test_payload_validates(self):
+        schema = load_schema("selectable_item")
+        payload = load_payload("selectable_item")
+        validate(payload, schema)
+
+    def test_required_fields_present(self):
+        payload = load_payload("selectable_item")
+        assert payload.get("id"), "selectable_item payload must have non-empty id"
+        assert payload.get("label"), "selectable_item payload must have label"
+        assert payload.get("description"), "selectable_item payload must have description"
+
+
+class TestChoiceCardPayload:
+    """choice_card.json validates against choice_card schema."""
+
+    def test_payload_validates(self):
+        schema = load_schema("choice_card")
+        payload = load_payload("choice_card")
+        validate(payload, schema)
+
+    def test_required_fields_present(self):
+        payload = load_payload("choice_card")
+        assert payload.get("id"), "choice_card payload must have non-empty id"
+        assert payload.get("items"), "choice_card payload must have non-empty items"
+
+    def test_items_within_bounds(self):
+        """ChoiceCard schema requires 1..20 items."""
+        payload = load_payload("choice_card")
+        items = payload.get("items", [])
+        assert 1 <= len(items) <= 20, "choice_card.items must be 1..20"
+
+
+class TestCapabilityPayload:
+    """capability.json validates against capability schema."""
+
+    def test_payload_validates(self):
+        schema = load_schema("capability")
+        payload = load_payload("capability")
+        validate(payload, schema)
+
+    def test_required_fields_present(self):
+        payload = load_payload("capability")
+        for f in ("id", "name", "version", "description"):
+            assert payload.get(f), f"capability payload must have non-empty {f}"
+
+
+class TestPolicyDecisionPayload:
+    """policy_decision.json validates against policy_decision schema."""
+
+    def test_payload_validates(self):
+        schema = load_schema("policy_decision")
+        payload = load_payload("policy_decision")
+        validate(payload, schema)
+
+    def test_required_fields_present(self):
+        payload = load_payload("policy_decision")
+        for f in ("decision_id", "decision", "capability_id", "principal", "timestamp"):
+            assert payload.get(f), f"policy_decision payload must have non-empty {f}"
+
+    def test_decision_is_allow_or_deny(self):
+        payload = load_payload("policy_decision")
+        assert payload["decision"] in ("allow", "deny")
+
+
+class TestHandlePayload:
+    """handle.json validates against handle schema."""
+
+    def test_payload_validates(self):
+        schema = load_schema("handle")
+        payload = load_payload("handle")
+        validate(payload, schema)
+
+    def test_required_fields_present(self):
+        payload = load_payload("handle")
+        for f in ("handle_id", "capability_id", "artifact_type", "created_at"):
+            assert payload.get(f), f"handle payload must have non-empty {f}"
+
+    def test_byte_size_non_negative(self):
+        payload = load_payload("handle")
+        if "byte_size" in payload and payload["byte_size"] is not None:
+            assert payload["byte_size"] >= 0
+
+
+class TestTraceEventPayload:
+    """trace_event.json validates against trace_event schema."""
+
+    def test_payload_validates(self):
+        schema = load_schema("trace_event")
+        payload = load_payload("trace_event")
+        validate(payload, schema)
+
+    def test_required_fields_present(self):
+        payload = load_payload("trace_event")
+        for f in ("event_id", "event_type", "timestamp"):
+            assert payload.get(f), f"trace_event payload must have non-empty {f}"
+
+    def test_event_type_in_enum(self):
+        """Invariant I-02: TraceEvent.event_type must be a known core type."""
+        payload = load_payload("trace_event")
+        valid_types = {
+            "capability_authorized", "capability_denied", "capability_executed",
+            "firewall_applied", "handle_created", "handle_resolved",
+            "token_issued", "token_invalidated",
+            "flow_started", "flow_step_started", "flow_step_completed",
+            "flow_completed", "flow_failed",
+        }
+        assert payload["event_type"] in valid_types

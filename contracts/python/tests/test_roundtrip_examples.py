@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import pytest
 
 from weaver_contracts.core import (
+    Capability,
     CapabilityToken,
     ChoiceCard,
     Frame,
@@ -82,6 +83,18 @@ class TestSelectableItem:
         with pytest.raises(ValueError, match="description must be non-empty"):
             SelectableItem(id="x", label="x", description="")
 
+    def test_from_payload(self):
+        payload = load_payload("selectable_item")
+        item = SelectableItem(
+            id=payload["id"],
+            label=payload["label"],
+            description=payload["description"],
+            capability_id=payload.get("capability_id"),
+            metadata=payload.get("metadata", {}),
+        )
+        assert item.id == payload["id"]
+        assert item.capability_id == payload["capability_id"]
+
 
 # ---------------------------------------------------------------------------
 # ChoiceCard
@@ -102,6 +115,27 @@ class TestChoiceCard:
     def test_empty_id_raises(self):
         with pytest.raises(ValueError, match="id must be non-empty"):
             ChoiceCard(id="", items=[self._item()])
+
+    def test_from_payload(self):
+        payload = load_payload("choice_card")
+        items = [
+            SelectableItem(
+                id=it["id"],
+                label=it["label"],
+                description=it["description"],
+                capability_id=it.get("capability_id"),
+            )
+            for it in payload["items"]
+        ]
+        card = ChoiceCard(
+            id=payload["id"],
+            items=items,
+            context_hint=payload.get("context_hint"),
+            metadata=payload.get("metadata", {}),
+        )
+        assert card.id == payload["id"]
+        assert len(card.items) == len(payload["items"])
+        assert card.context_hint == payload["context_hint"]
 
 
 # ---------------------------------------------------------------------------
@@ -249,6 +283,70 @@ class TestPolicyDecision:
                 timestamp=datetime.now(timezone.utc),
             )
 
+    def test_from_payload(self):
+        payload = load_payload("policy_decision")
+        pd = PolicyDecision(
+            decision_id=payload["decision_id"],
+            decision=payload["decision"],
+            capability_id=payload["capability_id"],
+            principal=payload["principal"],
+            timestamp=parse_dt(payload["timestamp"]),
+            token_id=payload.get("token_id"),
+            reason=payload.get("reason"),
+            metadata=payload.get("metadata", {}),
+        )
+        assert pd.decision_id == payload["decision_id"]
+        assert pd.decision == "allow"
+        assert pd.token_id == payload["token_id"]
+
+
+# ---------------------------------------------------------------------------
+# Capability
+# ---------------------------------------------------------------------------
+
+class TestCapability:
+    def test_valid_construction(self):
+        cap = Capability(
+            id="org.myapp.search_docs",
+            name="Search docs",
+            version="1.0.0",
+            description="Documentation search.",
+        )
+        assert cap.tags == []
+        assert cap.input_schema_ref is None
+
+    def test_empty_id_raises(self):
+        with pytest.raises(ValueError, match="id must be non-empty"):
+            Capability(id="", name="n", version="1.0.0", description="d")
+
+    def test_empty_name_raises(self):
+        with pytest.raises(ValueError, match="name must be non-empty"):
+            Capability(id="c", name="", version="1.0.0", description="d")
+
+    def test_empty_version_raises(self):
+        with pytest.raises(ValueError, match="version must be non-empty"):
+            Capability(id="c", name="n", version="", description="d")
+
+    def test_empty_description_raises(self):
+        with pytest.raises(ValueError, match="description must be non-empty"):
+            Capability(id="c", name="n", version="1.0.0", description="")
+
+    def test_from_payload(self):
+        payload = load_payload("capability")
+        cap = Capability(
+            id=payload["id"],
+            name=payload["name"],
+            version=payload["version"],
+            description=payload["description"],
+            input_schema_ref=payload.get("input_schema_ref"),
+            output_schema_ref=payload.get("output_schema_ref"),
+            tags=payload.get("tags", []),
+            metadata=payload.get("metadata", {}),
+        )
+        assert cap.id == payload["id"]
+        assert cap.version == payload["version"]
+        assert cap.tags == payload["tags"]
+
 
 # ---------------------------------------------------------------------------
 # Frame
@@ -322,6 +420,22 @@ class TestHandle:
                 byte_size=-1,
             )
 
+    def test_from_payload(self):
+        payload = load_payload("handle")
+        handle = Handle(
+            handle_id=payload["handle_id"],
+            capability_id=payload["capability_id"],
+            artifact_type=payload["artifact_type"],
+            created_at=parse_dt(payload["created_at"]),
+            expires_at=parse_dt(payload["expires_at"]) if payload.get("expires_at") else None,
+            access_policy=payload.get("access_policy"),
+            byte_size=payload.get("byte_size"),
+            metadata=payload.get("metadata", {}),
+        )
+        assert handle.handle_id == payload["handle_id"]
+        assert handle.byte_size == payload["byte_size"]
+        assert handle.expires_at is not None
+
 
 # ---------------------------------------------------------------------------
 # TraceEvent
@@ -362,3 +476,22 @@ class TestTraceEvent:
                 event_type="capability_executed",
                 timestamp=datetime.now(timezone.utc),
             )
+
+    def test_from_payload(self):
+        payload = load_payload("trace_event")
+        event = TraceEvent(
+            event_id=payload["event_id"],
+            event_type=payload["event_type"],
+            timestamp=parse_dt(payload["timestamp"]),
+            capability_id=payload.get("capability_id"),
+            principal=payload.get("principal"),
+            decision_id=payload.get("decision_id"),
+            frame_id=payload.get("frame_id"),
+            handle_id=payload.get("handle_id"),
+            outcome=payload.get("outcome"),
+            error_message=payload.get("error_message"),
+            metadata=payload.get("metadata", {}),
+        )
+        assert event.event_id == payload["event_id"]
+        assert event.event_type == "capability_executed"
+        assert event.outcome == "success"

@@ -1,0 +1,27 @@
+{
+  "id": "card-retrieval",
+  "context_hint": "Select the most appropriate document retrieval action for the user's query.",
+  "items": [
+    {
+      "id": "si-search-docs",
+      "label": "Search documentation",
+      "description": "Full-text search across the product documentation index.",
+      "capability_id": "org.myapp.search_docs"
+    },
+    {
+      "id": "si-fetch-page",
+      "label": "Fetch a specific page",
+      "description": "Retrieve a known documentation page by its slug.",
+      "capability_id": "org.myapp.fetch_doc_page"
+    },
+    {
+      "id": "si-list-recent",
+      "label": "List recently updated docs",
+      "description": "Retrieve the 10 most recently modified documentation articles.",
+      "capability_id": "org.myapp.list_recent_docs"
+    }
+  ],
+  "metadata": {
+    "compiled_from": "registry@2026-03-08T05:59:58Z"
+  }
+}
