@@ -65,7 +65,7 @@ Deprecations and removals are governed by [`docs/DEPRECATIONS.md`](docs/DEPRECAT
 
 ## Style Guidelines
 
-- **Docs**: concise, technical, unambiguous. No marketing language. Prefer tables and explicit definitions.
+- **Docs**: concise, technical, unambiguous. No marketing language. Prefer tables and explicit definitions. Mark binding requirements with `> [!IMPORTANT]` callouts and explanatory notes with `> [!NOTE]` callouts — see [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) for the full markup convention.
 - **JSON Schemas**: include `$id`, `title`, `description`, and `required` fields. Keep them small.
 - **Python types**: use stdlib only (`dataclasses`, `typing`). No runtime dependencies in `core.py`.
 - **Tests**: every new schema must have a sample payload; every new Python type must have a roundtrip test.
@@ -75,6 +75,25 @@ Deprecations and removals are governed by [`docs/DEPRECATIONS.md`](docs/DEPRECAT
 ## Local Development
 
 All commands below assume dev dependencies are installed (`pip install -e ".[dev]"` in `contracts/python/`).
+
+### Pre-commit Hooks (recommended)
+
+Install [pre-commit](https://pre-commit.com/) once to run the local validation gates automatically on `git commit` (and the full pytest suite on `git push`):
+
+```bash
+pip install pre-commit
+pre-commit install                # install commit-stage hooks
+pre-commit install --hook-type pre-push   # install push-stage hooks
+```
+
+Run all hooks against the full repo on demand:
+
+```bash
+pre-commit run --all-files
+pre-commit run --all-files --hook-stage pre-push
+```
+
+The hooks mirror the CI gates: JSON schema field validation, contracts-index freshness, `markdownlint-cli2`, `yamllint`, and (on push) the `weaver_contracts` pytest suite. See `.pre-commit-config.yaml` for the full hook list.
 
 ### Python Package Tests
 

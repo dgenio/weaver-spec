@@ -1,0 +1,82 @@
+# Pre-commit hooks for weaver-spec.
+#
+# Mirrors the local + CI validation commands in `AGENTS.md` and
+# `CONTRIBUTING.md`. Install once with:
+#
+#     pip install pre-commit
+#     pre-commit install
+#
+# Hooks run in strict mode and block the commit on failure. To run all
+# hooks manually against the full repo:
+#
+#     pre-commit run --all-files
+
+minimum_pre_commit_version: "3.5.0"
+
+default_language_version:
+  python: python3
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'  # markdownlint MD009 enforces this for Markdown.
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+      - id: check-json
+        files: '^(contracts/json/.*\.schema\.json|examples/sample_payloads/.*\.json|well-known/contracts\.json)$'
+      - id: check-yaml
+        files: '^(\.github/.*\.(ya?ml)|\.yamllint\.yml|\.pre-commit-config\.yaml)$'
+      - id: check-toml
+        files: '^contracts/python/pyproject\.toml$'
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ["-c", ".yamllint.yml", "-s"]
+        files: '^(\.github/ISSUE_TEMPLATE/.*\.ya?ml|\.github/workflows/.*\.ya?ml|\.yamllint\.yml|\.pre-commit-config\.yaml)$'
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.14.0
+    hooks:
+      - id: markdownlint-cli2
+        files: '^(README\.md|CONTRIBUTING\.md|CHANGELOG\.md|CHARTER\.md|docs/.*\.md|contracts/.*\.md|examples/.*\.md)$'
+
+  # Local hooks — invoke project-local validation scripts so a single
+  # `pre-commit run` reproduces the CI gates.
+  - repo: local
+    hooks:
+      - id: schema-fields-present
+        name: contracts/json schemas have $id, title, description
+        description: |
+          Mirrors the validate-schemas CI job. Every JSON Schema in
+          contracts/json/ must declare $id, title, and description.
+        entry: python scripts/check_schema_fields.py
+        language: system
+        pass_filenames: false
+        files: '^contracts/json/.*\.schema\.json$'
+
+      - id: contracts-index-fresh
+        name: well-known/contracts.json is up to date
+        description: |
+          Mirrors the validate-contracts-index CI job. Fails when a schema
+          is edited without running scripts/generate_contracts_index.py.
+        entry: python scripts/generate_contracts_index.py --check
+        language: system
+        pass_filenames: false
+        files: '^(contracts/json/.*\.schema\.json|well-known/contracts\.json|scripts/generate_contracts_index\.py|contracts/python/src/weaver_contracts/version\.py)$'
+
+      - id: weaver-contracts-tests
+        name: weaver_contracts pytest (changed Python files only)
+        description: |
+          Runs the contracts/python pytest suite. Triggered only when
+          Python sources, tests, schemas, or sample payloads change.
+        entry: bash -c 'cd contracts/python && python -m pytest -q'
+        language: system
+        pass_filenames: false
+        files: '^(contracts/python/.*\.(py|toml)|contracts/json/.*\.schema\.json|examples/sample_payloads/.*\.json)$'
+        stages: [pre-push]
