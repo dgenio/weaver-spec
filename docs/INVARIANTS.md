@@ -1,6 +1,12 @@
 # Invariants
 
+> [!IMPORTANT]
+> Every statement under each `I-NN` heading in this document is **normative**. An implementation that violates any of I-01 through I-07 is not spec-compliant. Subsections labelled **Rationale** are **informative** — they explain *why*, not *what*.
+
 These are the non-negotiable properties of the Weaver stack. Any implementation that violates these invariants is not spec-compliant, regardless of other behavior.
+
+> [!NOTE]
+> This document is the highest-authority spec page in the repo. When other docs appear to contradict an invariant here, **this page wins** — see the authority hierarchy in `AGENTS.md`. Doc markup conventions are described in [docs/DOCS_CONVENTIONS.md](DOCS_CONVENTIONS.md).
 
 ---
 

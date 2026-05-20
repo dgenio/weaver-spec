@@ -1,6 +1,12 @@
 # Responsibility Boundaries
 
+> [!IMPORTANT]
+> Every boundary statement in this document is **normative**. Each "Decision" block and the artifact-ownership tables are binding on spec-compliant implementations. Sections labelled **Rationale** are **informative** — they explain *why*, not *what*. Changing a normative boundary requires a spec-level ADR (see `CONTRIBUTING.md`).
+
 This document records the explicit boundary decisions that prevent overlap and duplication across the three Weaver repositories. These decisions are **non-negotiable**; changing them requires a spec-level ADR.
+
+> [!NOTE]
+> Doc markup conventions used throughout the spec are described in [docs/DOCS_CONVENTIONS.md](DOCS_CONVENTIONS.md). Authority order: `INVARIANTS.md > BOUNDARIES.md > ARCHITECTURE.md > everything else`.
 
 ---
 
