@@ -115,7 +115,7 @@ Paired `Handle` reference (raw artifact stays in the HandleStore):
 | **Consumer** | audit log infrastructure (append-only) |
 | **Trigger** | Any significant execution event (authorization, firewall application, capability execution, handle creation, token issuance, etc.). |
 | **Contract crossing** | [`TraceEvent`](../contracts/json/trace_event.schema.json) |
-| **Lifecycle phases** | All phases (a `TraceEvent` is appended at every phase transition). |
+| **Lifecycle phases** | At least Phases 2, 3, and 5 — a `TraceEvent` is required around each authorization and execution event per invariant I-02. Implementations may emit additional `TraceEvent`s at other transitions for richer audit trails. |
 | **BOUNDARIES.md row** | `TraceEvent` — owned by agent-kernel, crosses to the audit log. |
 | **Invariants** | **I-02** (every execution authorized + auditable). |
 | **Consumer action** | Audit log persists the event. The `decision_id`, `frame_id`, and `handle_id` fields chain events into per-request narratives. |

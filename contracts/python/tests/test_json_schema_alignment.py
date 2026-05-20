@@ -246,14 +246,13 @@ class TestTraceEventPayload:
         for f in ("event_id", "event_type", "timestamp"):
             assert payload.get(f), f"trace_event payload must have non-empty {f}"
 
-    def test_event_type_in_enum(self):
-        """Invariant I-02: TraceEvent.event_type must be a known core type."""
+    def test_event_type_in_schema_enum(self):
+        """Sample event_type must be one of the values declared in the schema.
+
+        Sourced from the loaded schema so the schema's enum remains the
+        single source of truth (no drift between test and schema).
+        """
+        schema = load_schema("trace_event")
         payload = load_payload("trace_event")
-        valid_types = {
-            "capability_authorized", "capability_denied", "capability_executed",
-            "firewall_applied", "handle_created", "handle_resolved",
-            "token_issued", "token_invalidated",
-            "flow_started", "flow_step_started", "flow_step_completed",
-            "flow_completed", "flow_failed",
-        }
-        assert payload["event_type"] in valid_types
+        enum_values = schema["properties"]["event_type"]["enum"]
+        assert payload["event_type"] in enum_values

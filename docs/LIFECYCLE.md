@@ -2,8 +2,11 @@
 
 This document defines the canonical five-phase lifecycle that ties the Weaver
 contracts together end-to-end: **route → call → interpret → answer → execute**.
-Each phase has a single owner repo, declared inputs and outputs, and a
-non-negotiable safety boundary.
+Phases 1–4 each have a single owner repo, declared inputs and outputs, and a
+non-negotiable safety boundary. Phase 5 is an orchestration phase: ChainWeaver
+owns the orchestration (DAG advancement, step sequencing) and delegates each
+step's execution back to agent-kernel via Phases 2–3 (invariant I-07). The
+"single owner" rule still holds within each delegated sub-phase.
 
 This document is normative for phase ownership and boundary rules. It is
 informative for sequencing — implementations may interleave phases (for
@@ -31,8 +34,11 @@ When this doc conflicts with any of the above, the higher-authority doc wins.
 | 4 | **Answer** | contextweaver (or caller) | `Frame` | enriched LLM context / final reply | agent-kernel → contextweaver → LLM/caller |
 | 5 | **Execute** | agent-kernel (under ChainWeaver orchestration when present) | `Frame`, next `RoutingDecision`, refreshed `CapabilityToken` | next-step `Frame`, `TraceEvent` chain | ChainWeaver → agent-kernel → audit log |
 
-A `TraceEvent` is appended to the audit log at every phase transition. This
-satisfies invariant I-02.
+A `TraceEvent` is appended to the audit log around each authorization and
+execution event (Phases 2, 3, and 5) per invariant I-02. Implementations are
+free to emit additional `TraceEvent`s at other transitions for richer
+audit trails, but only the I-02 events are required to claim spec
+compliance.
 
 ---
 
