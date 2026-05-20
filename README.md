@@ -8,15 +8,33 @@ This repository is the single source of truth for the vocabulary, invariants, re
 
 ## What This Repo Is For
 
-`weaver-spec` is **documentation + contracts**, not a runtime library. It defines the interfaces that three sibling repositories share:
+`weaver-spec` is **documentation + contracts**, not a runtime library. It defines the interfaces that the Weaver repositories share. Each repo can be adopted independently; `weaver-spec` defines the contracts that make them interoperable when used together.
 
-| Repo | Role |
-| ------ | ------ |
-| **contextweaver** | Context compilation, tool routing, ChoiceCard generation |
-| **agent-kernel** | Capability authZ/authN, execution, firewalling, audit |
-| **ChainWeaver** | Deterministic DAG/flow orchestration |
+### Ecosystem map
 
-Each repo can be adopted independently. `weaver-spec` defines the contracts that make them interoperable when used together.
+| Repo | Role | Layer ([ARCHITECTURE.md](docs/ARCHITECTURE.md)) |
+| ---- | ---- | ----------------------------------- |
+| **[contextweaver](https://github.com/dgenio/contextweaver)** | Context compilation, tool routing, ChoiceCard generation. | Routing |
+| **[agent-kernel](https://github.com/dgenio/agent-kernel)** | Capability authZ/authN, execution, firewalling, audit. | Execution |
+| **[ChainWeaver](https://github.com/dgenio/ChainWeaver)** | Deterministic DAG / flow orchestration. | Orchestration |
+| **AgentFence** | External policy firewall / proxy for tool calls. Optional; complements (does not replace) the agent-kernel firewall. | Adjacent — policy edge |
+| **VibeGuard** | Pre-merge checks for AI-generated code risks. Adjacent to the runtime stack; not on the request path. | Adjacent — dev workflow |
+
+Only the first three repos are on the runtime request path. AgentFence and VibeGuard are adjacent tools that share contracts and conventions but are not required for a working Weaver stack.
+
+### Adoption paths
+
+Pick the path that matches what you are integrating today. None requires adopting the full stack.
+
+| Goal | Adopt | Read first |
+| ---- | ----- | ---------- |
+| Smarter, bounded tool routing for an LLM you already host. | `contextweaver` alone. Provide your own execution layer that returns a `Frame`. | [docs/ADOPTION_GUIDE.md](docs/ADOPTION_GUIDE.md), [docs/LIFECYCLE.md](docs/LIFECYCLE.md) phase 1. |
+| Add capability authorization, firewalling, and audit to an existing tool runner. | `agent-kernel` alone. Provide your own routing that returns a `RoutingDecision`. | [docs/BOUNDARIES.md](docs/BOUNDARIES.md), [docs/LIFECYCLE.md](docs/LIFECYCLE.md) phases 2–3. |
+| Deterministic multi-step flows over any safe execution backend. | `ChainWeaver` alone, against any backend that honors the `CapabilityToken` + `RoutingDecision` contracts. | [docs/LIFECYCLE.md](docs/LIFECYCLE.md) phase 5, [examples/multi_agent_orchestration.md](examples/multi_agent_orchestration.md). |
+| Read or pin the shared contracts without adopting any sibling repo. | Reference the JSON Schemas in `contracts/json/` directly, or `pip install weaver_contracts` for Python types. | [docs/QUICKSTART.md](docs/QUICKSTART.md), [contracts/json/](contracts/json/). |
+| Propose a Core contract change. | Open an issue, then follow the ADR process. | [CONTRIBUTING.md](CONTRIBUTING.md), [docs/VERSIONING.md](docs/VERSIONING.md). |
+
+This repo is the contract layer for all of the above. You do not need to adopt every sibling to benefit; you do need to honor the contracts at any boundary you cross.
 
 ---
 
@@ -30,14 +48,18 @@ Each repo can be adopted independently. `weaver-spec` defines the contracts that
 | Layer architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Responsibility boundaries | [docs/BOUNDARIES.md](docs/BOUNDARIES.md) |
 | Non-negotiable invariants | [docs/INVARIANTS.md](docs/INVARIANTS.md) |
+| End-to-end lifecycle | [docs/LIFECYCLE.md](docs/LIFECYCLE.md) |
+| Cross-repo integration map | [docs/INTEGRATION_MAP.md](docs/INTEGRATION_MAP.md) |
 | Term definitions | [docs/GLOSSARY.md](docs/GLOSSARY.md) |
 | Sequence diagrams | [docs/SEQUENCE_DIAGRAMS.md](docs/SEQUENCE_DIAGRAMS.md) |
 | Versioning rules | [docs/VERSIONING.md](docs/VERSIONING.md) |
 | Adoption guide | [docs/ADOPTION_GUIDE.md](docs/ADOPTION_GUIDE.md) |
 | FAQ | [docs/FAQ.md](docs/FAQ.md) |
+| Contract artifact coverage | [contracts/COVERAGE.md](contracts/COVERAGE.md) |
 | JSON Schemas | [contracts/json/](contracts/json/) |
 | Python package | [contracts/python/](contracts/python/) |
 | End-to-end examples | [examples/](examples/) |
+| Minimal interoperability examples | [examples/interoperability/](examples/interoperability/) |
 
 ---
 

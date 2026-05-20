@@ -8,6 +8,56 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+### Added
+
+- Six missing Core sample payloads under `examples/sample_payloads/`:
+  `selectable_item.json`, `choice_card.json`, `capability.json`,
+  `policy_decision.json`, `handle.json`, `trace_event.json`. All validate
+  against their Core JSON schemas; each is exercised by a new
+  `Test<X>Payload` schema-validation class in
+  `contracts/python/tests/test_json_schema_alignment.py` and a
+  `test_from_payload` roundtrip case in
+  `contracts/python/tests/test_roundtrip_examples.py`. Closes #11.
+- `scripts/generate_coverage_table.py` — stdlib-only build-time generator
+  for the schema-to-artifact coverage table. Supports `--check` for CI
+  staleness detection. Closes #24.
+- `contracts/COVERAGE.md` — auto-generated coverage table covering all 16
+  contract types (9 Core + 7 Extended) across JSON schema, Python class,
+  sample payload, roundtrip test, and schema validation test artifacts.
+- `coverage-table` CI job in `.github/workflows/ci.yml` running
+  `python scripts/generate_coverage_table.py --check` so stale tables fail
+  the build.
+- `docs/INTEGRATION_MAP.md` — concrete cross-repo integration points
+  (contextweaver ↔ agent-kernel, agent-kernel → audit log, ChainWeaver →
+  contextweaver) with JSON payload snippets at each handoff and explicit
+  invariant references. Closes #27.
+- README ecosystem map (including AgentFence and VibeGuard as adjacent,
+  off-runtime-path tools) and Adoption Paths table. Closes #53.
+- `docs/LIFECYCLE.md` — normative five-phase lifecycle contract
+  (`route → call → interpret → answer → execute`) defining owner repo,
+  inputs, outputs, boundary, and applicable invariants per phase, plus an
+  informative "ambiguous cases" section. Closes #54.
+- `examples/interoperability/` — minimal happy-path
+  (`happy_path.md`: RoutingDecision → PolicyDecision(allow) →
+  Frame + Handle → TraceEvent chain) and denied-path
+  (`denied_path.md`: RoutingDecision → PolicyDecision(deny) → TraceEvent;
+  no Frame, no Handle) walkthroughs using inline `<!-- schema: X -->`
+  markers so existing CI validates every payload. Closes #55.
+
+### Changed
+
+- README Quick Navigation gained links to `docs/LIFECYCLE.md`,
+  `docs/INTEGRATION_MAP.md`, `contracts/COVERAGE.md`, and
+  `examples/interoperability/`.
+- `markdownlint` CI job now globs `examples/**/*.md` recursively (was
+  `examples/*.md`) so new subdirectories are linted.
+- `AGENTS.md` repo map updated with `examples/interoperability/`,
+  `docs/LIFECYCLE.md`, `docs/INTEGRATION_MAP.md`,
+  `scripts/generate_coverage_table.py`, and `contracts/COVERAGE.md`.
+
+**No Core contract changes** — no JSON schema fields added or removed, no
+Python dataclass surface changes, no `CONTRACT_VERSION` bump.
+
 ---
 
 ## [0.3.0] — 2026-05-19
