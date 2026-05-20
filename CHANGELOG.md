@@ -10,18 +10,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ---
 
-## [0.3.0] — 2026-05-19
+## [0.4.0] — 2026-05-20
 
 ### Added
 
-- `examples/failure_scenarios.md` — three failure-path walkthroughs (routing failure, authorization denial, partial execution failure) with contract payloads at every boundary. Closes #18.
-- `examples/multi_agent_orchestration.md` — two-agent ChainWeaver-coordinated walkthrough showing the full `RoutingDecision` → `Frame` → re-routing cycle. Closes #22.
-- `examples/partial_capability_routing.md` — partial-match routing walkthrough with three overlapping candidates and a ranked `ChoiceCard`. Closes #26.
-- `docs/SEQUENCE_DIAGRAMS.md` — three new Mermaid sequence diagrams (sections 4 — 6) for the routing-failure, authorization-denial, and partial-execution-failure paths. Diagrams use the same scenarios as `examples/failure_scenarios.md`. Closes #25.
-- CI step in `.github/workflows/ci.yml` that extracts inline JSON payloads from the new walkthroughs (and `docs/SEQUENCE_DIAGRAMS.md`) and validates each against its declared schema in `contracts/json/` using `jsonschema`, with `format`-keyword enforcement (e.g., `date-time`) and a non-zero-marker guard to fail loud on accidental marker removal. Blocks merges on walkthrough/contract drift.
-- `docs/QUICKSTART.md` — quick-start integration guide with Python and JS/TS code, schema validation patterns, and one integration snippet per sibling repo (contextweaver, agent-kernel, ChainWeaver). No runtime dependencies added. Closes #19.
-- `docs/CONTRACT_REFERENCE.md` — single-page field reference for all 16 contract types (9 Core + 7 Extended) with per-field type/required/description tables, source-of-truth links, and per-Extended-type usage guidance, Core relationship, and inline JSON example. Supersedes #21. Closes #20.
-- `docs/FAQ.md` — eight new task-oriented entries covering capability registration, Extended metadata composition, language-agnostic schema validation, version-mismatch handling, telemetry, the Core-field proposal workflow, the Frame-vs-Handle distinction, and spec-conformance testing. Closes #23.
 - `CHARTER.md` — governance roles (Contributor / Reviewer / Maintainer / Core Maintainer), decision flow, Working Group lifecycle, and current maintainer roster. Linked from `README.md` and `AGENTS.md`. Closes #42.
 - `docs/SECURITY_MAPPING.md` — alignment map between invariants `I-01`–`I-07` and OWASP LLM Top 10 (2025), MITRE ATLAS, and NIST AI RMF 1.0. Uses "aligned with" wording only. Linked from `SECURITY.md` and `README.md`. Closes #39.
 - `docs/DEPRECATIONS.md` — deprecation register and removal policy (≥1 MAJOR retention rule, removal requires ADR). Referenced from `.github/pull_request_template.md` and `CONTRIBUTING.md`. Closes #40.
@@ -35,6 +27,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - `.github/workflows/publish.yml` — adds `attestations: true` to the PyPI publish step and `attestations: write` permission, so each release emits a PEP 740 Sigstore-signed SLSA build provenance attestation. `SECURITY.md` and `contracts/python/README.md` document the `sigstore verify` flow for adopters. Closes #38.
 - `.github/pull_request_template.md` — adds a Deprecations section linking to `docs/DEPRECATIONS.md`.
 - `.github/workflows/ci.yml` and `CONTRIBUTING.md` — markdownlint command extended to lint `CHARTER.md`.
+
+**No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
+
+---
+
+## [0.3.0] — 2026-05-19
+
+### Added
+
+- `examples/failure_scenarios.md` — three failure-path walkthroughs (routing failure, authorization denial, partial execution failure) with contract payloads at every boundary. Closes #18.
+- `examples/multi_agent_orchestration.md` — two-agent ChainWeaver-coordinated walkthrough showing the full `RoutingDecision` → `Frame` → re-routing cycle. Closes #22.
+- `examples/partial_capability_routing.md` — partial-match routing walkthrough with three overlapping candidates and a ranked `ChoiceCard`. Closes #26.
+- `docs/SEQUENCE_DIAGRAMS.md` — three new Mermaid sequence diagrams (sections 4 — 6) for the routing-failure, authorization-denial, and partial-execution-failure paths. Diagrams use the same scenarios as `examples/failure_scenarios.md`. Closes #25.
+- CI step in `.github/workflows/ci.yml` that extracts inline JSON payloads from the new walkthroughs (and `docs/SEQUENCE_DIAGRAMS.md`) and validates each against its declared schema in `contracts/json/` using `jsonschema`, with `format`-keyword enforcement (e.g., `date-time`) and a non-zero-marker guard to fail loud on accidental marker removal. Blocks merges on walkthrough/contract drift.
+- `docs/QUICKSTART.md` — quick-start integration guide with Python and JS/TS code, schema validation patterns, and one integration snippet per sibling repo (contextweaver, agent-kernel, ChainWeaver). No runtime dependencies added. Closes #19.
+- `docs/CONTRACT_REFERENCE.md` — single-page field reference for all 16 contract types (9 Core + 7 Extended) with per-field type/required/description tables, source-of-truth links, and per-Extended-type usage guidance, Core relationship, and inline JSON example. Supersedes #21. Closes #20.
+- `docs/FAQ.md` — eight new task-oriented entries covering capability registration, Extended metadata composition, language-agnostic schema validation, version-mismatch handling, telemetry, the Core-field proposal workflow, the Frame-vs-Handle distinction, and spec-conformance testing. Closes #23.
 - `README.md` — Quick Navigation table now links to `docs/QUICKSTART.md` and `docs/CONTRACT_REFERENCE.md`.
 
 **No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
@@ -123,7 +132,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - Sample payloads for `routing_decision`, `frame_with_handles`, and `capability_token`.
 - CI workflows: `ci.yml` (Python tests + schema lint) and `links.yml` (link checker).
 
-[Unreleased]: https://github.com/dgenio/weaver-spec/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/dgenio/weaver-spec/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/dgenio/weaver-spec/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/dgenio/weaver-spec/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dgenio/weaver-spec/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/dgenio/weaver-spec/compare/v0.1.0...v0.1.1
