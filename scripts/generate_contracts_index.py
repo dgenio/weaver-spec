@@ -59,7 +59,9 @@ def read_schema_version_prefix() -> str:
 def schema_entry(path: Path, version_prefix: str) -> dict[str, Any]:
     """Build one index row for a single .schema.json file."""
     raw = path.read_bytes()
-    sha256 = hashlib.sha256(raw).hexdigest()
+    # Normalize to LF so hashes match across platforms (git stores LF).
+    normalized = raw.replace(b"\r\n", b"\n")
+    sha256 = hashlib.sha256(normalized).hexdigest()
     schema = json.loads(raw)
 
     schema_id = schema.get("$id")

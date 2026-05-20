@@ -7,63 +7,63 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/capability.schema.json",
       "path": "contracts/json/capability.schema.json",
-      "sha256": "b72ad0281d87e7dd07addfb9f5404a4666849d207b345f355b5e0c6cfb5f8e73"
+      "sha256": "fe319fe2743708186dbef4620cf645ad21b253d728ffe4b70980e83e476b7306"
     },
     {
       "name": "capability_token",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/capability_token.schema.json",
       "path": "contracts/json/capability_token.schema.json",
-      "sha256": "e4a6d0bf63763672c0c19c7a662f23ae855180a687d6a9c172c3e5bab5a8a6e7"
+      "sha256": "774a0768512e4b9d9cab6baa29b73a3a2942e6eff5a3de17398d440cfc971f9f"
     },
     {
       "name": "choice_card",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/choice_card.schema.json",
       "path": "contracts/json/choice_card.schema.json",
-      "sha256": "75ed894da91558ac397cc5358aad1bb376df8c83ffb4df77c49f5a22d27545b9"
+      "sha256": "114a3e50007e145d186d98dcb9b6c14bbfca0d035388d685e8ca881a524db6a4"
     },
     {
       "name": "frame",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/frame.schema.json",
       "path": "contracts/json/frame.schema.json",
-      "sha256": "cb1d9b88fd711a15f6fad4c90a07ca3251e9ed36be543648cb206e6156b60e0f"
+      "sha256": "9fbd3e8e535ba496bfffd399f9209dbfec62531fb46c815e7d8dd59316bc413e"
     },
     {
       "name": "handle",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/handle.schema.json",
       "path": "contracts/json/handle.schema.json",
-      "sha256": "6820234fd51a6a014e8e30d4ea93e84f8179a0416a20d9f48c07e24fcf2ff891"
+      "sha256": "1352f4866eeb1ad3dffc13656ed3567a4ccdc96822ce73cc77cc1e2ef049a74b"
     },
     {
       "name": "policy_decision",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/policy_decision.schema.json",
       "path": "contracts/json/policy_decision.schema.json",
-      "sha256": "b0e1bfb9e76cd7fc9e595cb5fa156216d736724f41fe24698c8c8e19936c008b"
+      "sha256": "f766e8b71c6e67b34280d1fac593771481b85ae3d40fd3200977b38fdbd2adbe"
     },
     {
       "name": "routing_decision",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/routing_decision.schema.json",
       "path": "contracts/json/routing_decision.schema.json",
-      "sha256": "2c6a07e16ebe01b3863d6764544a688e7f1f7e2157e9c40819ba334095e70b4f"
+      "sha256": "f38c91b28326a89c8c9154adef991aa707f2d608480290e33915167e10ff85d3"
     },
     {
       "name": "selectable_item",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/selectable_item.schema.json",
       "path": "contracts/json/selectable_item.schema.json",
-      "sha256": "38065b779455fbae158dda2c5c31a35eba91b280a5bf6dcffe342a6fdca28962"
+      "sha256": "1fa3dcfc33e591458ad49fa8dac021628d01db2421ce162e4f81bb981748fecd"
     },
     {
       "name": "trace_event",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/trace_event.schema.json",
       "path": "contracts/json/trace_event.schema.json",
-      "sha256": "97ab830610c92e46502a556f18d8d3248e600828878f2a76e915cd357092e55c"
+      "sha256": "a388c87ae93d540874ab822cb3686ec89e80703d8ef609dcbd3ebbcd01c7bbd9"
     }
   ],
   "extended": []
