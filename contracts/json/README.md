@@ -44,7 +44,7 @@ const valid = validate(payload);
 ## Schema Design Principles
 
 - All schemas use `$schema: https://json-schema.org/draft/2020-12/schema`.
-- All schemas have `$id`, `title`, and `description`.
+- All schemas have `$id`, `title`, `description`, and a top-level `required` array (enforced by `scripts/check_schema_fields.py` in CI and pre-commit).
 - `required` fields are minimal — only truly required fields are listed.
 - `additionalProperties: true` allows extensions without breaking validation.
 - Cross-schema references use the full `$id` URI.

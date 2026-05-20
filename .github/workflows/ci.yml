@@ -187,7 +187,8 @@ jobs:
             README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
             'docs/**/*.md' \
             'contracts/**/*.md' \
-            'examples/*.md'
+            'examples/*.md' \
+            '.github/**/*.md'
 
   yamllint:
     name: YAML Lint

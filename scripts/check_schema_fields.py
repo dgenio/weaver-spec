@@ -2,15 +2,18 @@
 """Validate that every JSON Schema in contracts/json/ has the required fields.
 
 A spec-compliant schema in this repository must declare ``$id``, ``title``,
-and ``description``. This script enforces that contract from both CI and
-the pre-commit hook so the two stay in sync.
+``description``, and a top-level ``required`` array (per CONTRIBUTING.md
+"Style Guidelines" and contracts/json/README.md "Schema Design Principles").
+This script enforces that contract from both CI and the pre-commit hook so
+the two stay in sync.
 
 Run with no arguments to scan ``contracts/json/*.schema.json``:
 
     python scripts/check_schema_fields.py
 
-Exits non-zero on the first schema missing a required field. Prints one
-``OK`` line per validated schema.
+Scans every schema and reports all violations before exiting non-zero, so a
+single run shows every fix needed. Prints one ``OK`` line per validated
+schema and a summary line on success.
 
 This script is intentionally stdlib-only. No third-party dependencies.
 """
@@ -23,7 +26,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_DIR = REPO_ROOT / "contracts" / "json"
-REQUIRED_FIELDS = ("$id", "title", "description")
+REQUIRED_FIELDS = ("$id", "title", "description", "required")
 
 
 def main() -> int:
@@ -34,18 +37,18 @@ def main() -> int:
 
     failures: list[str] = []
     for path in files:
+        rel = path.relative_to(REPO_ROOT)
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
-            failures.append(f"{path}: invalid JSON ({exc})")
+            failures.append(f"{rel}: invalid JSON ({exc})")
             continue
 
         missing = [field for field in REQUIRED_FIELDS if field not in data]
         if missing:
-            failures.append(f"{path}: missing {', '.join(missing)}")
+            failures.append(f"{rel}: missing {', '.join(missing)}")
             continue
 
-        rel = path.relative_to(REPO_ROOT)
         print(f"OK: {rel}")
 
     if failures:

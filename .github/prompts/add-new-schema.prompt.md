@@ -59,7 +59,7 @@ Template (replace `<type_name>` and field block):
 
 ### 2. Python dataclass — `contracts/python/src/weaver_contracts/core.py`
 
-- Add the class with `@dataclass(frozen=False)` (the existing pattern; check the file for the canonical decorator style).
+- Add the class with a plain `@dataclass` decorator — the established style across all 9 Core types in `core.py`. Do not introduce `frozen=`, `slots=`, or other decorator arguments without a precedent in the file.
 - Field names + types must mirror the JSON Schema **exactly** — zero divergence allowed.
 - Implement `__post_init__` for any non-structural constraint the schema enforces (enum membership, non-empty string, range checks). Raise `ValueError` on violation.
 - Do **not** import any non-stdlib module.

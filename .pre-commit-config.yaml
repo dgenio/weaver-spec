@@ -44,7 +44,7 @@ repos:
     rev: v0.14.0
     hooks:
       - id: markdownlint-cli2
-        files: '^(README\.md|CONTRIBUTING\.md|CHANGELOG\.md|CHARTER\.md|docs/.*\.md|contracts/.*\.md|examples/.*\.md)$'
+        files: '^(README\.md|CONTRIBUTING\.md|CHANGELOG\.md|CHARTER\.md|docs/.*\.md|contracts/.*\.md|examples/.*\.md|\.github/.*\.md)$'
 
   # Local hooks — invoke project-local validation scripts so a single
   # `pre-commit run` reproduces the CI gates.
