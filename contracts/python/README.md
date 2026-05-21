@@ -18,6 +18,21 @@ For development (includes `pytest` and `jsonschema`):
 pip install "weaver_contracts[dev]"
 ```
 
+### Verifying SLSA build provenance
+
+Starting with version **0.3.0**, releases ship with a [PEP 740](https://peps.python.org/pep-0740/) Sigstore-signed SLSA build provenance attestation. Earlier releases (`0.2.0` and below) do **not** carry an attestation. Verify a downloaded wheel before installing in production:
+
+```bash
+pip install sigstore
+pip download "weaver_contracts==<VERSION>" --no-deps -d ./dist
+sigstore verify identity \
+  --cert-identity-regexp '^https://github.com/dgenio/weaver-spec/' \
+  --cert-oidc-issuer 'https://token.actions.githubusercontent.com' \
+  ./dist/weaver_contracts-*.whl
+```
+
+See [SECURITY.md](../../SECURITY.md) for the full adopter security guidance.
+
 ---
 
 ## Usage

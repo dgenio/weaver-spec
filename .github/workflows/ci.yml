@@ -54,6 +54,22 @@ jobs:
           print(f'Validated {len(files)} payload(s)')
           "
 
+  validate-contracts-index:
+    name: Validate Contracts Index
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check well-known/contracts.json is up to date
+        run: python scripts/generate_contracts_index.py --check
+
   validate-walkthroughs:
     name: Validate Walkthrough Payloads
     runs-on: ubuntu-latest
@@ -184,7 +200,7 @@ jobs:
       - name: Lint Markdown files
         run: |
           markdownlint \
-            README.md CONTRIBUTING.md CHANGELOG.md \
+            README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
             'docs/**/*.md' \
             'contracts/**/*.md' \
             'examples/**/*.md'

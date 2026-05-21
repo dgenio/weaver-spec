@@ -7,7 +7,7 @@ This file adds Claude-specific operating behavior only.
 
 ## Critical rules (projected from AGENTS.md)
 
-- This repo is **docs + contracts only**. Never add runtime logic, CLI tools, or helper utilities.
+- This repo is **docs + contracts only**. Never add runtime logic, adopter-facing CLI tools, or adopter-facing helper utilities. Build-time spec-maintenance tooling is permitted under `scripts/` (stdlib-only, never imported by `weaver_contracts`, never published) — see `AGENTS.md` for the full scope rule.
 - **Authority hierarchy:** `docs/INVARIANTS.md` → `docs/BOUNDARIES.md` → `docs/ARCHITECTURE.md` → everything else.
 - **Every Core contract change must update all six artifacts in the same PR:** JSON schema, Python dataclass, sample payload, roundtrip test, CHANGELOG, version bump.
 - **Core contract changes affect sibling repos** (contextweaver, agent-kernel, ChainWeaver). Flag cross-repo impact in the PR description.

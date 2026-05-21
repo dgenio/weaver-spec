@@ -60,6 +60,28 @@ Python dataclass surface changes, no `CONTRACT_VERSION` bump.
 
 ---
 
+## [0.4.0] — 2026-05-20
+
+### Added
+
+- `CHARTER.md` — governance roles (Contributor / Reviewer / Maintainer / Core Maintainer), decision flow, Working Group lifecycle, and current maintainer roster. Linked from `README.md` and `AGENTS.md`. Closes #42.
+- `docs/SECURITY_MAPPING.md` — alignment map between invariants `I-01`–`I-07` and OWASP LLM Top 10 (2025), MITRE ATLAS, and NIST AI RMF 1.0. Uses "aligned with" wording only. Linked from `SECURITY.md` and `README.md`. Closes #39.
+- `docs/DEPRECATIONS.md` — deprecation register and removal policy (≥1 MAJOR retention rule, removal requires ADR). Referenced from `.github/pull_request_template.md` and `CONTRIBUTING.md`. Closes #40.
+- `docs/SCHEMA_HOSTING.md` — JSON Schema `$id` URL pattern, current hosting status, immutability rule, and content-addressed index policy.
+- `well-known/contracts.json` — content-addressed index of the 9 Core JSON Schemas with SHA-256 per file.
+- `scripts/generate_contracts_index.py` — stdlib-only generator for `well-known/contracts.json`. `--check` mode used in CI to fail on stale index.
+- CI job `validate-contracts-index` in `.github/workflows/ci.yml` that runs `python scripts/generate_contracts_index.py --check`. Closes #41.
+
+### Changed
+
+- `.github/workflows/publish.yml` — adds `attestations: true` to the PyPI publish step and `attestations: write` permission, so each release emits a PEP 740 Sigstore-signed SLSA build provenance attestation. `SECURITY.md` and `contracts/python/README.md` document the `sigstore verify` flow for adopters. Closes #38.
+- `.github/pull_request_template.md` — adds a Deprecations section linking to `docs/DEPRECATIONS.md`.
+- `.github/workflows/ci.yml` and `CONTRIBUTING.md` — markdownlint command extended to lint `CHARTER.md`.
+
+**No Core contract changes** — JSON Schemas, Python types, and existing sample payloads are unchanged.
+
+---
+
 ## [0.3.0] — 2026-05-19
 
 ### Added
@@ -160,7 +182,8 @@ Python dataclass surface changes, no `CONTRACT_VERSION` bump.
 - Sample payloads for `routing_decision`, `frame_with_handles`, and `capability_token`.
 - CI workflows: `ci.yml` (Python tests + schema lint) and `links.yml` (link checker).
 
-[Unreleased]: https://github.com/dgenio/weaver-spec/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/dgenio/weaver-spec/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/dgenio/weaver-spec/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/dgenio/weaver-spec/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/dgenio/weaver-spec/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/dgenio/weaver-spec/compare/v0.1.0...v0.1.1
