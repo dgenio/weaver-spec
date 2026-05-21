@@ -84,7 +84,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install jsonschema
-        run: pip install jsonschema
+        run: pip install jsonschema referencing
 
       - name: Validate inline JSON payloads against schemas
         run: |

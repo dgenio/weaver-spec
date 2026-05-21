@@ -55,11 +55,14 @@ def camel_to_snake(name: str) -> str:
 
 
 def discover_class_names(path: Path) -> List[str]:
-    """Return dataclass names declared in a Python source file, in source order."""
+    """Return @dataclass-decorated class names in a Python source file, in source order."""
     if not path.exists():
         return []
     text = path.read_text(encoding="utf-8")
-    return re.findall(r"^class\s+([A-Za-z_][A-Za-z0-9_]*)\b", text, re.MULTILINE)
+    # Only match classes immediately preceded by @dataclass (with optional args).
+    return re.findall(
+        r"^@dataclass.*\n^class\s+([A-Za-z_][A-Za-z0-9_]*)\b", text, re.MULTILINE
+    )
 
 
 def schema_path_for(snake: str, tier: str) -> Path:
@@ -79,7 +82,8 @@ def payload_path_for(snake: str, tier: str) -> List[Path]:
 def references_class(path: Path, class_name: str) -> bool:
     if not path.exists():
         return False
-    return class_name in path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8")
+    return bool(re.search(r"\b" + re.escape(class_name) + r"\b", text))
 
 
 def row_for(class_name: str, tier: str) -> Tuple[str, str, str, str, str, str, str]:
