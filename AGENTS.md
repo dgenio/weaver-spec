@@ -30,13 +30,18 @@ This repository is **documentation + contracts only**.
 | `contracts/python/pyproject.toml` | Package build config | Every version bump |
 | `contracts/python/tests/` | Roundtrip + schema alignment tests | Every contract change |
 | `examples/sample_payloads/` | Example JSON payloads | Every new or changed schema |
+| `examples/interoperability/` | Minimal happy-path and denied-path walkthroughs linking the Core contracts | When you need a tiny end-to-end illustration of contract handoffs |
 | `docs/` | Specification documents | When changing behavior, boundaries, or invariants |
+| `docs/LIFECYCLE.md` | Five-phase lifecycle (route → call → interpret → answer → execute) — owner, inputs, outputs, boundary per phase | When reasoning about phase ownership or phase transitions |
+| `docs/INTEGRATION_MAP.md` | Concrete inter-repo handoff points with JSON payloads at each boundary | When adding or reviewing cross-repo contract crossings |
 | `docs/adr/` | Architecture Decision Records for breaking changes | When proposing or reviewing a breaking Core contract change |
 | `docs/agent-context/` | Agent-oriented supporting docs | When you need workflow detail, invariant context, lessons learned, or a review checklist |
+| `scripts/generate_coverage_table.py` | Build-time tooling (stdlib only) that regenerates `contracts/COVERAGE.md` from the filesystem | When adding a new contract type, sample payload, or test class |
+| `contracts/COVERAGE.md` | Auto-generated artifact coverage table (JSON Schema / Python class / payload / roundtrip / schema test per type) | Re-read after any contract artifact change; CI fails if stale |
 | `docs/DEPRECATIONS.md` | Deprecation register (≥1 MAJOR retention rule) | Any PR that deprecates or removes a field, type, or constraint |
 | `docs/SCHEMA_HOSTING.md` | `$id` URL policy and content-addressed index policy | When changing schema `$id` URIs or the index format |
 | `well-known/contracts.json` | Generated content-addressed schema index (SHA-256 per file) | Regenerate via `scripts/generate_contracts_index.py` after any `contracts/json/` change |
-| `scripts/` | Build-time, stdlib-only utilities (e.g., index generator). Not runtime code. | When the build-time tooling itself changes |
+| `scripts/` | Build-time, stdlib-only utilities (e.g., index generator, coverage table generator). Not runtime code. | When the build-time tooling itself changes |
 | `CHARTER.md` | Governance roles, decision flow, Working Groups | When governance roles or process change |
 
 ---

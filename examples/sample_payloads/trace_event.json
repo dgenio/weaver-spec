@@ -1,0 +1,15 @@
+{
+  "event_id": "te-20260308-005",
+  "event_type": "capability_executed",
+  "timestamp": "2026-03-08T06:00:05Z",
+  "capability_id": "org.myapp.search_docs",
+  "principal": "agent-session-7f3a",
+  "decision_id": "pd-20260308-001",
+  "frame_id": "frame-20260308-001",
+  "handle_id": "handle-rawresult-20260308-001",
+  "outcome": "success",
+  "metadata": {
+    "duration_ms": 142,
+    "audit_log_sequence": 24891
+  }
+}
