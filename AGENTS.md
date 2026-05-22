@@ -180,9 +180,9 @@ pytest --cov --cov-report=term-missing
 # 2. Type checking
 mypy src/
 
-# 3. JSON schema validation
+# 3. JSON schema validation (required fields + valid JSON)
 cd ../..
-python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
+python scripts/check_schema_fields.py
 
 # 4. Contracts index freshness — regenerate first if any contracts/json/ file changed
 python scripts/generate_contracts_index.py --check
@@ -190,6 +190,8 @@ python scripts/generate_contracts_index.py --check
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 ```
+
+Or, if pre-commit is installed (recommended): `pre-commit run --all-files` runs checks 3–5 automatically. Add `pre-commit install --hook-type pre-push` to also gate check 1 on push.
 
 ---
 

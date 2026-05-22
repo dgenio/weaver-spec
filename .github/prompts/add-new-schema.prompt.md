@@ -116,7 +116,7 @@ python scripts/generate_contracts_index.py --check
 
 # 5. Markdown lint (see CONTRIBUTING.md for the canonical command)
 markdownlint README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
-  'docs/**/*.md' 'contracts/**/*.md' 'examples/*.md'
+  'docs/**/*.md' 'contracts/**/*.md' 'examples/**/*.md' '.github/**/*.md'
 ```
 
 Or, if pre-commit is installed: `pre-commit run --all-files`.

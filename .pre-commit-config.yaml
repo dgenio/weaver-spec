@@ -75,7 +75,8 @@ repos:
         description: |
           Runs the contracts/python pytest suite. Triggered only when
           Python sources, tests, schemas, or sample payloads change.
-        entry: bash -c 'cd contracts/python && python -m pytest -q'
+        entry: |-
+          python -c "import subprocess,sys; sys.exit(subprocess.run([sys.executable,'-m','pytest','-q'],cwd='contracts/python').returncode)"
         language: system
         pass_filenames: false
         files: '^(contracts/python/.*\.(py|toml)|contracts/json/.*\.schema\.json|examples/sample_payloads/.*\.json)$'
