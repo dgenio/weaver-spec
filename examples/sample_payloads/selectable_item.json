@@ -1,0 +1,10 @@
+{
+  "id": "si-search-docs",
+  "label": "Search documentation",
+  "description": "Full-text search across the product documentation index.",
+  "capability_id": "org.myapp.search_docs",
+  "metadata": {
+    "ranking_hint": "prefer-recent",
+    "card_position": 1
+  }
+}

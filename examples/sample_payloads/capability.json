@@ -1,0 +1,13 @@
+{
+  "id": "org.myapp.search_docs",
+  "name": "Search documentation",
+  "version": "1.2.0",
+  "description": "Full-text search across the product documentation index. Returns ranked matches with titles, slugs, and relevance scores. Does not return raw document bodies.",
+  "input_schema_ref": "https://schemas.myapp.org/capabilities/search_docs/input/v1.json",
+  "output_schema_ref": "https://schemas.myapp.org/capabilities/search_docs/output/v1.json",
+  "tags": ["retrieval", "documentation", "read-only"],
+  "metadata": {
+    "owner_team": "platform-search",
+    "rate_limit_rpm": 60
+  }
+}

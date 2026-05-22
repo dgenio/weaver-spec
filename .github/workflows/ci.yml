@@ -68,7 +68,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install jsonschema
-        run: pip install jsonschema
+        run: pip install jsonschema referencing
 
       - name: Validate inline JSON payloads against schemas
         run: |
@@ -187,7 +187,7 @@ jobs:
             README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
             'docs/**/*.md' \
             'contracts/**/*.md' \
-            'examples/*.md' \
+            'examples/**/*.md' \
             '.github/**/*.md'
 
   yamllint:
@@ -213,3 +213,19 @@ jobs:
             .github/workflows/ \
             .yamllint.yml \
             .pre-commit-config.yaml
+
+  coverage-table:
+    name: Validate Coverage Table
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check contracts/COVERAGE.md is up to date
+        run: python scripts/generate_coverage_table.py --check
