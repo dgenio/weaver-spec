@@ -60,6 +60,7 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 | Security framework alignment | [docs/SECURITY_MAPPING.md](docs/SECURITY_MAPPING.md) |
 | Deprecation register | [docs/DEPRECATIONS.md](docs/DEPRECATIONS.md) |
 | Schema hosting policy | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) |
+| Doc markup conventions | [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) |
 | Content-addressed schema index | [well-known/contracts.json](well-known/contracts.json) |
 | JSON Schemas | [contracts/json/](contracts/json/) |
 | Python package | [contracts/python/](contracts/python/) |
@@ -84,6 +85,9 @@ Contracts are split into two tiers:
 3. For doc-only or additive changes, a PR with a clear description is sufficient.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
+
+> [!NOTE]
+> Throughout the docs, `> [!IMPORTANT]` callouts mark **binding requirements**, `> [!NOTE]` callouts mark **informative guidance**, and fenced code blocks contain **illustrative examples**. See [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) for the full markup convention.
 
 ---
 

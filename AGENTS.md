@@ -22,7 +22,10 @@ This repository is **documentation + contracts only**.
 |------|----------|-----------------|
 | `.github/pull_request_template.md` | PR checklist (six-artifact rule, invariants, cross-repo impact) | Opening or reviewing any PR |
 | `.github/ISSUE_TEMPLATE/` | Issue forms (bug report, feature request, ADR proposal) | Triaging or filing issues; understanding required intake fields |
+| `.github/prompts/` | VS Code `.prompt.md` templates encoding the six-artifact rule (add field, add schema) | Driving a Core contract change end-to-end without re-reading the full spec |
 | `.github/CODEOWNERS` | Auto-assignment rules for PR review | Adding new paths or reviewers |
+| `.pre-commit-config.yaml` | Pre-commit hook bundle mirroring the CI gates (JSON/YAML/markdown lint, contracts-index freshness, pytest on push) | Onboarding a new contributor; adding a new local validation gate |
+| `.yamllint.yml` | yamllint config tuned for GitHub-flavored YAML (issue forms, workflows) | Adding new YAML files or adjusting workflow style |
 | `contracts/json/` | JSON Schemas (Draft 2020-12) | Adding or modifying contract definitions |
 | `contracts/python/src/weaver_contracts/core.py` | Core contract dataclasses (9 types) | When schemas change — must update in same PR |
 | `contracts/python/src/weaver_contracts/extended.py` | Extended metadata types | Adding optional metadata contracts |
@@ -177,9 +180,9 @@ pytest --cov --cov-report=term-missing
 # 2. Type checking
 mypy src/
 
-# 3. JSON schema validation
+# 3. JSON schema validation (required fields + valid JSON)
 cd ../..
-python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('contracts/json/*.schema.json')]"
+python scripts/check_schema_fields.py
 
 # 4. Contracts index freshness — regenerate first if any contracts/json/ file changed
 python scripts/generate_contracts_index.py --check
@@ -187,6 +190,8 @@ python scripts/generate_contracts_index.py --check
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 ```
+
+Or, if pre-commit is installed (recommended): `pre-commit run --all-files` runs checks 3–5 automatically. Add `pre-commit install --hook-type pre-push` to also gate check 1 on push.
 
 ---
 
@@ -207,6 +212,7 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/SECURITY_MAPPING.md](docs/SECURITY_MAPPING.md) | Alignment map between invariants and OWASP / MITRE ATLAS / NIST AI RMF |
 | [docs/DEPRECATIONS.md](docs/DEPRECATIONS.md) | Deprecation register and removal policy |
 | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) | `$id` URL pattern, immutability rule, content-addressed index |
+| [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) | Markup convention for normative requirements vs informative notes vs examples |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |
 | [docs/agent-context/invariants.md](docs/agent-context/invariants.md) | Hard constraints, forbidden shortcuts, safe-vs-unsafe changes |

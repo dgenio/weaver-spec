@@ -1,0 +1,45 @@
+# yamllint configuration for weaver-spec.
+#
+# Scope: GitHub issue templates, GitHub Actions workflows, and any other
+# YAML files committed to this repository.
+#
+# Rules are tuned for GitHub-flavored YAML (issue forms, workflows). Line
+# length is relaxed because issue-form `value: |` blocks routinely exceed
+# 80 columns, and workflow files contain long uses/with values.
+
+extends: default
+
+rules:
+  # GitHub issue forms and workflows commonly exceed 80 cols (issue-form
+  # `value: |` blocks contain wrapped markdown prose). Allow long lines
+  # but still catch egregious cases.
+  line-length:
+    max: 250
+    level: warning
+
+  # Workflows pin many actions with `uses:` — comments above each pin are
+  # idiomatic, so don't require a blank line between them.
+  empty-lines:
+    max-end: 1
+
+  # Document start markers (`---`) are optional in GitHub workflows and
+  # issue forms; don't enforce.
+  document-start: disable
+
+  # GitHub issue forms commonly use `true`/`false` and `on`/`off` in the
+  # same file (e.g., `required: true`, `on: push`). Default truthy check
+  # flags `on:` in workflows as a truthy value misuse — disable for repos
+  # that have GitHub Actions workflows.
+  truthy:
+    check-keys: false
+
+  # Two-space indent matches the existing files in `.github/ISSUE_TEMPLATE/`
+  # and `.github/workflows/`.
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+  # Comments don't need to start with `#` followed by a space in every case
+  # (e.g., `#!/...` shebangs are not present here but be tolerant).
+  comments:
+    min-spaces-from-content: 1
