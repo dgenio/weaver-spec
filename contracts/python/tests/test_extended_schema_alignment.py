@@ -127,6 +127,20 @@ class TestExtendedNegativeCases:
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(bad, schema)
 
+    def test_evaluation_artifact_high_risk_deploy_fails(self):
+        # #67: a high-risk evaluation is not deployment evidence. The schema
+        # must reject this pairing, matching the Python dataclass constraint.
+        schema = load_extended_schema("evaluation_artifact")
+        bad = {
+            "artifact_id": "e1",
+            "producer": "skdr-eval",
+            "created_at": "2026-05-27T10:00:00Z",
+            "support_state": "high_risk",
+            "recommendation_kind": "deploy",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
     def test_artifact_safety_report_bad_decision_fails(self):
         schema = load_extended_schema("artifact_safety_report")
         bad = {

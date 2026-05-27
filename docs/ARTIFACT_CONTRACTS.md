@@ -166,8 +166,8 @@ agent cannot misuse a headline score. `support_state` (`ok` \| `caution` \|
 machine-readable verdict.
 
 > [!IMPORTANT]
-> A `high_risk` evaluation must never recommend deployment. The Python contract
-> rejects `support_state = "high_risk"` together with
+> A `high_risk` evaluation must never recommend deployment. Both the JSON Schema
+> and the Python contract reject `support_state = "high_risk"` together with
 > `recommendation_kind = "deploy"`: a high-risk evaluation is not deployment
 > evidence.
 

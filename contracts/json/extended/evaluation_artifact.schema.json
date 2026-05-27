@@ -102,5 +102,15 @@
       "additionalProperties": true
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "if": {
+    "properties": { "support_state": { "const": "high_risk" } },
+    "required": ["support_state"]
+  },
+  "then": {
+    "not": {
+      "properties": { "recommendation_kind": { "const": "deploy" } },
+      "required": ["recommendation_kind"]
+    }
+  }
 }

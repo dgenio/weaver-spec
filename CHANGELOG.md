@@ -19,9 +19,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   `ReviewArtifact` (Closes #65); `MemoryArtifact` + `SessionHandoff`
   (Closes #56); `LessonCard` + `SkillCard` (Closes #64); `EvaluationArtifact`
   (Closes #67); `ArtifactSafetyGateRequest` + `ArtifactSafetyReport`
-  (Closes #63). `EvaluationArtifact` rejects, at construction time, a
-  `high_risk` support state paired with a `deploy` recommendation (a high-risk
-  evaluation is not deployment evidence).
+  (Closes #63). `EvaluationArtifact` rejects — in both the JSON Schema and at
+  Python construction time — a `high_risk` support state paired with a `deploy`
+  recommendation (a high-risk evaluation is not deployment evidence).
 - `contracts/json/extended/` — first Extended JSON Schemas (8 files). Their
   `$id` URIs live under the `extended/` namespace and are picked up
   automatically by `scripts/generate_contracts_index.py`.

@@ -86,7 +86,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/evaluation_artifact.schema.json",
       "path": "contracts/json/extended/evaluation_artifact.schema.json",
-      "sha256": "87e828ad60b6fe8288bbb1c72acbdb496335d0977f3a3180130925c061a9017c"
+      "sha256": "11b7a02fd3d13881ccfcc85e22e57cf5292411e23f80993d7956d5c474a6af52"
     },
     {
       "name": "lesson_card",
