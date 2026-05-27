@@ -15,14 +15,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   `agent-kernel`, `ChainWeaver`). Declares per-repo `status`
   (`verified` / `provisional` / `unverified` / `incompatible`),
   `supported_spec_versions`, `tested_version`, `declaration`, and
-  `known_limitations`. Validated by a new `validate-compatibility` CI job
-  (`.github/workflows/ci.yml`, PyYAML) that enforces the status vocabulary,
-  semver formatting of every version field, that each
+  `known_limitations`. The validation logic lives in stdlib-only
+  `scripts/validate_compatibility.py` (with a self-test of its rejection
+  paths) and runs both in the `validate-compatibility` CI job
+  (`.github/workflows/ci.yml`, PyYAML) and locally via the
+  `compatibility-manifest` pre-commit hook. It enforces the status
+  vocabulary, semver formatting of every version field, that each
   `supported_spec_versions` entry is one of `contract_versions`, that
   `verified`/`provisional` entries carry concrete version and declaration
   references, and that every manifest repo is referenced in
-  `docs/VERSIONING.md`; also linted by the `yamllint` CI job and the
-  pre-commit `yamllint` hook. Closes #57.
+  `docs/VERSIONING.md`; the manifest is also linted by the `yamllint` CI job
+  and the pre-commit `yamllint` hook. Closes #57.
 - `docs/ECOSYSTEM.md` — derived, informative ecosystem boundary map:
   per-project owns / does-not-own / consumes / emits table, an end-to-end
   lifecycle example, a weaver-spec-vs-individual-repo concern split, and

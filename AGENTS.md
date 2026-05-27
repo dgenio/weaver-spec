@@ -41,6 +41,7 @@ This repository is **documentation + contracts only**.
 | `docs/adr/` | Architecture Decision Records for breaking changes | When proposing or reviewing a breaking Core contract change |
 | `docs/agent-context/` | Agent-oriented supporting docs | When you need workflow detail, invariant context, lessons learned, or a review checklist |
 | `scripts/generate_coverage_table.py` | Build-time tooling (stdlib only) that regenerates `contracts/COVERAGE.md` from the filesystem | When adding a new contract type, sample payload, or test class |
+| `scripts/validate_compatibility.py` | Build-time tooling (stdlib only — no YAML parser) holding the `compatibility.yaml` validation logic + self-test; callers (the `validate-compatibility` CI job and the `compatibility-manifest` pre-commit hook) parse the YAML and call `validate()` | When changing the compatibility manifest's required fields or validation rules |
 | `contracts/COVERAGE.md` | Auto-generated artifact coverage table (JSON Schema / Python class / payload / roundtrip / schema test per type) | Re-read after any contract artifact change; CI fails if stale |
 | `docs/DEPRECATIONS.md` | Deprecation register (≥1 MAJOR retention rule) | Any PR that deprecates or removes a field, type, or constraint |
 | `docs/SCHEMA_HOSTING.md` | `$id` URL policy and content-addressed index policy | When changing schema `$id` URIs or the index format |
