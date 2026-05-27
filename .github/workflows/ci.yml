@@ -38,6 +38,109 @@ jobs:
           print(f'Validated {len(files)} payload(s)')
           "
 
+  validate-compatibility:
+    name: Validate Compatibility Manifest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate compatibility.yaml structure and matrix consistency
+        run: |
+          python << 'PYEOF'
+          import re
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          ALLOWED_STATUS = {"verified", "provisional", "unverified", "incompatible"}
+          SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
+          REQUIRED_KEYS = {
+              "name",
+              "role",
+              "status",
+              "supported_spec_versions",
+              "tested_version",
+              "declaration",
+              "known_limitations",
+          }
+
+          errors: list[str] = []
+          manifest = yaml.safe_load(Path("compatibility.yaml").read_text(encoding="utf-8"))
+
+          if not isinstance(manifest, dict):
+              print("FAIL: compatibility.yaml must be a mapping", file=sys.stderr)
+              sys.exit(1)
+
+          if manifest.get("schema_version") != 1:
+              errors.append("schema_version must be 1")
+
+          versions = manifest.get("contract_versions")
+          if not isinstance(versions, list) or not versions:
+              errors.append("contract_versions must be a non-empty list")
+          else:
+              for v in versions:
+                  if not isinstance(v, str) or not SEMVER.match(v):
+                      errors.append(f"contract_versions entry {v!r} is not MAJOR.MINOR.PATCH")
+
+          repos = manifest.get("repositories")
+          if not isinstance(repos, list) or not repos:
+              errors.append("repositories must be a non-empty list")
+              repos = []
+
+          required_repos = {"contextweaver", "agent-kernel", "ChainWeaver"}
+          seen = set()
+          versioning_md = Path("docs/VERSIONING.md").read_text(encoding="utf-8")
+
+          for i, entry in enumerate(repos):
+              where = f"repositories[{i}]"
+              if not isinstance(entry, dict):
+                  errors.append(f"{where} must be a mapping")
+                  continue
+              missing = REQUIRED_KEYS - entry.keys()
+              if missing:
+                  errors.append(f"{where} missing keys: {sorted(missing)}")
+              name = entry.get("name")
+              if isinstance(name, str):
+                  seen.add(name)
+                  if name not in versioning_md:
+                      errors.append(f"{where}: {name!r} is not referenced in docs/VERSIONING.md")
+              status = entry.get("status")
+              if status not in ALLOWED_STATUS:
+                  errors.append(f"{where}: status {status!r} not in {sorted(ALLOWED_STATUS)}")
+              ssv = entry.get("supported_spec_versions")
+              if not isinstance(ssv, list):
+                  errors.append(f"{where}: supported_spec_versions must be a list")
+              else:
+                  for v in ssv:
+                      if not isinstance(v, str) or not SEMVER.match(v):
+                          errors.append(f"{where}: supported_spec_versions entry {v!r} is not semver")
+              # A claimed status must be backed by a declaration reference.
+              if status in {"verified", "provisional"} and not entry.get("declaration"):
+                  errors.append(
+                      f"{where}: status {status!r} requires a non-null 'declaration' reference"
+                  )
+
+          for missing_repo in sorted(required_repos - seen):
+              errors.append(f"required sibling repository {missing_repo!r} is missing from the manifest")
+
+          if errors:
+              for e in errors:
+                  print(f"FAIL: {e}", file=sys.stderr)
+              sys.exit(1)
+          print(f"OK: compatibility.yaml valid — {len(repos)} repositories, status vocabulary enforced.")
+          PYEOF
+
   validate-contracts-index:
     name: Validate Contracts Index
     runs-on: ubuntu-latest
@@ -212,7 +315,8 @@ jobs:
             .github/ISSUE_TEMPLATE/ \
             .github/workflows/ \
             .yamllint.yml \
-            .pre-commit-config.yaml
+            .pre-commit-config.yaml \
+            compatibility.yaml
 
   coverage-table:
     name: Validate Coverage Table
