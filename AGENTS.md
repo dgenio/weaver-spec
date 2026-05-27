@@ -45,6 +45,7 @@ This repository is **documentation + contracts only**.
 | `docs/DEPRECATIONS.md` | Deprecation register (≥1 MAJOR retention rule) | Any PR that deprecates or removes a field, type, or constraint |
 | `docs/SCHEMA_HOSTING.md` | `$id` URL policy and content-addressed index policy | When changing schema `$id` URIs or the index format |
 | `well-known/contracts.json` | Generated content-addressed schema index (SHA-256 per file) | Regenerate via `scripts/generate_contracts_index.py` after any `contracts/json/` change |
+| `compatibility.yaml` | Machine-readable sibling-repo compatibility manifest (human-readable view in `docs/VERSIONING.md`). Validated by the `validate-compatibility` CI job | When a sibling repo declares or changes its supported spec versions |
 | `scripts/` | Build-time, stdlib-only utilities (e.g., index generator, coverage table generator). Not runtime code. | When the build-time tooling itself changes |
 | `CHARTER.md` | Governance roles, decision flow, Working Groups | When governance roles or process change |
 
@@ -215,6 +216,7 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) | `$id` URL pattern, immutability rule, content-addressed index |
 | [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) | Markup convention for normative requirements vs informative notes vs examples |
 | [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) | Cross-project Extended artifact vocabulary (memory, session handoff, lesson/skill cards, evaluation, safety gate) |
+| [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) | Derived ecosystem boundary map (owns/consumes/emits per project, end-to-end lifecycle); points to BOUNDARIES.md/LIFECYCLE.md as canonical |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |
 | [docs/agent-context/invariants.md](docs/agent-context/invariants.md) | Hard constraints, forbidden shortcuts, safe-vs-unsafe changes |

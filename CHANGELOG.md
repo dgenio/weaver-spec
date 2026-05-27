@@ -10,6 +10,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- `compatibility.yaml` — machine-readable manifest of sibling-repository
+  compatibility with each weaver-spec contract version (`contextweaver`,
+  `agent-kernel`, `ChainWeaver`). Declares per-repo `status`
+  (`verified` / `provisional` / `unverified` / `incompatible`),
+  `supported_spec_versions`, `tested_version`, `declaration`, and
+  `known_limitations`. Validated by a new `validate-compatibility` CI job
+  (`.github/workflows/ci.yml`, PyYAML) that enforces the status vocabulary,
+  semver formatting, and that every manifest repo is referenced in
+  `docs/VERSIONING.md`; also linted by the `yamllint` CI job and the
+  pre-commit `yamllint` hook. Closes #57.
+- `docs/ECOSYSTEM.md` — derived, informative ecosystem boundary map:
+  per-project owns / does-not-own / consumes / emits table, an end-to-end
+  lifecycle example, a weaver-spec-vs-individual-repo concern split, and
+  compatibility pointers. Points to `docs/BOUNDARIES.md` and
+  `docs/LIFECYCLE.md` as canonical and is linked from `README.md`. Closes #62.
+- `docs/VERSIONING.md` — filled the compatibility matrix with an explicit
+  status vocabulary and a documented declaration process, replacing the
+  `— (TBD)` placeholders; references `compatibility.yaml` as the
+  machine-readable source of truth. Closes #3.
 - Eight new **Extended** cross-project artifact contracts in
   `weaver_contracts.extended`, each shipped with the full artifact set (JSON
   Schema under `contracts/json/extended/`, sample payload under
@@ -92,6 +111,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - Regenerated `contracts/COVERAGE.md` (now 24 contract types) and
   `well-known/contracts.json` (Extended entries populated; `contract_version`
   → 0.5.0).
+- `README.md` — corrected the stale "Current contract version" value
+  (`0.3.0` → `0.5.0`) to match `weaver_contracts.version.CONTRACT_VERSION`,
+  and linked the new `docs/ECOSYSTEM.md` from the ecosystem map and Quick
+  Navigation.
 
 **No Core contract changes** — no Core JSON schema fields added or removed, no
 Core Python dataclass surface changes. This cycle adds eight additive

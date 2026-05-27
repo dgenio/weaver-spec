@@ -22,6 +22,8 @@ This repository is the single source of truth for the vocabulary, invariants, re
 
 Only the first three repos are on the runtime request path. AgentFence and VibeGuard are adjacent tools that share contracts and conventions but are not required for a working Weaver stack.
 
+For the full boundary map (owns / consumes / emits per project, plus an end-to-end lifecycle), see [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md).
+
 ### Adoption paths
 
 Pick the path that matches what you are integrating today. None requires adopting the full stack.
@@ -43,6 +45,7 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 | What you need | Where to look |
 | --------------- | --------------- |
 | Ecosystem overview | [docs/VISION.md](docs/VISION.md) |
+| Ecosystem boundary map | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) |
 | Quick-start (Python + JS/TS) | [docs/QUICKSTART.md](docs/QUICKSTART.md) |
 | Contract field reference | [docs/CONTRACT_REFERENCE.md](docs/CONTRACT_REFERENCE.md) |
 | Layer architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
@@ -108,7 +111,7 @@ examples/
 
 The spec and contracts follow semantic versioning. See [docs/VERSIONING.md](docs/VERSIONING.md) for the full compatibility promise.
 
-Current contract version: **0.3.0**
+Current contract version: **0.5.0**
 
 ---
 
