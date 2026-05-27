@@ -1,0 +1,51 @@
+# Machine-readable compatibility manifest for the Weaver Stack.
+#
+# Source of truth for which sibling-repository versions are known-compatible
+# with each weaver-spec contract version. The human-readable view lives in
+# docs/VERSIONING.md ("Compatibility Matrix"); this file is what tooling and
+# sibling-repo CI consume.
+#
+# Status vocabulary (full definitions live in docs/VERSIONING.md):
+#   verified     - sibling declared support AND backed it with tests/conformance
+#   provisional  - sibling claims support; not yet test-verified
+#   unverified   - no compatibility declaration published yet (default)
+#   incompatible - known not to work against this contract version
+#
+# A repository may only be "verified" or "provisional" when backed by a real
+# "declaration" reference. Unknown compatibility MUST stay "unverified" — never
+# assume or invent a version claim.
+---
+schema_version: 1
+
+# weaver-spec contract versions this manifest reasons about. All 0.x versions
+# share MAJOR 0 and are mutually compatible (see docs/VERSIONING.md).
+contract_versions:
+  - "0.5.0"
+
+repositories:
+  - name: contextweaver
+    role: "Context compilation, tool routing, ChoiceCard generation"
+    status: unverified
+    supported_spec_versions: []
+    tested_version: null
+    declaration: null
+    known_limitations:
+      - "No compatibility declaration published yet."
+
+  - name: agent-kernel
+    role: "Capability authZ/authN, execution, firewalling, audit"
+    status: unverified
+    supported_spec_versions: []
+    tested_version: null
+    declaration: null
+    known_limitations:
+      - "No compatibility declaration published yet."
+
+  - name: ChainWeaver
+    role: "Deterministic DAG / flow orchestration"
+    status: unverified
+    supported_spec_versions: []
+    tested_version: null
+    declaration: null
+    known_limitations:
+      - "No compatibility declaration published yet."
