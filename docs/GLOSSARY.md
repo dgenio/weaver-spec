@@ -111,3 +111,77 @@ An immutable audit log entry recording a single significant event in the executi
 The storage backend for raw tool output artifacts referenced by Handles. The HandleStore is an agent-kernel internal component; its implementation is not specified here. What is specified is the Handle contract that references artifacts stored within it.
 
 **Key property:** Artifacts in the HandleStore are accessible only through Handle resolution, which requires authorization.
+
+---
+
+## ReviewArtifact
+
+**(Extended.)** A minimal, language-neutral interchange shape for trace/review records exchanged between projects (context build records, execution records, policy decisions, review notes, safety reports). An interchange shape, not a storage system. See [docs/ARTIFACT_CONTRACTS.md](ARTIFACT_CONTRACTS.md).
+
+**Key fields:** `artifact_id`, `artifact_type`, `source_project`, `created_at`, `evidence_refs`, `decision_refs`.
+
+**Owned by:** any project (cross-project vocabulary).
+
+---
+
+## MemoryArtifact
+
+**(Extended.)** A durable or semi-durable agent memory record, distinct from transient conversation context, raw tool output, and traces. Carries its own sensitivity and provenance.
+
+**Key fields:** `memory_id`, `memory_type`, `content`, `source`, `created_at`, `scope`, `sensitivity`, `confidence`, `expires_at`.
+
+**Owned by:** contextweaver (memory source) and adjacent memory stores; produced/consumed across the stack.
+
+---
+
+## SessionHandoff
+
+**(Extended.)** A compact continuity pack carried between agent sessions. References durable memory via `memory_refs` rather than inlining it.
+
+**Key fields:** `handoff_id`, `from_session_id`, `to_session_id`, `created_at`, `summary`, `open_threads`, `memory_refs`.
+
+**Owned by:** the host application / orchestration layer at session boundaries.
+
+---
+
+## LessonCard
+
+**(Extended.)** A reviewed, reusable lesson derived from traces and approved for reuse. Not a raw trace, raw memory, or prompt fragment. `lifecycle_state` gates activation (review before `active`).
+
+**Key fields:** `lesson_id`, `title`, `body`, `created_at`, `lifecycle_state`, `scope`, `sensitivity`, `applicability`, `source_refs`.
+
+**Owned by:** lessonweaver (produces); any agent applies approved lessons.
+
+---
+
+## SkillCard
+
+**(Extended.)** A reviewed, reusable procedure/skill derived from traces. Like LessonCard, `lifecycle_state` gates activation; `steps` and `preconditions` describe how and when to apply it.
+
+**Key fields:** `skill_id`, `name`, `description`, `created_at`, `lifecycle_state`, `steps`, `preconditions`, `scope`, `sensitivity`, `source_refs`.
+
+**Owned by:** lessonweaver (produces); any agent applies approved skills.
+
+---
+
+## EvaluationArtifact
+
+**(Extended.)** A statistical / offline model-evaluation report carried with explicit semantics so agents cannot misuse a headline score. `support_state` summarizes diagnostic confidence; `recommendation_kind` is the machine-readable verdict.
+
+**Key fields:** `artifact_id`, `producer`, `created_at`, `artifact_type`, `metrics`, `uncertainty`, `support_state`, `warnings`, `recommendation_kind`, `limitations`.
+
+**Owned by:** skdr-eval (produces); contextweaver / ChainWeaver / agent-kernel interpret.
+
+**Invariant (construction-time):** A `high_risk` evaluation must not carry `recommendation_kind = "deploy"` — a high-risk evaluation is not deployment evidence.
+
+---
+
+## ArtifactSafetyGateRequest / ArtifactSafetyReport
+
+**(Extended.)** Inputs and outputs of an optional, implementation-neutral safety gate over agent-produced artifacts (code, config, docs, manifests) before a high-impact action. The report's `mode` distinguishes an advisory check from a blocking gate; `decision` is the pass/fail verdict.
+
+**Key request fields:** `request_id`, `repository_root`, `artifact_paths`, `diff_scope`, `policy_level`, `output_format`.
+
+**Key report fields:** `report_id`, `gate_id`, `decision`, `created_at`, `mode`, `findings` (each with `severity`, `message`, optional `fingerprint`, `remediation`).
+
+**Owned by:** vibeguard or an equivalent gate (produces); the host / agent-kernel acts on the result.

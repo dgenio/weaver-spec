@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_version": "0.4.0",
+  "contract_version": "0.5.0",
   "core": [
     {
       "name": "capability",
@@ -66,5 +66,62 @@
       "sha256": "a388c87ae93d540874ab822cb3686ec89e80703d8ef609dcbd3ebbcd01c7bbd9"
     }
   ],
-  "extended": []
+  "extended": [
+    {
+      "name": "artifact_safety_gate_request",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/artifact_safety_gate_request.schema.json",
+      "path": "contracts/json/extended/artifact_safety_gate_request.schema.json",
+      "sha256": "c923b62b0fbe656761c734c20d3036951d17212c92be6d767b48782e508308ff"
+    },
+    {
+      "name": "artifact_safety_report",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/artifact_safety_report.schema.json",
+      "path": "contracts/json/extended/artifact_safety_report.schema.json",
+      "sha256": "2352e7f2e848500a0b670657fa9716d3b1758e56ffb685876a0f82e2bb64cb49"
+    },
+    {
+      "name": "evaluation_artifact",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/evaluation_artifact.schema.json",
+      "path": "contracts/json/extended/evaluation_artifact.schema.json",
+      "sha256": "11b7a02fd3d13881ccfcc85e22e57cf5292411e23f80993d7956d5c474a6af52"
+    },
+    {
+      "name": "lesson_card",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/lesson_card.schema.json",
+      "path": "contracts/json/extended/lesson_card.schema.json",
+      "sha256": "922283d72140920f591e7f9ea30621878ba28606c65b078e71ef5459584b9d1a"
+    },
+    {
+      "name": "memory_artifact",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/memory_artifact.schema.json",
+      "path": "contracts/json/extended/memory_artifact.schema.json",
+      "sha256": "5c469d4a3d825be40ac848db79bccef08e5accec5c9cf97318f7f7fa9b174aea"
+    },
+    {
+      "name": "review_artifact",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/review_artifact.schema.json",
+      "path": "contracts/json/extended/review_artifact.schema.json",
+      "sha256": "9ac740c96079862dfe047e60084050279167f44ee5e983e1205070988d059bbe"
+    },
+    {
+      "name": "session_handoff",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/session_handoff.schema.json",
+      "path": "contracts/json/extended/session_handoff.schema.json",
+      "sha256": "09e64fefaa82d7c657840993a1649a356880193e8b3a2efad0c8eb41f5a153c6"
+    },
+    {
+      "name": "skill_card",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/skill_card.schema.json",
+      "path": "contracts/json/extended/skill_card.schema.json",
+      "sha256": "964833d0835a01172686611bdda74757166822d6aed47156c612f7c063c85559"
+    }
+  ]
 }

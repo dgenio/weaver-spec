@@ -1,0 +1,18 @@
+{
+  "artifact_id": "rev-20260527-001",
+  "artifact_type": "review_note",
+  "source_project": "agent-kernel",
+  "created_at": "2026-05-27T08:00:00Z",
+  "subject_ref": "flow:invoice_reminder_flow@1.2.0",
+  "summary": "Execution completed within policy; no firewall bypass observed.",
+  "evidence_refs": [
+    "trace:evt-20260527-014",
+    "frame:frame-20260527-007"
+  ],
+  "decision_refs": [
+    "policy:pd-20260527-003"
+  ],
+  "metadata": {
+    "reviewer": "audit-bot"
+  }
+}

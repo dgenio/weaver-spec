@@ -81,7 +81,7 @@ jobs:
 
           schemas_by_name = {}
           registry = Registry()
-          for p in Path('contracts/json').glob('*.schema.json'):
+          for p in Path('contracts/json').rglob('*.schema.json'):
               name = p.stem.removesuffix('.schema')
               schema = json.loads(p.read_text(encoding='utf-8'))
               schemas_by_name[name] = schema

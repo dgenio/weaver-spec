@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/session_handoff.schema.json",
+  "title": "SessionHandoff",
+  "description": "Extended. A compact continuity pack carried between agent sessions. Summarizes the state needed to resume work and references (does not inline) durable memory.",
+  "type": "object",
+  "required": ["handoff_id", "from_session_id", "created_at", "summary"],
+  "properties": {
+    "handoff_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this handoff."
+    },
+    "from_session_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the session being handed off from."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the handoff was created."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Compact continuity summary of the session state."
+    },
+    "to_session_id": {
+      "type": ["string", "null"],
+      "description": "Optional identifier of the resuming session, if already known."
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "description": "Sensitivity level governing how the handoff may be surfaced."
+    },
+    "open_threads": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unresolved threads or follow-ups to carry into the next session."
+    },
+    "memory_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to MemoryArtifact IDs relevant to continuity."
+    },
+    "expires_at": {
+      "type": ["string", "null"],
+      "description": "Optional ISO 8601 expiry timestamp."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Optional structured provenance.",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -17,12 +17,12 @@ CI runs the same script with `--check` and fails if this file is stale.
 
 ## Summary
 
-- Total contract types: **16**
-- JSON Schemas: **9 / 16**
-- Python classes: **16 / 16**
-- Sample payloads: **16 / 16**
-- Roundtrip tests: **16 / 16**
-- Schema validation tests: **3 / 16**
+- Total contract types: **24**
+- JSON Schemas: **17 / 24**
+- Python classes: **24 / 24**
+- Sample payloads: **24 / 24**
+- Roundtrip tests: **24 / 24**
+- Schema validation tests: **11 / 24**
 
 ## Coverage table
 
@@ -44,6 +44,14 @@ CI runs the same script with `--check` and fails if this file is stale.
 | Extended | `RiskAssessment` | -- | OK | OK | OK | -- |
 | Extended | `ExtendedFrameMetadata` | -- | OK | OK | OK | -- |
 | Extended | `ExtendedSelectableItemMetadata` | -- | OK | OK | OK | -- |
+| Extended | `ReviewArtifact` | OK | OK | OK | OK | OK |
+| Extended | `MemoryArtifact` | OK | OK | OK | OK | OK |
+| Extended | `SessionHandoff` | OK | OK | OK | OK | OK |
+| Extended | `LessonCard` | OK | OK | OK | OK | OK |
+| Extended | `SkillCard` | OK | OK | OK | OK | OK |
+| Extended | `EvaluationArtifact` | OK | OK | OK | OK | OK |
+| Extended | `ArtifactSafetyGateRequest` | OK | OK | OK | OK | OK |
+| Extended | `ArtifactSafetyReport` | OK | OK | OK | OK | OK |
 
 ## Legend
 
