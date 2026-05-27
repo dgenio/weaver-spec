@@ -17,7 +17,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   `supported_spec_versions`, `tested_version`, `declaration`, and
   `known_limitations`. Validated by a new `validate-compatibility` CI job
   (`.github/workflows/ci.yml`, PyYAML) that enforces the status vocabulary,
-  semver formatting, and that every manifest repo is referenced in
+  semver formatting of every version field, that each
+  `supported_spec_versions` entry is one of `contract_versions`, that
+  `verified`/`provisional` entries carry concrete version and declaration
+  references, and that every manifest repo is referenced in
   `docs/VERSIONING.md`; also linted by the `yamllint` CI job and the
   pre-commit `yamllint` hook. Closes #57.
 - `docs/ECOSYSTEM.md` — derived, informative ecosystem boundary map:

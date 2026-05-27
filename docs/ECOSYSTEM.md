@@ -27,13 +27,13 @@ A neutral map of the projects in the Weaver ecosystem: what each one is, where t
 
 ## Boundary table
 
-Each project owns a distinct, non-overlapping responsibility. The contracts named below are defined in [`contracts/json/`](../contracts/json/) (Core) and [`contracts/json/extended/`](../contracts/json/extended/) (Extended).
+Each project owns a distinct, non-overlapping responsibility. Contract type names below (such as `Frame` or `RoutingDecision`) are defined in [`contracts/json/`](../contracts/json/) (Core) and [`contracts/json/extended/`](../contracts/json/extended/) (Extended); a `—` marks a project that emits or consumes no contract in that direction.
 
 | Project | Owns | Does not own | Consumes contracts | Emits contracts |
 | ------- | ---- | ------------ | ------------------ | --------------- |
 | contextweaver | Context compilation, routing, ChoiceCard generation | Execution, firewalling, token issuance | `Frame`; passes `CapabilityToken` through | `RoutingDecision`, `ChoiceCard` |
 | agent-kernel | Output firewall, capability execution, authorization, audit | Routing, flow orchestration | `RoutingDecision`; the `CapabilityToken` it issued | `CapabilityToken`, `PolicyDecision`, `Frame`, `Handle`, `TraceEvent` |
-| ChainWeaver | DAG/flow definition, step sequencing, pure inter-step transforms | Direct tool execution, token issuance, raw output access | `RoutingDecision`, `CapabilityToken` (delegates execution to agent-kernel) | Flow orchestration state (per-step `RoutingDecision` usage) |
+| ChainWeaver | DAG/flow definition, step sequencing, pure inter-step transforms | Direct tool execution, token issuance, raw output access | `RoutingDecision`, `CapabilityToken` (delegates execution to agent-kernel) | — (orchestrates only; reuses `RoutingDecision` / `CapabilityToken` per step, emits no new contract type) |
 | lessonweaver | Trace → lesson/skill review and export | Routing, execution, authorization | `ReviewArtifact` / trace records | `LessonCard`, `SkillCard` |
 | vibeguard | Pre-merge artifact safety gate | The runtime request path | `ArtifactSafetyGateRequest` | `ArtifactSafetyReport` |
 

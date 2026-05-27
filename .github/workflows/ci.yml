@@ -93,6 +93,12 @@ jobs:
                   if not isinstance(v, str) or not SEMVER.match(v):
                       errors.append(f"contract_versions entry {v!r} is not MAJOR.MINOR.PATCH")
 
+          valid_contract_versions = (
+              {v for v in versions if isinstance(v, str)}
+              if isinstance(versions, list)
+              else set()
+          )
+
           repos = manifest.get("repositories")
           if not isinstance(repos, list) or not repos:
               errors.append("repositories must be a non-empty list")
@@ -125,11 +131,30 @@ jobs:
                   for v in ssv:
                       if not isinstance(v, str) or not SEMVER.match(v):
                           errors.append(f"{where}: supported_spec_versions entry {v!r} is not semver")
-              # A claimed status must be backed by a declaration reference.
-              if status in {"verified", "provisional"} and not entry.get("declaration"):
+                      elif v not in valid_contract_versions:
+                          errors.append(
+                              f"{where}: supported_spec_versions entry {v!r} is not one of "
+                              f"contract_versions {sorted(valid_contract_versions)}"
+                          )
+              tested = entry.get("tested_version")
+              if tested is not None and (not isinstance(tested, str) or not SEMVER.match(tested)):
                   errors.append(
-                      f"{where}: status {status!r} requires a non-null 'declaration' reference"
+                      f"{where}: tested_version {tested!r} must be null or MAJOR.MINOR.PATCH"
                   )
+              # A claimed status must be backed by a declaration reference and concrete versions.
+              if status in {"verified", "provisional"}:
+                  if not entry.get("declaration"):
+                      errors.append(
+                          f"{where}: status {status!r} requires a non-null 'declaration' reference"
+                      )
+                  if not isinstance(ssv, list) or not ssv:
+                      errors.append(
+                          f"{where}: status {status!r} requires a non-empty 'supported_spec_versions'"
+                      )
+                  if tested is None:
+                      errors.append(
+                          f"{where}: status {status!r} requires a non-null 'tested_version'"
+                      )
 
           for missing_repo in sorted(required_repos - seen):
               errors.append(f"required sibling repository {missing_repo!r} is missing from the manifest")
@@ -138,7 +163,7 @@ jobs:
               for e in errors:
                   print(f"FAIL: {e}", file=sys.stderr)
               sys.exit(1)
-          print(f"OK: compatibility.yaml valid — {len(repos)} repositories, status vocabulary enforced.")
+          print(f"OK: compatibility.yaml valid — {len(repos)} repositories, status vocabulary and version consistency enforced.")
           PYEOF
 
   validate-contracts-index:
