@@ -1,0 +1,27 @@
+{
+  "skill_id": "skl-20260527-001",
+  "name": "Add an Extended contract",
+  "description": "End-to-end procedure for adding a new Extended contract type to weaver-spec.",
+  "created_at": "2026-05-27T09:30:00Z",
+  "lifecycle_state": "in_review",
+  "steps": [
+    "Add the dataclass to contracts/python/src/weaver_contracts/extended.py.",
+    "Add the JSON schema under contracts/json/extended/.",
+    "Add a sample payload under examples/sample_payloads/.",
+    "Add roundtrip tests to test_extended.py and schema tests to test_extended_schema_alignment.py.",
+    "Bump version, update CHANGELOG, regenerate COVERAGE.md and well-known/contracts.json."
+  ],
+  "preconditions": [
+    "Type is non-universal (Extended, not Core) per invariant I-04."
+  ],
+  "scope": "repo",
+  "sensitivity": "internal",
+  "source_refs": [
+    "doc:docs/agent-context/workflows.md#extended-contract-change-workflow"
+  ],
+  "expires_at": null,
+  "provenance": {
+    "derived_from": "workflow_doc"
+  },
+  "metadata": {}
+}

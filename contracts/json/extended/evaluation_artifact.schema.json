@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/evaluation_artifact.schema.json",
+  "title": "EvaluationArtifact",
+  "description": "Extended. A statistical / offline model-evaluation report carried with explicit semantics so agents cannot misuse a headline score. The support_state and recommendation_kind fields encode that a high-risk evaluation is not deployment evidence.",
+  "type": "object",
+  "required": ["artifact_id", "producer", "created_at"],
+  "properties": {
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this evaluation artifact."
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The system that produced the evaluation (e.g. skdr-eval)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the evaluation was produced."
+    },
+    "artifact_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Kind of evaluation, e.g. offline_policy_evaluation."
+    },
+    "producer_version": {
+      "type": ["string", "null"],
+      "description": "Optional producer version for reproducibility."
+    },
+    "target_estimand": {
+      "type": ["string", "null"],
+      "description": "What is being estimated (e.g. the policy value under a target distribution)."
+    },
+    "candidate_policy": {
+      "type": ["string", "null"],
+      "description": "Identifier of the candidate policy being evaluated."
+    },
+    "baseline_policy": {
+      "type": ["string", "null"],
+      "description": "Identifier of the baseline/comparison policy."
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Value estimates and headline metrics.",
+      "additionalProperties": true
+    },
+    "uncertainty": {
+      "type": "object",
+      "description": "Uncertainty quantification (confidence intervals, standard errors).",
+      "additionalProperties": true
+    },
+    "support_state": {
+      "type": "string",
+      "enum": ["ok", "caution", "high_risk"],
+      "description": "Overall support/diagnostic state. high_risk means the evidence cannot back a deploy decision."
+    },
+    "support_diagnostics": {
+      "type": "object",
+      "description": "Diagnostics behind the support_state (overlap, effective sample size).",
+      "additionalProperties": true
+    },
+    "propensity_diagnostics": {
+      "type": "object",
+      "description": "Diagnostics on propensity/weighting assumptions.",
+      "additionalProperties": true
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "description": "Sensitivity level governing how the report may be surfaced."
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Heuristic warnings (distinct from mathematical assumptions)."
+    },
+    "recommendation": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable recommendation text."
+    },
+    "recommendation_kind": {
+      "type": ["string", "null"],
+      "enum": ["deploy", "do_not_deploy", "experiment_ready", "needs_more_data", null],
+      "description": "Machine-readable recommendation. 'deploy' is not permitted when support_state is 'high_risk'."
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Stated limitations of the evaluation."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Optional structured provenance (dataset, code version, run id).",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

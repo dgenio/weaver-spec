@@ -26,7 +26,8 @@ This repository is **documentation + contracts only**.
 | `.github/CODEOWNERS` | Auto-assignment rules for PR review | Adding new paths or reviewers |
 | `.pre-commit-config.yaml` | Pre-commit hook bundle mirroring the CI gates (JSON/YAML/markdown lint, contracts-index freshness, pytest on push) | Onboarding a new contributor; adding a new local validation gate |
 | `.yamllint.yml` | yamllint config tuned for GitHub-flavored YAML (issue forms, workflows) | Adding new YAML files or adjusting workflow style |
-| `contracts/json/` | JSON Schemas (Draft 2020-12) | Adding or modifying contract definitions |
+| `contracts/json/` | Core JSON Schemas (Draft 2020-12) | Adding or modifying Core contract definitions |
+| `contracts/json/extended/` | Extended JSON Schemas (Draft 2020-12) | Adding or modifying Extended contract definitions |
 | `contracts/python/src/weaver_contracts/core.py` | Core contract dataclasses (9 types) | When schemas change — must update in same PR |
 | `contracts/python/src/weaver_contracts/extended.py` | Extended metadata types | Adding optional metadata contracts |
 | `contracts/python/src/weaver_contracts/version.py` | `CONTRACT_VERSION` constant | Every version bump |
@@ -66,7 +67,7 @@ For JSON schema conventions specifically, `contracts/json/README.md` is authorit
 
 JSON Schemas are the language-agnostic source of truth for all **Core** contract definitions. Python Core types must mirror them exactly — same field names, same types, same required/optional status. Zero divergence.
 
-Extended contracts currently have no JSON Schemas — the Python dataclasses in `extended.py` are the source of truth for Extended types.
+Extended contracts may define JSON Schemas under `contracts/json/extended/`. Where an Extended schema exists, it leads and the Python dataclass in `extended.py` must mirror it (same as Core). The original metadata types (`TelemetryHint`, `SchemaFingerprint`, `RedactionPolicy`, `UIHint`, `RiskAssessment`, `ExtendedFrameMetadata`, `ExtendedSelectableItemMetadata`) remain Python-source-of-truth pending their schema retrofit (#46).
 
 ---
 
@@ -213,6 +214,7 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/DEPRECATIONS.md](docs/DEPRECATIONS.md) | Deprecation register and removal policy |
 | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) | `$id` URL pattern, immutability rule, content-addressed index |
 | [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) | Markup convention for normative requirements vs informative notes vs examples |
+| [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) | Cross-project Extended artifact vocabulary (memory, session handoff, lesson/skill cards, evaluation, safety gate) |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |
 | [docs/agent-context/invariants.md](docs/agent-context/invariants.md) | Hard constraints, forbidden shortcuts, safe-vs-unsafe changes |

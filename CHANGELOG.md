@@ -10,6 +10,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- Eight new **Extended** cross-project artifact contracts in
+  `weaver_contracts.extended`, each shipped with the full artifact set (JSON
+  Schema under `contracts/json/extended/`, sample payload under
+  `examples/sample_payloads/`, roundtrip test in `tests/test_extended.py`,
+  schema-alignment test in the new `tests/test_extended_schema_alignment.py`,
+  glossary entry, plus coverage/index regeneration):
+  `ReviewArtifact` (Closes #65); `MemoryArtifact` + `SessionHandoff`
+  (Closes #56); `LessonCard` + `SkillCard` (Closes #64); `EvaluationArtifact`
+  (Closes #67); `ArtifactSafetyGateRequest` + `ArtifactSafetyReport`
+  (Closes #63). `EvaluationArtifact` rejects, at construction time, a
+  `high_risk` support state paired with a `deploy` recommendation (a high-risk
+  evaluation is not deployment evidence).
+- `contracts/json/extended/` — first Extended JSON Schemas (8 files). Their
+  `$id` URIs live under the `extended/` namespace and are picked up
+  automatically by `scripts/generate_contracts_index.py`.
+- `docs/ARTIFACT_CONTRACTS.md` — consolidated, informative spec page for the
+  cross-project artifact vocabulary: shared envelope, taxonomy, and a
+  CI-validated inline example per type.
+- `contracts/python/tests/test_extended_schema_alignment.py` — validates every
+  Extended sample payload against its Extended schema, with targeted negative
+  cases.
 - `.pre-commit-config.yaml` — pre-commit hook bundle mirroring the CI gates: `pre-commit-hooks` (trailing whitespace, end-of-file, large file guard, JSON/YAML/TOML/merge-conflict checks), `yamllint`, `markdownlint-cli2`, a local hook running `scripts/check_schema_fields.py`, a local hook running `scripts/generate_contracts_index.py --check`, and a `pre-push`-staged hook that runs the `weaver_contracts` pytest suite. Setup instructions added to `CONTRIBUTING.md`. `pre-commit` and `yamllint` added to `[project.optional-dependencies] dev` in `contracts/python/pyproject.toml`. Closes #14.
 - `.yamllint.yml` — yamllint config tuned for GitHub-flavored YAML (relaxed line length, `truthy.check-keys: false` to permit `on:` in workflows).
 - CI job `yamllint` in `.github/workflows/ci.yml` — lints `.github/ISSUE_TEMPLATE/`, `.github/workflows/`, `.yamllint.yml`, and `.pre-commit-config.yaml` via `yamllint==1.35.1` so malformed templates fail in CI rather than at GitHub form-render time. Closes #35.
@@ -58,8 +79,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   `docs/INTEGRATION_MAP.md`, `contracts/COVERAGE.md`, and
   `examples/interoperability/`.
 - `AGENTS.md` repo map updated with `.github/prompts/`, `.pre-commit-config.yaml`, `.yamllint.yml`, `docs/DOCS_CONVENTIONS.md`, `examples/interoperability/`, `docs/LIFECYCLE.md`, `docs/INTEGRATION_MAP.md`, `scripts/generate_coverage_table.py`, and `contracts/COVERAGE.md`.
+- `scripts/check_schema_fields.py` now scans `contracts/json/**/*.schema.json`
+  recursively so Extended schemas are validated alongside Core.
+- `.github/workflows/ci.yml` — the walkthrough inline-JSON validator resolves
+  schemas recursively (`contracts/json/**`), so inline examples can reference
+  Extended schemas.
+- `AGENTS.md` ("schemas lead" section, repo map, documentation map) and
+  `docs/agent-context/workflows.md` (Extended-contract workflow) updated to
+  reflect that Extended schemas now live under `contracts/json/extended/`; the
+  original 7 Extended metadata types remain Python-source-of-truth pending #46.
+- `contracts/json/README.md` documents the `extended/` subdirectory.
+- Regenerated `contracts/COVERAGE.md` (now 24 contract types) and
+  `well-known/contracts.json` (Extended entries populated; `contract_version`
+  → 0.5.0).
 
-**No Core contract changes** — no JSON schema fields added or removed, no Python dataclass surface changes, no `CONTRACT_VERSION` bump.
+**No Core contract changes** — no Core JSON schema fields added or removed, no
+Core Python dataclass surface changes. This cycle adds eight additive
+**Extended** contract types, which bumps `CONTRACT_VERSION` 0.4.0 → 0.5.0
+(MINOR, per the Extended-contract workflow). No sibling-repo coordination is
+required: the new types are optional and opt-in.
 
 ---
 

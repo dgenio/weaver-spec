@@ -1,0 +1,20 @@
+{
+  "handoff_id": "ho-20260527-001",
+  "from_session_id": "sess-20260527-am",
+  "created_at": "2026-05-27T12:00:00Z",
+  "summary": "Implemented 5 Extended artifact contracts; tests green; PR description drafted.",
+  "to_session_id": null,
+  "sensitivity": "internal",
+  "open_threads": [
+    "Confirm whether the original 7 Extended types should be retrofitted under #46.",
+    "Decide release date for 0.5.0."
+  ],
+  "memory_refs": [
+    "mem-20260527-001"
+  ],
+  "expires_at": "2026-06-27T12:00:00Z",
+  "provenance": {
+    "derived_from": "session_summary"
+  },
+  "metadata": {}
+}

@@ -7,7 +7,8 @@ A spec-compliant schema in this repository must declare ``$id``, ``title``,
 This script enforces that contract from both CI and the pre-commit hook so
 the two stay in sync.
 
-Run with no arguments to scan ``contracts/json/*.schema.json``:
+Run with no arguments to scan ``contracts/json/**/*.schema.json`` (Core at the
+top level and Extended under ``contracts/json/extended/``):
 
     python scripts/check_schema_fields.py
 
@@ -30,7 +31,7 @@ REQUIRED_FIELDS = ("$id", "title", "description", "required")
 
 
 def main() -> int:
-    files = sorted(SCHEMA_DIR.glob("*.schema.json"))
+    files = sorted(SCHEMA_DIR.rglob("*.schema.json"))
     if not files:
         print(f"ERROR: No schema files found under {SCHEMA_DIR}", file=sys.stderr)
         return 1

@@ -1,6 +1,8 @@
 # JSON Schemas
 
-This directory contains JSON Schema definitions for all Core Weaver contracts.
+This directory contains JSON Schema definitions for the Weaver contracts. Core
+contracts live at the top level; Extended contracts live under
+[`extended/`](extended/).
 
 ## Schema List
 
@@ -15,6 +17,17 @@ This directory contains JSON Schema definitions for all Core Weaver contracts.
 | `frame.schema.json` | Safe, filtered view of a tool execution result |
 | `handle.schema.json` | Opaque reference to a raw artifact in the HandleStore |
 | `trace_event.schema.json` | Immutable audit log entry |
+
+## Extended schemas (`extended/`)
+
+The [`extended/`](extended/) subdirectory holds schemas for optional Extended
+contracts (not required for spec compliance; see invariant I-04). Their `$id`
+URIs live under the `extended/` namespace, e.g.
+`https://weaver-spec.dev/contracts/v0/extended/memory_artifact.schema.json`.
+Extended schemas follow the same design principles below and are picked up
+automatically by `scripts/generate_contracts_index.py`. See
+[`../../docs/ARTIFACT_CONTRACTS.md`](../../docs/ARTIFACT_CONTRACTS.md) for the
+cross-project artifact vocabulary.
 
 ## Usage
 

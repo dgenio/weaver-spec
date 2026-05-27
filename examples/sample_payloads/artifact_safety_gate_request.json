@@ -1,0 +1,15 @@
+{
+  "request_id": "asg-req-20260527-001",
+  "repository_root": "/workspace/app",
+  "artifact_paths": [
+    "src/handlers/payment.py",
+    ".github/workflows/deploy.yml"
+  ],
+  "diff_scope": "origin/main...HEAD",
+  "policy_level": "strict",
+  "output_format": "json",
+  "capability_id": "org.vibeguard.scan_changes",
+  "metadata": {
+    "trigger": "pre_merge"
+  }
+}

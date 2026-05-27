@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/artifact_safety_report.schema.json",
+  "title": "ArtifactSafetyReport",
+  "description": "Extended. Output of an artifact safety gate run. The mode field distinguishes an advisory check from a blocking gate; decision is the pass/fail verdict; findings carry severity, message, an optional stable fingerprint, and a remediation hint.",
+  "type": "object",
+  "required": ["report_id", "gate_id", "decision", "created_at"],
+  "properties": {
+    "report_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this report."
+    },
+    "gate_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the gate/check that produced this report."
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["pass", "fail"],
+      "description": "Pass/fail verdict for the checked artifacts."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the report was produced."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["advisory", "blocking"],
+      "description": "Whether the gate is advisory (informational) or blocking (must pass before the action)."
+    },
+    "request_id": {
+      "type": ["string", "null"],
+      "description": "Optional ArtifactSafetyGateRequest ID this report answers."
+    },
+    "target_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference to what was checked (e.g. a commit or diff range)."
+    },
+    "summary": {
+      "type": ["string", "null"],
+      "description": "Optional short human-readable summary."
+    },
+    "findings": {
+      "type": "array",
+      "description": "Individual findings produced by the gate.",
+      "items": {
+        "type": "object",
+        "required": ["finding_id", "severity", "message"],
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable identifier for this finding."
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "low", "medium", "high", "critical"],
+            "description": "Severity of the finding."
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Human-readable description of the finding."
+          },
+          "fingerprint": {
+            "type": ["string", "null"],
+            "description": "Optional stable fingerprint for deduplication across runs."
+          },
+          "remediation": {
+            "type": ["string", "null"],
+            "description": "Optional remediation hint."
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Optional structured provenance (tool, version, ruleset).",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

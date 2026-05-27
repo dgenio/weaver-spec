@@ -136,3 +136,385 @@ class ExtendedSelectableItemMetadata:
     estimated_duration_ms: Optional[int] = None
     requires_confirmation: bool = False
     extra: Dict[str, Any] = field(default_factory=dict)
+
+
+# ===========================================================================
+# Cross-project artifact contracts
+#
+# The types below are standalone, language-neutral artifacts exchanged between
+# Weaver-stack repos and adjacent tools (lessonweaver, skdr-eval, vibeguard).
+# They are Extended (optional, not required for spec compliance per I-04) and
+# share a common envelope: a non-empty string id, an ISO-8601 `created_at`
+# string, an optional `sensitivity` level, optional `provenance`, and a
+# `metadata` extension bag. See docs/ARTIFACT_CONTRACTS.md for the taxonomy
+# that distinguishes these from one another and from Core contracts.
+# ===========================================================================
+
+# Shared sensitivity vocabulary for artifact contracts.
+_SENSITIVITY_LEVELS = frozenset(
+    {"public", "internal", "confidential", "restricted"}
+)
+
+# Shared lifecycle states for reusable, review-gated artifacts (lessons, skills).
+_LIFECYCLE_STATES = frozenset({"draft", "in_review", "active", "deprecated"})
+
+
+# ---------------------------------------------------------------------------
+# ReviewArtifact — minimal cross-project trace/review interchange shape
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ReviewArtifact:
+    """A minimal, language-neutral interchange shape for trace/review artifacts.
+
+    Sibling projects produce or consume trace-like records (context build
+    records, execution records, policy decisions, review notes, safety
+    reports). This is the interchange envelope, not a storage system. Richer,
+    project-specific fields belong under ``metadata`` (namespaced).
+    """
+
+    artifact_id: str
+    artifact_type: str
+    source_project: str
+    created_at: str
+    subject_ref: Optional[str] = None
+    summary: Optional[str] = None
+    evidence_refs: List[str] = field(default_factory=list)
+    decision_refs: List[str] = field(default_factory=list)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.artifact_id:
+            raise ValueError("ReviewArtifact.artifact_id must be non-empty")
+        if not self.artifact_type:
+            raise ValueError("ReviewArtifact.artifact_type must be non-empty")
+        if not self.source_project:
+            raise ValueError("ReviewArtifact.source_project must be non-empty")
+        if not self.created_at:
+            raise ValueError("ReviewArtifact.created_at must be non-empty")
+
+
+# ---------------------------------------------------------------------------
+# MemoryArtifact — durable or semi-durable agent memory record
+# ---------------------------------------------------------------------------
+
+@dataclass
+class MemoryArtifact:
+    """A durable or semi-durable agent memory record.
+
+    Distinct from transient conversation context, raw tool output, and traces:
+    a MemoryArtifact is a curated, reusable fact/preference/convention carrying
+    its own sensitivity and provenance. Memory content may be sensitive, so
+    ``sensitivity`` and ``provenance`` are first-class.
+    """
+
+    memory_id: str
+    memory_type: str
+    content: str
+    source: str
+    created_at: str
+    updated_at: Optional[str] = None
+    scope: Optional[str] = None
+    sensitivity: str = "internal"
+    confidence: Optional[float] = None
+    expires_at: Optional[str] = None
+    dependency_refs: List[str] = field(default_factory=list)
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.memory_id:
+            raise ValueError("MemoryArtifact.memory_id must be non-empty")
+        if not self.memory_type:
+            raise ValueError("MemoryArtifact.memory_type must be non-empty")
+        if not self.content:
+            raise ValueError("MemoryArtifact.content must be non-empty")
+        if not self.source:
+            raise ValueError("MemoryArtifact.source must be non-empty")
+        if not self.created_at:
+            raise ValueError("MemoryArtifact.created_at must be non-empty")
+        if self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"MemoryArtifact.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# SessionHandoff — compact continuity pack between sessions
+# ---------------------------------------------------------------------------
+
+@dataclass
+class SessionHandoff:
+    """A compact continuity pack carried between agent sessions.
+
+    Summarizes state needed to resume work without replaying full context. It
+    references (does not inline) durable memory via ``memory_refs``.
+    """
+
+    handoff_id: str
+    from_session_id: str
+    created_at: str
+    summary: str
+    to_session_id: Optional[str] = None
+    sensitivity: str = "internal"
+    open_threads: List[str] = field(default_factory=list)
+    memory_refs: List[str] = field(default_factory=list)
+    expires_at: Optional[str] = None
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.handoff_id:
+            raise ValueError("SessionHandoff.handoff_id must be non-empty")
+        if not self.from_session_id:
+            raise ValueError("SessionHandoff.from_session_id must be non-empty")
+        if not self.created_at:
+            raise ValueError("SessionHandoff.created_at must be non-empty")
+        if not self.summary:
+            raise ValueError("SessionHandoff.summary must be non-empty")
+        if self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"SessionHandoff.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# LessonCard — a reviewed, reusable lesson derived from traces
+# ---------------------------------------------------------------------------
+
+@dataclass
+class LessonCard:
+    """A reusable lesson derived from traces and approved for reuse.
+
+    Not a raw trace, raw memory, or generic prompt fragment. ``lifecycle_state``
+    gates activation: a lesson should pass through review before it is
+    ``active``.
+    """
+
+    lesson_id: str
+    title: str
+    body: str
+    created_at: str
+    lifecycle_state: str = "draft"
+    scope: Optional[str] = None
+    sensitivity: str = "internal"
+    applicability: List[str] = field(default_factory=list)
+    source_refs: List[str] = field(default_factory=list)
+    expires_at: Optional[str] = None
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.lesson_id:
+            raise ValueError("LessonCard.lesson_id must be non-empty")
+        if not self.title:
+            raise ValueError("LessonCard.title must be non-empty")
+        if not self.body:
+            raise ValueError("LessonCard.body must be non-empty")
+        if not self.created_at:
+            raise ValueError("LessonCard.created_at must be non-empty")
+        if self.lifecycle_state not in _LIFECYCLE_STATES:
+            raise ValueError(
+                f"LessonCard.lifecycle_state must be one of {_LIFECYCLE_STATES}"
+            )
+        if self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"LessonCard.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# SkillCard — a reviewed, reusable procedure derived from traces
+# ---------------------------------------------------------------------------
+
+@dataclass
+class SkillCard:
+    """A reusable procedure/skill derived from traces and approved for reuse.
+
+    Like LessonCard, ``lifecycle_state`` gates activation. ``steps`` and
+    ``preconditions`` describe how and when to apply the skill.
+    """
+
+    skill_id: str
+    name: str
+    description: str
+    created_at: str
+    lifecycle_state: str = "draft"
+    steps: List[str] = field(default_factory=list)
+    preconditions: List[str] = field(default_factory=list)
+    scope: Optional[str] = None
+    sensitivity: str = "internal"
+    source_refs: List[str] = field(default_factory=list)
+    expires_at: Optional[str] = None
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.skill_id:
+            raise ValueError("SkillCard.skill_id must be non-empty")
+        if not self.name:
+            raise ValueError("SkillCard.name must be non-empty")
+        if not self.description:
+            raise ValueError("SkillCard.description must be non-empty")
+        if not self.created_at:
+            raise ValueError("SkillCard.created_at must be non-empty")
+        if self.lifecycle_state not in _LIFECYCLE_STATES:
+            raise ValueError(
+                f"SkillCard.lifecycle_state must be one of {_LIFECYCLE_STATES}"
+            )
+        if self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"SkillCard.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# EvaluationArtifact — statistical / model-evaluation decision report
+# ---------------------------------------------------------------------------
+
+@dataclass
+class EvaluationArtifact:
+    """A statistical / offline model-evaluation report carried with semantics.
+
+    Makes the intended meaning explicit so agents cannot misuse a headline
+    score: value estimates, uncertainty, support diagnostics, warnings, and a
+    decision recommendation. ``support_state`` and ``recommendation_kind``
+    encode that a high-risk evaluation is not deployment evidence.
+    """
+
+    artifact_id: str
+    producer: str
+    created_at: str
+    artifact_type: str = "offline_policy_evaluation"
+    producer_version: Optional[str] = None
+    target_estimand: Optional[str] = None
+    candidate_policy: Optional[str] = None
+    baseline_policy: Optional[str] = None
+    metrics: Dict[str, Any] = field(default_factory=dict)
+    uncertainty: Dict[str, Any] = field(default_factory=dict)
+    support_state: str = "ok"
+    support_diagnostics: Dict[str, Any] = field(default_factory=dict)
+    propensity_diagnostics: Dict[str, Any] = field(default_factory=dict)
+    sensitivity: str = "internal"
+    warnings: List[str] = field(default_factory=list)
+    recommendation: Optional[str] = None
+    recommendation_kind: Optional[str] = None
+    limitations: List[str] = field(default_factory=list)
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    _SUPPORT_STATES = frozenset({"ok", "caution", "high_risk"})
+    _RECOMMENDATION_KINDS = frozenset(
+        {"deploy", "do_not_deploy", "experiment_ready", "needs_more_data"}
+    )
+
+    def __post_init__(self) -> None:
+        if not self.artifact_id:
+            raise ValueError("EvaluationArtifact.artifact_id must be non-empty")
+        if not self.producer:
+            raise ValueError("EvaluationArtifact.producer must be non-empty")
+        if not self.created_at:
+            raise ValueError("EvaluationArtifact.created_at must be non-empty")
+        if not self.artifact_type:
+            raise ValueError("EvaluationArtifact.artifact_type must be non-empty")
+        if self.support_state not in self._SUPPORT_STATES:
+            raise ValueError(
+                f"EvaluationArtifact.support_state must be one of {self._SUPPORT_STATES}"
+            )
+        if (
+            self.recommendation_kind is not None
+            and self.recommendation_kind not in self._RECOMMENDATION_KINDS
+        ):
+            raise ValueError(
+                "EvaluationArtifact.recommendation_kind must be one of "
+                f"{self._RECOMMENDATION_KINDS}"
+            )
+        if self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"EvaluationArtifact.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
+        # A high-risk evaluation must never recommend deployment: a high-risk
+        # support state means the evidence cannot back a deploy decision.
+        if self.support_state == "high_risk" and self.recommendation_kind == "deploy":
+            raise ValueError(
+                "EvaluationArtifact: recommendation_kind 'deploy' is not permitted "
+                "when support_state is 'high_risk' (a high-risk evaluation is not "
+                "deployment evidence)"
+            )
+
+
+# ---------------------------------------------------------------------------
+# ArtifactSafetyGateRequest — inputs to an artifact safety gate capability
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ArtifactSafetyGateRequest:
+    """Inputs to an optional artifact safety gate run.
+
+    Describes what to check (artifact paths, diff scope, repository root) and
+    how (policy level, output format). Implementation-neutral: it does not
+    name a specific scanner or rule set.
+    """
+
+    request_id: str
+    repository_root: str
+    artifact_paths: List[str] = field(default_factory=list)
+    diff_scope: Optional[str] = None
+    policy_level: str = "standard"
+    output_format: str = "json"
+    capability_id: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.request_id:
+            raise ValueError("ArtifactSafetyGateRequest.request_id must be non-empty")
+        if not self.repository_root:
+            raise ValueError(
+                "ArtifactSafetyGateRequest.repository_root must be non-empty"
+            )
+
+
+# ---------------------------------------------------------------------------
+# ArtifactSafetyReport — output of an artifact safety gate capability
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ArtifactSafetyReport:
+    """Output of an artifact safety gate run.
+
+    ``mode`` distinguishes an advisory check from a blocking gate; ``decision``
+    is the pass/fail verdict. ``findings`` is a list of objects, each carrying
+    a severity, message, optional stable fingerprint, and remediation hint
+    (shape defined in the JSON schema).
+    """
+
+    report_id: str
+    gate_id: str
+    decision: str
+    created_at: str
+    mode: str = "advisory"
+    request_id: Optional[str] = None
+    target_ref: Optional[str] = None
+    summary: Optional[str] = None
+    findings: List[Dict[str, Any]] = field(default_factory=list)
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    _DECISIONS = frozenset({"pass", "fail"})
+    _MODES = frozenset({"advisory", "blocking"})
+
+    def __post_init__(self) -> None:
+        if not self.report_id:
+            raise ValueError("ArtifactSafetyReport.report_id must be non-empty")
+        if not self.gate_id:
+            raise ValueError("ArtifactSafetyReport.gate_id must be non-empty")
+        if not self.created_at:
+            raise ValueError("ArtifactSafetyReport.created_at must be non-empty")
+        if self.decision not in self._DECISIONS:
+            raise ValueError(
+                f"ArtifactSafetyReport.decision must be one of {self._DECISIONS}"
+            )
+        if self.mode not in self._MODES:
+            raise ValueError(
+                f"ArtifactSafetyReport.mode must be one of {self._MODES}"
+            )

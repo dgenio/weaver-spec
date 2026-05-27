@@ -1,0 +1,21 @@
+{
+  "lesson_id": "lsn-20260527-001",
+  "title": "Regenerate generated artifacts before pushing",
+  "body": "After any contracts/json change, regenerate well-known/contracts.json and contracts/COVERAGE.md; CI runs both generators with --check and fails on staleness.",
+  "created_at": "2026-05-27T09:00:00Z",
+  "lifecycle_state": "active",
+  "scope": "repo",
+  "sensitivity": "internal",
+  "applicability": [
+    "changed:contracts/json/**",
+    "task:add_contract"
+  ],
+  "source_refs": [
+    "trace:ci-failure-stale-index"
+  ],
+  "expires_at": null,
+  "provenance": {
+    "derived_from": "ci_failure_review"
+  },
+  "metadata": {}
+}

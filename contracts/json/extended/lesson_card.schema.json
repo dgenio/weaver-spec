@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/lesson_card.schema.json",
+  "title": "LessonCard",
+  "description": "Extended. A reusable lesson derived from traces and approved for reuse. Not a raw trace, raw memory, or generic prompt fragment. The lifecycle_state gates activation: a lesson should pass review before becoming active.",
+  "type": "object",
+  "required": ["lesson_id", "title", "body", "created_at"],
+  "properties": {
+    "lesson_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this lesson."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Short human-readable title."
+    },
+    "body": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The lesson content."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the lesson was created."
+    },
+    "lifecycle_state": {
+      "type": "string",
+      "enum": ["draft", "in_review", "active", "deprecated"],
+      "description": "Lifecycle state; activation requires passing through review."
+    },
+    "scope": {
+      "type": ["string", "null"],
+      "description": "Optional reuse scope, e.g. repo, team, org, global."
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "description": "Sensitivity level governing how the lesson may be surfaced."
+    },
+    "applicability": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Conditions or tags describing when the lesson applies."
+    },
+    "source_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to the traces/memory the lesson was derived from (provenance)."
+    },
+    "expires_at": {
+      "type": ["string", "null"],
+      "description": "Optional ISO 8601 expiry timestamp."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Optional structured provenance.",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

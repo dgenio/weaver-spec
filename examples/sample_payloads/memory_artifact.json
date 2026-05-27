@@ -1,0 +1,18 @@
+{
+  "memory_id": "mem-20260527-001",
+  "memory_type": "repo_convention",
+  "content": "This repo is docs + contracts only; never add runtime logic to weaver_contracts.",
+  "source": "AGENTS.md",
+  "created_at": "2026-05-27T08:00:00Z",
+  "updated_at": "2026-05-27T08:05:00Z",
+  "scope": "repo",
+  "sensitivity": "internal",
+  "confidence": 0.95,
+  "expires_at": null,
+  "dependency_refs": [],
+  "provenance": {
+    "derived_from": "doc_ingest",
+    "doc": "AGENTS.md#purpose-and-scope"
+  },
+  "metadata": {}
+}
