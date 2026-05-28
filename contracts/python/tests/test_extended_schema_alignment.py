@@ -26,7 +26,8 @@ PAYLOADS_DIR = REPO_ROOT / "examples" / "sample_payloads"
 # ExtendedFrameMetadata, ExtendedSelectableItemMetadata,
 # ReviewArtifact, MemoryArtifact, SessionHandoff, LessonCard, SkillCard,
 # EvaluationArtifact, ArtifactSafetyGateRequest, ArtifactSafetyReport,
-# CapabilityTokenSignature, OtelTraceMapping.
+# CapabilityTokenSignature, OtelTraceMapping, CompiledFlow,
+# ExecutionCandidate, ExecutionRoutingDecision, ExecutionFeedback.
 EXTENDED_TYPES = [
     ("TelemetryHint", "telemetry_hint"),
     ("SchemaFingerprint", "schema_fingerprint"),
@@ -45,6 +46,10 @@ EXTENDED_TYPES = [
     ("ArtifactSafetyReport", "artifact_safety_report"),
     ("CapabilityTokenSignature", "capability_token_signature"),
     ("OtelTraceMapping", "otel_trace_mapping"),
+    ("CompiledFlow", "compiled_flow"),
+    ("ExecutionCandidate", "execution_candidate"),
+    ("ExecutionRoutingDecision", "execution_routing_decision"),
+    ("ExecutionFeedback", "execution_feedback"),
 ]
 
 
@@ -271,6 +276,80 @@ class TestExtendedNegativeCases:
             "alg": "ed25519",
             "kid": "k1",
             "sig": "A" * 50,  # base64url alphabet, wrong length
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_compiled_flow_missing_required_fails(self):
+        # #66: flow_id is the only required field.
+        schema = load_extended_schema("compiled_flow")
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate({"name": "no id"}, schema)
+
+    def test_compiled_flow_invalid_sensitivity_fails(self):
+        # sensitivity must be one of the shared artifact sensitivity levels.
+        schema = load_extended_schema("compiled_flow")
+        bad = {"flow_id": "f1", "sensitivity": "top-secret"}
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_execution_candidate_invalid_type_fails(self):
+        # #61 open question 1 settled: candidate_type is a fixed enum.
+        schema = load_extended_schema("execution_candidate")
+        bad = {"candidate_id": "c1", "candidate_type": "macro"}
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_execution_candidate_with_compiled_flow_validates(self):
+        # candidate_type=flow may embed a CompiledFlow via $ref; this must
+        # resolve against the local schema store and validate.
+        schema = load_extended_schema("execution_candidate")
+        payload = load_payload("execution_candidate")
+        validate(payload, schema)
+
+    def test_execution_candidate_compiled_flow_on_non_flow_fails(self):
+        # compiled_flow is only valid when candidate_type == "flow" (if/then).
+        schema = load_extended_schema("execution_candidate")
+        bad = {
+            "candidate_id": "c1",
+            "candidate_type": "tool",
+            "compiled_flow": {"flow_id": "f1"},
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_execution_routing_decision_missing_candidate_fails(self):
+        # candidate is required; a decision without one is invalid.
+        schema = load_extended_schema("execution_routing_decision")
+        bad = {"decision_id": "dec_1"}
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_execution_routing_decision_confidence_above_range_fails(self):
+        # #61 open question 2 settled: confidence is standardized to [0.0, 1.0].
+        schema = load_extended_schema("execution_routing_decision")
+        bad = {
+            "decision_id": "dec_1",
+            "candidate": {"candidate_id": "c1", "candidate_type": "tool"},
+            "confidence": 1.5,
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_execution_feedback_missing_required_fails(self):
+        schema = load_extended_schema("execution_feedback")
+        bad = {"decision_id": "dec_1", "candidate_id": "c1"}  # no success/timestamp
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_execution_feedback_negative_latency_fails(self):
+        schema = load_extended_schema("execution_feedback")
+        bad = {
+            "decision_id": "dec_1",
+            "candidate_id": "c1",
+            "success": True,
+            "timestamp": "2026-05-25T08:00:00Z",
+            "latency_ms": -1,
         }
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(bad, schema)

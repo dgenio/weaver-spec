@@ -17,12 +17,12 @@ CI runs the same script with `--check` and fails if this file is stale.
 
 ## Summary
 
-- Total contract types: **26**
-- JSON Schemas: **26 / 26**
-- Python classes: **26 / 26**
-- Sample payloads: **26 / 26**
-- Roundtrip tests: **26 / 26**
-- Schema validation tests: **20 / 26**
+- Total contract types: **30**
+- JSON Schemas: **30 / 30**
+- Python classes: **30 / 30**
+- Sample payloads: **30 / 30**
+- Roundtrip tests: **30 / 30**
+- Schema validation tests: **24 / 30**
 
 ## Coverage table
 
@@ -54,6 +54,10 @@ CI runs the same script with `--check` and fails if this file is stale.
 | Extended | `ArtifactSafetyReport` | OK | OK | OK | OK | OK |
 | Extended | `CapabilityTokenSignature` | OK | OK | OK | OK | OK |
 | Extended | `OtelTraceMapping` | OK | OK | OK | OK | OK |
+| Extended | `CompiledFlow` | OK | OK | OK | OK | OK |
+| Extended | `ExecutionCandidate` | OK | OK | OK | OK | OK |
+| Extended | `ExecutionRoutingDecision` | OK | OK | OK | OK | OK |
+| Extended | `ExecutionFeedback` | OK | OK | OK | OK | OK |
 
 ## Legend
 

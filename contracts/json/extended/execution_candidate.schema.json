@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json",
+  "title": "ExecutionCandidate",
+  "description": "Extended. Something that can be selected for execution: a tool, flow, capability, agent, or workflow. Implementation-neutral identifier-plus-metadata shape used by the selection ↔ execution boundary contracts. When candidate_type is `flow` the candidate may carry a `compiled_flow` detail. See docs/EXECUTION_BOUNDARY.md.",
+  "type": "object",
+  "required": ["candidate_id", "candidate_type"],
+  "properties": {
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier for the selected item."
+    },
+    "candidate_type": {
+      "type": "string",
+      "enum": ["tool", "flow", "capability", "agent", "workflow"],
+      "description": "The kind of item selected. A runtime is not required to support every kind."
+    },
+    "name": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable name."
+    },
+    "version": {
+      "type": ["string", "null"],
+      "description": "Optional version, useful for versioned flows and tools."
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Optional short description."
+    },
+    "compiled_flow": {
+      "anyOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Optional CompiledFlow detail. Only valid when candidate_type is `flow`."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
+      "additionalProperties": true
+    }
+  },
+  "if": {
+    "required": ["compiled_flow"],
+    "properties": {
+      "compiled_flow": { "type": "object" }
+    }
+  },
+  "then": {
+    "properties": {
+      "candidate_type": { "const": "flow" }
+    }
+  },
+  "additionalProperties": true
+}

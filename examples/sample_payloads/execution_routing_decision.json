@@ -1,0 +1,38 @@
+{
+  "decision_id": "dec_123",
+  "candidate": {
+    "candidate_id": "invoice_reminder_flow",
+    "candidate_type": "flow",
+    "name": "Invoice reminder flow",
+    "version": "1.2.0",
+    "compiled_flow": {
+      "flow_id": "invoice_reminder_flow",
+      "version": "1.2.0",
+      "tool_dependencies": [
+        "org.billing.list_unpaid_invoices",
+        "org.email.send_reminder"
+      ],
+      "sensitivity": "confidential",
+      "side_effects": ["external_email", "data_read"],
+      "requires_authorization": true
+    }
+  },
+  "confidence": 0.86,
+  "reason_codes": ["capability_match", "low_latency", "historical_success"],
+  "reason": "Selected because it matches the requested capability and has strong historical success.",
+  "fallback_candidates": [
+    {
+      "candidate_id": "generic_email_workflow",
+      "candidate_type": "workflow",
+      "name": "Generic email workflow"
+    }
+  ],
+  "constraints": {
+    "max_latency_ms": 2000,
+    "prefer_low_cost": true
+  },
+  "policy_context_ref": "agent-kernel:policy-ctx:abc",
+  "trace_ref": "router:trace:abc123",
+  "created_at": "2026-05-25T07:59:00Z",
+  "metadata": {}
+}

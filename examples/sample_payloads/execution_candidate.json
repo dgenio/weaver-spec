@@ -1,0 +1,23 @@
+{
+  "candidate_id": "invoice_reminder_flow",
+  "candidate_type": "flow",
+  "name": "Invoice reminder flow",
+  "version": "1.2.0",
+  "description": "Find unpaid invoices and send reminder emails.",
+  "compiled_flow": {
+    "flow_id": "invoice_reminder_flow",
+    "name": "Invoice reminder flow",
+    "version": "1.2.0",
+    "description": "Find unpaid invoices and send reminder emails.",
+    "tool_dependencies": [
+      "org.billing.list_unpaid_invoices",
+      "org.email.send_reminder"
+    ],
+    "sensitivity": "confidential",
+    "side_effects": ["external_email", "data_read"],
+    "requires_authorization": true
+  },
+  "metadata": {
+    "runtime": "chainweaver"
+  }
+}

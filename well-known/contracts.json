@@ -89,11 +89,39 @@
       "sha256": "0b214fa8fa77bc0859584acd68e767f239716e4e43c3d782cec063517b2e7f92"
     },
     {
+      "name": "compiled_flow",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json",
+      "path": "contracts/json/extended/compiled_flow.schema.json",
+      "sha256": "0dc2a8ddfc9b3b8d33f85d442661fe696639e56184c2d89d812ab9cbf0082829"
+    },
+    {
       "name": "evaluation_artifact",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/evaluation_artifact.schema.json",
       "path": "contracts/json/extended/evaluation_artifact.schema.json",
       "sha256": "11b7a02fd3d13881ccfcc85e22e57cf5292411e23f80993d7956d5c474a6af52"
+    },
+    {
+      "name": "execution_candidate",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json",
+      "path": "contracts/json/extended/execution_candidate.schema.json",
+      "sha256": "55425ac4bb62a9e2e2466a88af270827c77953232d6b0c302ce18c4c336b4c0a"
+    },
+    {
+      "name": "execution_feedback",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_feedback.schema.json",
+      "path": "contracts/json/extended/execution_feedback.schema.json",
+      "sha256": "60478a8f29caf35f964cfbe9abcf66ab0f5a58da1d908f3ae21458933229579c"
+    },
+    {
+      "name": "execution_routing_decision",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_routing_decision.schema.json",
+      "path": "contracts/json/extended/execution_routing_decision.schema.json",
+      "sha256": "5f9834fdcd48b53c3c29d20abe295625e34d504a9ea068dbfafac1d4c9ae5d61"
     },
     {
       "name": "extended_frame_metadata",

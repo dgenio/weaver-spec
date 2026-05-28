@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json",
+  "title": "CompiledFlow",
+  "description": "Extended. A compiled flow (e.g. a ChainWeaver flow) exposed as a Weaver ecosystem item that can be routed to and executed like a capability. References (does not inline) its input/output schemas, lists the capability IDs it depends on internally, and carries sensitivity/side-effect metadata derived from those tools. A pre-compiled flow does not bypass execution authorization: a flow step that invokes a tool still goes through the kernel authorization/audit path (invariant I-07). See docs/EXECUTION_BOUNDARY.md.",
+  "type": "object",
+  "required": ["flow_id"],
+  "properties": {
+    "flow_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier for the compiled flow."
+    },
+    "name": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable name."
+    },
+    "version": {
+      "type": ["string", "null"],
+      "description": "Optional flow version (useful for versioned ChainWeaver flows)."
+    },
+    "description": {
+      "type": ["string", "null"],
+      "description": "Optional short description of what the flow does."
+    },
+    "input_schema_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference (URI or registry key) to the flow's input schema. The schema is referenced, not inlined, to avoid context bloat."
+    },
+    "output_schema_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference (URI or registry key) to the flow's output schema."
+    },
+    "tool_dependencies": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Capability IDs the flow invokes internally. Used to derive sensitivity and side-effect metadata and to plan authorization."
+    },
+    "sensitivity": {
+      "type": ["string", "null"],
+      "enum": ["public", "internal", "confidential", "restricted", null],
+      "description": "Optional sensitivity level, typically derived from the most sensitive tool the flow depends on. One of the shared artifact sensitivity levels."
+    },
+    "side_effects": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional side-effect markers derived from the flow's tools (e.g. `external_email`, `data_write`). Free-form; namespace project-specific values."
+    },
+    "requires_authorization": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether executing this flow requires authorization through the execution/policy layer. Defaults to true; a pre-compiled flow does not bypass the kernel authorization path (invariant I-07)."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

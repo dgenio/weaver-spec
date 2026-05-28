@@ -1,0 +1,18 @@
+{
+  "decision_id": "dec_123",
+  "candidate_id": "invoice_reminder_flow",
+  "success": true,
+  "timestamp": "2026-05-25T08:00:00Z",
+  "latency_ms": 842,
+  "cost": {
+    "estimated_tokens_saved": 1200,
+    "estimated_cost_saved_usd": 0.02
+  },
+  "quality_score": 0.9,
+  "trace_ref": "chainweaver:trace_id:abc123",
+  "execution_summary": {
+    "flow_name": "invoice_reminder_flow",
+    "step_count": 4
+  },
+  "metadata": {}
+}

@@ -1,0 +1,18 @@
+{
+  "flow_id": "invoice_reminder_flow",
+  "name": "Invoice reminder flow",
+  "version": "1.2.0",
+  "description": "Find unpaid invoices and send reminder emails.",
+  "input_schema_ref": "https://weaver-spec.dev/examples/schemas/invoice_reminder_input.json",
+  "output_schema_ref": "https://weaver-spec.dev/examples/schemas/invoice_reminder_output.json",
+  "tool_dependencies": [
+    "org.billing.list_unpaid_invoices",
+    "org.email.send_reminder"
+  ],
+  "sensitivity": "confidential",
+  "side_effects": ["external_email", "data_read"],
+  "requires_authorization": true,
+  "metadata": {
+    "runtime": "chainweaver"
+  }
+}
