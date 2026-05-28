@@ -244,6 +244,23 @@ class TestExtendedNegativeCases:
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(bad, schema)
 
+    def test_extended_frame_metadata_confidence_score_above_range_fails(self):
+        # Description claims [0.0, 1.0]; schema must enforce both bounds.
+        schema = load_extended_schema("extended_frame_metadata")
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate({"confidence_score": 1.5}, schema)
+
+    def test_extended_frame_metadata_confidence_score_below_range_fails(self):
+        schema = load_extended_schema("extended_frame_metadata")
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate({"confidence_score": -0.1}, schema)
+
+    def test_extended_selectable_item_negative_duration_fails(self):
+        # Schema declares `minimum: 0` on estimated_duration_ms.
+        schema = load_extended_schema("extended_selectable_item_metadata")
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate({"estimated_duration_ms": -1}, schema)
+
     def test_capability_token_signature_wrong_length_sig_fails(self):
         # docs/SIGNING.md fixes both registered algorithms at 64 raw bytes,
         # which is 86 base64url chars without padding. Anything else (DER-

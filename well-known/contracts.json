@@ -100,7 +100,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_frame_metadata.schema.json",
       "path": "contracts/json/extended/extended_frame_metadata.schema.json",
-      "sha256": "67f18a8030ffa37ab9df07898814e65925c714bd30edda29481e8808c65ec3ca"
+      "sha256": "02915e1b0cb20432685e451ee3d09f86085ad26605db5310ae3fc6e6fd5a8b0e"
     },
     {
       "name": "extended_selectable_item_metadata",

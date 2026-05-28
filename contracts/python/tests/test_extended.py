@@ -240,6 +240,19 @@ class TestExtendedFrameMetadata:
         json.dumps(data)
         assert data["telemetry"]["trace_id"] == "trace-3"
 
+    def test_confidence_score_boundaries_accepted(self):
+        # Inclusive boundaries — 0.0 and 1.0 are valid.
+        ExtendedFrameMetadata(confidence_score=0.0)
+        ExtendedFrameMetadata(confidence_score=1.0)
+
+    def test_confidence_score_below_range_raises(self):
+        with pytest.raises(ValueError, match=r"confidence_score must be in \[0\.0, 1\.0\]"):
+            ExtendedFrameMetadata(confidence_score=-0.01)
+
+    def test_confidence_score_above_range_raises(self):
+        with pytest.raises(ValueError, match=r"confidence_score must be in \[0\.0, 1\.0\]"):
+            ExtendedFrameMetadata(confidence_score=1.01)
+
 
 class TestExtendedSelectableItemMetadata:
     def test_valid_from_payload(self):
@@ -272,6 +285,17 @@ class TestExtendedSelectableItemMetadata:
         data = asdict(metadata)
         json.dumps(data)
         assert data["estimated_duration_ms"] == 500
+
+    def test_estimated_duration_ms_zero_accepted(self):
+        # Boundary — zero is valid (instant operation).
+        ExtendedSelectableItemMetadata(estimated_duration_ms=0)
+
+    def test_negative_estimated_duration_ms_raises(self):
+        with pytest.raises(
+            ValueError,
+            match="estimated_duration_ms must be >= 0",
+        ):
+            ExtendedSelectableItemMetadata(estimated_duration_ms=-1)
 
 
 class TestReviewArtifact:

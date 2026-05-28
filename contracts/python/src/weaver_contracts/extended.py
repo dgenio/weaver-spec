@@ -122,6 +122,12 @@ class ExtendedFrameMetadata:
     source_capability_version: Optional[str] = None
     extra: Dict[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        if self.confidence_score is not None and not 0.0 <= self.confidence_score <= 1.0:
+            raise ValueError(
+                "ExtendedFrameMetadata.confidence_score must be in [0.0, 1.0]"
+            )
+
 
 # ---------------------------------------------------------------------------
 # ExtendedSelectableItemMetadata — UI and risk hints for a SelectableItem
@@ -136,6 +142,12 @@ class ExtendedSelectableItemMetadata:
     estimated_duration_ms: Optional[int] = None
     requires_confirmation: bool = False
     extra: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.estimated_duration_ms is not None and self.estimated_duration_ms < 0:
+            raise ValueError(
+                "ExtendedSelectableItemMetadata.estimated_duration_ms must be >= 0"
+            )
 
 
 # ===========================================================================

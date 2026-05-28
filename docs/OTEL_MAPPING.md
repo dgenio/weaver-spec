@@ -80,15 +80,15 @@ separation.
 
 | Field | Source / formula | Example |
 | ----- | ---------------- | ------- |
-| `trace_id` | W3C Trace Context `trace-id` (32 hex chars). Producers SHOULD propagate from the inbound `traceparent` header. | `4bf92f3577b34da6a3ce929d0e0e4736` |
-| `span_id` | W3C Trace Context `span-id` (16 hex chars), unique per span. | `00f067aa0ba902b7` |
+| `trace_id` | W3C Trace Context `trace-id` (32 lowercase hex chars). Producers SHOULD propagate from the inbound `traceparent` header. | `4bf92f3577b34da6a3ce929d0e0e4736` |
+| `span_id` | W3C Trace Context `span-id` (16 lowercase hex chars), unique per span. | `00f067aa0ba902b7` |
 | `span_kind` | Per the table above. | `INTERNAL` |
 | `gen_ai_operation_name` | Per the event-type table above. | `execute_tool` |
 | `gen_ai_agent_id` | `TraceEvent.principal` | `agent-kernel-prod-1` |
 | `gen_ai_agent_name` | Stable display name of the agent. | `agent-kernel` |
 | `gen_ai_tool_name` | `TraceEvent.capability_id` | `org.myapp.search_docs` |
 | `gen_ai_system` | Producer-defined; `weaver` for native Weaver events. | `weaver` |
-| `parent_span_id` | The OTel span ID of the parent operation, if any. | `b9c7c989f97918e1` |
+| `parent_span_id` | The OTel span ID of the parent operation, if any (16 lowercase hex chars). | `b9c7c989f97918e1` |
 | `semconv_version` | Snapshot referenced above. | `1.30.0` |
 
 ---

@@ -44,10 +44,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
     `sig`, W3C-lowercase enforcement on `trace_id` / `span_id` /
     `parent_span_id`, and all five OTel span kinds).
     `test_extended_schema_alignment.py` adds the nine new schemas to its
-    parametrized list plus eight new negative cases (unknown signing
+    parametrized list plus eleven new negative cases (unknown signing
     algorithm, unknown canonicalization, signed CapabilityToken
     validation, invalid OTel span kind, malformed `trace_id`, uppercase
-    `trace_id`, wrong-length `sig`, missing fingerprint required fields).
+    `trace_id`, wrong-length `sig`, `confidence_score` above/below
+    `[0.0, 1.0]`, negative `estimated_duration_ms`, missing fingerprint
+    required fields).
+  - `ExtendedFrameMetadata` and `ExtendedSelectableItemMetadata` gain
+    `__post_init__` range validation so the Python dataclass enforces
+    the same numeric bounds the JSON Schemas document: `confidence_score`
+    must be in `[0.0, 1.0]` (the schema gains explicit `minimum`/`maximum`
+    too) and `estimated_duration_ms` must be `>= 0` (schema's existing
+    `minimum: 0` is now mirrored in Python).
 - `compatibility.yaml` — machine-readable manifest of sibling-repository
   compatibility with each weaver-spec contract version (`contextweaver`,
   `agent-kernel`, `ChainWeaver`). Declares per-repo `status`

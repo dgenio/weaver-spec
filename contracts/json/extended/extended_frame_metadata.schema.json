@@ -29,6 +29,8 @@
     },
     "confidence_score": {
       "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
       "description": "Optional confidence score in [0.0, 1.0] for the upstream capability's result."
     },
     "source_capability_version": {
