@@ -231,3 +231,29 @@ class TestExtendedNegativeCases:
         }
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(bad, schema)
+
+    def test_otel_trace_mapping_uppercase_trace_id_fails(self):
+        # W3C Trace Context requires lowercase hex; the schema pattern must
+        # reject uppercase even though chars are hex-valid.
+        schema = load_extended_schema("otel_trace_mapping")
+        bad = {
+            "trace_id": "4BF92F3577B34DA6A3CE929D0E0E4736",
+            "span_id": "00f067aa0ba902b7",
+            "span_kind": "INTERNAL",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_capability_token_signature_wrong_length_sig_fails(self):
+        # docs/SIGNING.md fixes both registered algorithms at 64 raw bytes,
+        # which is 86 base64url chars without padding. Anything else (DER-
+        # encoded ECDSA, RSA, truncated, etc.) is structurally invalid and
+        # the schema pattern must reject it before crypto verification runs.
+        schema = load_extended_schema("capability_token_signature")
+        bad = {
+            "alg": "ed25519",
+            "kid": "k1",
+            "sig": "A" * 50,  # base64url alphabet, wrong length
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)

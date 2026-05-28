@@ -9,13 +9,13 @@
     "trace_id": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^[0-9a-fA-F]{32}$",
+      "pattern": "^[0-9a-f]{32}$",
       "description": "OTel trace identifier. 32 lowercase hex characters per the W3C Trace Context (https://www.w3.org/TR/trace-context/#trace-id)."
     },
     "span_id": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^[0-9a-fA-F]{16}$",
+      "pattern": "^[0-9a-f]{16}$",
       "description": "OTel span identifier. 16 lowercase hex characters per the W3C Trace Context (https://www.w3.org/TR/trace-context/#parent-id)."
     },
     "span_kind": {
@@ -45,7 +45,7 @@
     },
     "parent_span_id": {
       "type": ["string", "null"],
-      "pattern": "^[0-9a-fA-F]{16}$",
+      "pattern": "^[0-9a-f]{16}$",
       "description": "Optional parent span ID for nested operations. Same format as span_id."
     },
     "semconv_version": {

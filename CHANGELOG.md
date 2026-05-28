@@ -39,13 +39,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
     `docs/OTEL_MAPPING.md` (pinned to OTel semconv snapshot `1.30.0`) with
     a CI-validated inline payload, plus a sample payload. Closes #47.
   - Tests: `test_extended.py` gains `TestCapabilityTokenSignature` and
-    `TestOtelTraceMapping` (8 + 9 cases each, including JCS/algorithm
-    registry enforcement, W3C trace/span hex-format checks, and all five
-    OTel span kinds). `test_extended_schema_alignment.py` adds the nine
-    new schemas to its parametrized list plus six new negative cases
-    (unknown signing algorithm, unknown canonicalization, signed
-    CapabilityToken validation, invalid OTel span kind, malformed
-    `trace_id`, missing fingerprint required fields).
+    `TestOtelTraceMapping` (11 + 12 cases each, including JCS/algorithm
+    registry enforcement, the 86-char base64url length constraint on
+    `sig`, W3C-lowercase enforcement on `trace_id` / `span_id` /
+    `parent_span_id`, and all five OTel span kinds).
+    `test_extended_schema_alignment.py` adds the nine new schemas to its
+    parametrized list plus eight new negative cases (unknown signing
+    algorithm, unknown canonicalization, signed CapabilityToken
+    validation, invalid OTel span kind, malformed `trace_id`, uppercase
+    `trace_id`, wrong-length `sig`, missing fingerprint required fields).
 - `compatibility.yaml` — machine-readable manifest of sibling-repository
   compatibility with each weaver-spec contract version (`contextweaver`,
   `agent-kernel`, `ChainWeaver`). Declares per-repo `status`

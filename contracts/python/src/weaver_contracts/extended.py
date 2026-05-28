@@ -557,6 +557,13 @@ class CapabilityTokenSignature:
 
     _VALID_ALGS = frozenset({"ed25519", "es256"})
     _VALID_CANONICALIZATIONS = frozenset({"JCS"})
+    # Both registered algorithms produce 64-byte raw signatures (ed25519 RFC 8032
+    # raw, or es256 IEEE P1363 r||s), which encode to exactly 86 base64url chars
+    # without padding. See docs/SIGNING.md for the algorithm registry.
+    _SIG_BASE64URL_LEN = 86
+    _SIG_BASE64URL_ALPHABET = frozenset(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    )
 
     def __post_init__(self) -> None:
         if self.alg not in self._VALID_ALGS:
@@ -567,6 +574,14 @@ class CapabilityTokenSignature:
             raise ValueError("CapabilityTokenSignature.kid must be non-empty")
         if not self.sig:
             raise ValueError("CapabilityTokenSignature.sig must be non-empty")
+        if (
+            len(self.sig) != self._SIG_BASE64URL_LEN
+            or not all(c in self._SIG_BASE64URL_ALPHABET for c in self.sig)
+        ):
+            raise ValueError(
+                "CapabilityTokenSignature.sig must be 86 base64url characters "
+                "(64 raw bytes, RFC 4648 §5 no padding); see docs/SIGNING.md"
+            )
         if self.canonicalization not in self._VALID_CANONICALIZATIONS:
             raise ValueError(
                 "CapabilityTokenSignature.canonicalization must be one of "
@@ -608,20 +623,22 @@ class OtelTraceMapping:
     def __post_init__(self) -> None:
         if not self.trace_id:
             raise ValueError("OtelTraceMapping.trace_id must be non-empty")
+        # W3C Trace Context requires lowercase hex; producers must normalize
+        # before constructing this object (https://www.w3.org/TR/trace-context/#trace-id).
         if len(self.trace_id) != self._TRACE_ID_LEN or not all(
-            c in "0123456789abcdefABCDEF" for c in self.trace_id
+            c in "0123456789abcdef" for c in self.trace_id
         ):
             raise ValueError(
-                "OtelTraceMapping.trace_id must be 32 hex characters "
+                "OtelTraceMapping.trace_id must be 32 lowercase hex characters "
                 "(W3C Trace Context)"
             )
         if not self.span_id:
             raise ValueError("OtelTraceMapping.span_id must be non-empty")
         if len(self.span_id) != self._SPAN_ID_LEN or not all(
-            c in "0123456789abcdefABCDEF" for c in self.span_id
+            c in "0123456789abcdef" for c in self.span_id
         ):
             raise ValueError(
-                "OtelTraceMapping.span_id must be 16 hex characters "
+                "OtelTraceMapping.span_id must be 16 lowercase hex characters "
                 "(W3C Trace Context)"
             )
         if self.span_kind not in self._VALID_SPAN_KINDS:
@@ -630,8 +647,8 @@ class OtelTraceMapping:
             )
         if self.parent_span_id is not None and (
             len(self.parent_span_id) != self._SPAN_ID_LEN
-            or not all(c in "0123456789abcdefABCDEF" for c in self.parent_span_id)
+            or not all(c in "0123456789abcdef" for c in self.parent_span_id)
         ):
             raise ValueError(
-                "OtelTraceMapping.parent_span_id must be 16 hex characters"
+                "OtelTraceMapping.parent_span_id must be 16 lowercase hex characters"
             )

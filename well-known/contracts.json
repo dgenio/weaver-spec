@@ -86,7 +86,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/capability_token_signature.schema.json",
       "path": "contracts/json/extended/capability_token_signature.schema.json",
-      "sha256": "70e9492cc4a6cecedccccaba34d9c355e9fb740451d4ea50570ae9449af6399b"
+      "sha256": "0b214fa8fa77bc0859584acd68e767f239716e4e43c3d782cec063517b2e7f92"
     },
     {
       "name": "evaluation_artifact",
@@ -128,7 +128,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/otel_trace_mapping.schema.json",
       "path": "contracts/json/extended/otel_trace_mapping.schema.json",
-      "sha256": "5bbb1083ba706826979e3e141c6a4b59ee3435e36e844f3e9f9ad1b290c7475d"
+      "sha256": "e885ce38b247d08c8014d0c37b2bf1743eedd2b6214a761eaf7c681dd27cdace"
     },
     {
       "name": "redaction_policy",

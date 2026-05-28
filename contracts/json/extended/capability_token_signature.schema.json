@@ -18,9 +18,8 @@
     },
     "sig": {
       "type": "string",
-      "minLength": 1,
-      "pattern": "^[A-Za-z0-9_-]+$",
-      "description": "Base64url-encoded signature bytes (RFC 4648 §5, no padding). For ed25519 this is 64 bytes (86 base64url chars). For es256 this is the IEEE P1363 concatenated (r||s) form, 64 bytes (86 base64url chars)."
+      "pattern": "^[A-Za-z0-9_-]{86}$",
+      "description": "Base64url-encoded signature bytes (RFC 4648 §5, no padding). For ed25519 this is 64 bytes (86 base64url chars). For es256 this is the IEEE P1363 concatenated (r||s) form, 64 bytes (86 base64url chars). The schema enforces the 86-char length; verifiers MUST still decode and validate cryptographically per docs/SIGNING.md."
     },
     "canonicalization": {
       "type": "string",

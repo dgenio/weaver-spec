@@ -757,11 +757,17 @@ class TestArtifactSafetyReport:
 
 
 class TestCapabilityTokenSignature:
+    # 86-char base64url placeholder (64 raw bytes encoded RFC 4648 §5 no padding).
+    # Illustrative only — never produced by a real keyring.
+    _ILLUSTRATIVE_SIG = (
+        "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-Pw"
+    )
+
     def _kwargs(self, **overrides):
         base = dict(
             alg="ed25519",
             kid="agent-kernel-2026-05-key-01",
-            sig="MEUCIQDxQ7w4_4Tq3rH9aJZQz9wHvN9p2lYkM7Z5oXrLg8b7nQ",
+            sig=self._ILLUSTRATIVE_SIG,
         )
         base.update(overrides)
         return base
@@ -789,6 +795,20 @@ class TestCapabilityTokenSignature:
     def test_empty_sig_raises(self):
         with pytest.raises(ValueError, match="sig must be non-empty"):
             CapabilityTokenSignature(**self._kwargs(sig=""))
+
+    def test_short_sig_raises(self):
+        with pytest.raises(ValueError, match="sig must be 86 base64url"):
+            CapabilityTokenSignature(**self._kwargs(sig="A" * 85))
+
+    def test_long_sig_raises(self):
+        with pytest.raises(ValueError, match="sig must be 86 base64url"):
+            CapabilityTokenSignature(**self._kwargs(sig="A" * 87))
+
+    def test_non_base64url_sig_raises(self):
+        # '+' and '/' belong to standard base64 — base64url forbids them.
+        bad = "A" * 84 + "+/"
+        with pytest.raises(ValueError, match="sig must be 86 base64url"):
+            CapabilityTokenSignature(**self._kwargs(sig=bad))
 
     def test_unknown_canonicalization_raises(self):
         with pytest.raises(ValueError, match="canonicalization must be one of"):
@@ -843,17 +863,35 @@ class TestOtelTraceMapping:
         assert m.gen_ai_tool_name == "org.myapp.search_docs"
 
     def test_short_trace_id_raises(self):
-        with pytest.raises(ValueError, match="trace_id must be 32 hex"):
+        with pytest.raises(ValueError, match="trace_id must be 32 lowercase hex"):
             OtelTraceMapping(**self._kwargs(trace_id="deadbeef"))
 
     def test_short_span_id_raises(self):
-        with pytest.raises(ValueError, match="span_id must be 16 hex"):
+        with pytest.raises(ValueError, match="span_id must be 16 lowercase hex"):
             OtelTraceMapping(**self._kwargs(span_id="dead"))
 
     def test_non_hex_trace_id_raises(self):
-        with pytest.raises(ValueError, match="trace_id must be 32 hex"):
+        with pytest.raises(ValueError, match="trace_id must be 32 lowercase hex"):
             OtelTraceMapping(
                 **self._kwargs(trace_id="z" * 32)  # 32 chars, not hex
+            )
+
+    def test_uppercase_trace_id_raises(self):
+        # W3C Trace Context requires lowercase hex; uppercase is non-conformant
+        # even though the chars are hex-valid.
+        with pytest.raises(ValueError, match="trace_id must be 32 lowercase hex"):
+            OtelTraceMapping(
+                **self._kwargs(trace_id="4BF92F3577B34DA6A3CE929D0E0E4736")
+            )
+
+    def test_uppercase_span_id_raises(self):
+        with pytest.raises(ValueError, match="span_id must be 16 lowercase hex"):
+            OtelTraceMapping(**self._kwargs(span_id="00F067AA0BA902B7"))
+
+    def test_uppercase_parent_span_id_raises(self):
+        with pytest.raises(ValueError, match="parent_span_id must be 16 lowercase hex"):
+            OtelTraceMapping(
+                **self._kwargs(parent_span_id="B9C7C989F97918E1")
             )
 
     def test_invalid_span_kind_raises(self):
@@ -861,7 +899,7 @@ class TestOtelTraceMapping:
             OtelTraceMapping(**self._kwargs(span_kind="DOWNSTREAM"))
 
     def test_invalid_parent_span_id_raises(self):
-        with pytest.raises(ValueError, match="parent_span_id must be 16 hex"):
+        with pytest.raises(ValueError, match="parent_span_id must be 16 lowercase hex"):
             OtelTraceMapping(**self._kwargs(parent_span_id="z" * 16))
 
     def test_defaults_omit_optional(self):
