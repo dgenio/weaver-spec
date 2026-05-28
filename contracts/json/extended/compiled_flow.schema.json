@@ -48,6 +48,7 @@
     },
     "requires_authorization": {
       "type": "boolean",
+      "default": true,
       "description": "Whether executing this flow requires authorization through the execution/policy layer. Defaults to true; a pre-compiled flow does not bypass the kernel authorization path (invariant I-07)."
     },
     "metadata": {

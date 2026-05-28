@@ -93,7 +93,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json",
       "path": "contracts/json/extended/compiled_flow.schema.json",
-      "sha256": "8b2e26c79913c0cb4b42b15e87b98c071f0e49817f8b33f69ebb4794d56fea39"
+      "sha256": "0dc2a8ddfc9b3b8d33f85d442661fe696639e56184c2d89d812ab9cbf0082829"
     },
     {
       "name": "evaluation_artifact",
@@ -121,7 +121,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_routing_decision.schema.json",
       "path": "contracts/json/extended/execution_routing_decision.schema.json",
-      "sha256": "81d04e517625a196691960fc8f7fcfcb2017c7e7a39abe7024f4f2837af9c001"
+      "sha256": "5f9834fdcd48b53c3c29d20abe295625e34d504a9ea068dbfafac1d4c9ae5d61"
     },
     {
       "name": "extended_frame_metadata",

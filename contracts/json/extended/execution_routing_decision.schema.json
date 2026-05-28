@@ -12,7 +12,9 @@
       "description": "Stable ID correlating this decision with downstream execution traces and ExecutionFeedback."
     },
     "candidate": {
-      "$ref": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json",
+      "allOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json" }
+      ],
       "description": "The selected ExecutionCandidate."
     },
     "confidence": {
