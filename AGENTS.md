@@ -69,7 +69,7 @@ For JSON schema conventions specifically, `contracts/json/README.md` is authorit
 
 JSON Schemas are the language-agnostic source of truth for all **Core** contract definitions. Python Core types must mirror them exactly — same field names, same types, same required/optional status. Zero divergence.
 
-Extended contracts may define JSON Schemas under `contracts/json/extended/`. Where an Extended schema exists, it leads and the Python dataclass in `extended.py` must mirror it (same as Core). The original metadata types (`TelemetryHint`, `SchemaFingerprint`, `RedactionPolicy`, `UIHint`, `RiskAssessment`, `ExtendedFrameMetadata`, `ExtendedSelectableItemMetadata`) remain Python-source-of-truth pending their schema retrofit (#46).
+Extended contracts define JSON Schemas under `contracts/json/extended/`. The Python dataclass in `extended.py` must mirror its schema (same as Core).
 
 ---
 
@@ -138,7 +138,7 @@ Do not merge, collapse, or "simplify" these types without a spec-level ADR.
 
 ## Domain clarifications
 
-**CapabilityToken:** Currently a plain data structure. The word "signed" in the Glossary and schema descriptions is aspirational. Signing is an agent-kernel implementation concern, not enforced in this spec. Do not add signature fields or cryptographic logic here.
+**CapabilityToken:** The Core token remains a plain data structure. As of v0.6.0 the spec defines an Extended detached-signature contract (`CapabilityTokenSignature`, attached under `x_weaver_signature`) per [ADR 001](docs/adr/001-capability-token-signing.md) — the word "signed" is accurate when that extension is present. Signing is opt-in in v0.x; do not add signature fields or cryptographic logic to the Core schema, and do not invent alternative signature shapes — use the Extended contract.
 
 **ID format:** IDs are any non-empty string (`minLength: 1`). UUIDs are not required. Sample payloads use readable slug-style IDs (e.g., `rd-20260308-001`). If any other docs or examples ever conflict with this, treat the JSON Schemas as the authority.
 

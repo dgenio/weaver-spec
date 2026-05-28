@@ -10,11 +10,13 @@ import pytest
 from weaver_contracts.extended import (
     ArtifactSafetyGateRequest,
     ArtifactSafetyReport,
+    CapabilityTokenSignature,
     EvaluationArtifact,
     ExtendedFrameMetadata,
     ExtendedSelectableItemMetadata,
     LessonCard,
     MemoryArtifact,
+    OtelTraceMapping,
     RedactionPolicy,
     ReviewArtifact,
     RiskAssessment,
@@ -752,3 +754,129 @@ class TestArtifactSafetyReport:
         data = asdict(rep)
         json.dumps(data)
         assert data["findings"][0]["finding_id"] == "f1"
+
+
+class TestCapabilityTokenSignature:
+    def _kwargs(self, **overrides):
+        base = dict(
+            alg="ed25519",
+            kid="agent-kernel-2026-05-key-01",
+            sig="MEUCIQDxQ7w4_4Tq3rH9aJZQz9wHvN9p2lYkM7Z5oXrLg8b7nQ",
+        )
+        base.update(overrides)
+        return base
+
+    def test_valid_from_payload(self):
+        p = load_payload("capability_token_signature")
+        sig = CapabilityTokenSignature(
+            alg=p["alg"],
+            kid=p["kid"],
+            sig=p["sig"],
+            canonicalization=p.get("canonicalization", "JCS"),
+            signed_at=p.get("signed_at"),
+        )
+        assert sig.alg == "ed25519"
+        assert sig.canonicalization == "JCS"
+
+    def test_unknown_alg_raises(self):
+        with pytest.raises(ValueError, match="alg must be one of"):
+            CapabilityTokenSignature(**self._kwargs(alg="rsa-pkcs1"))
+
+    def test_empty_kid_raises(self):
+        with pytest.raises(ValueError, match="kid must be non-empty"):
+            CapabilityTokenSignature(**self._kwargs(kid=""))
+
+    def test_empty_sig_raises(self):
+        with pytest.raises(ValueError, match="sig must be non-empty"):
+            CapabilityTokenSignature(**self._kwargs(sig=""))
+
+    def test_unknown_canonicalization_raises(self):
+        with pytest.raises(ValueError, match="canonicalization must be one of"):
+            CapabilityTokenSignature(
+                **self._kwargs(canonicalization="sorted-keys")
+            )
+
+    def test_defaults(self):
+        sig = CapabilityTokenSignature(**self._kwargs())
+        assert sig.canonicalization == "JCS"
+        assert sig.signed_at is None
+
+    def test_es256_accepted(self):
+        sig = CapabilityTokenSignature(**self._kwargs(alg="es256"))
+        assert sig.alg == "es256"
+
+    def test_serialization(self):
+        sig = CapabilityTokenSignature(
+            **self._kwargs(signed_at="2026-05-28T08:00:00Z")
+        )
+        data = asdict(sig)
+        json.dumps(data)
+        assert data["signed_at"] == "2026-05-28T08:00:00Z"
+
+
+class TestOtelTraceMapping:
+    def _kwargs(self, **overrides):
+        base = dict(
+            trace_id="4bf92f3577b34da6a3ce929d0e0e4736",
+            span_id="00f067aa0ba902b7",
+            span_kind="INTERNAL",
+        )
+        base.update(overrides)
+        return base
+
+    def test_valid_from_payload(self):
+        p = load_payload("otel_trace_mapping")
+        m = OtelTraceMapping(
+            trace_id=p["trace_id"],
+            span_id=p["span_id"],
+            span_kind=p["span_kind"],
+            gen_ai_operation_name=p.get("gen_ai_operation_name"),
+            gen_ai_agent_id=p.get("gen_ai_agent_id"),
+            gen_ai_agent_name=p.get("gen_ai_agent_name"),
+            gen_ai_tool_name=p.get("gen_ai_tool_name"),
+            gen_ai_system=p.get("gen_ai_system"),
+            parent_span_id=p.get("parent_span_id"),
+            semconv_version=p.get("semconv_version"),
+        )
+        assert m.span_kind == "INTERNAL"
+        assert m.gen_ai_operation_name == "execute_tool"
+        assert m.gen_ai_tool_name == "org.myapp.search_docs"
+
+    def test_short_trace_id_raises(self):
+        with pytest.raises(ValueError, match="trace_id must be 32 hex"):
+            OtelTraceMapping(**self._kwargs(trace_id="deadbeef"))
+
+    def test_short_span_id_raises(self):
+        with pytest.raises(ValueError, match="span_id must be 16 hex"):
+            OtelTraceMapping(**self._kwargs(span_id="dead"))
+
+    def test_non_hex_trace_id_raises(self):
+        with pytest.raises(ValueError, match="trace_id must be 32 hex"):
+            OtelTraceMapping(
+                **self._kwargs(trace_id="z" * 32)  # 32 chars, not hex
+            )
+
+    def test_invalid_span_kind_raises(self):
+        with pytest.raises(ValueError, match="span_kind must be one of"):
+            OtelTraceMapping(**self._kwargs(span_kind="DOWNSTREAM"))
+
+    def test_invalid_parent_span_id_raises(self):
+        with pytest.raises(ValueError, match="parent_span_id must be 16 hex"):
+            OtelTraceMapping(**self._kwargs(parent_span_id="z" * 16))
+
+    def test_defaults_omit_optional(self):
+        m = OtelTraceMapping(**self._kwargs())
+        assert m.gen_ai_operation_name is None
+        assert m.parent_span_id is None
+        assert m.semconv_version is None
+
+    def test_all_span_kinds_accepted(self):
+        for kind in ("INTERNAL", "CLIENT", "SERVER", "PRODUCER", "CONSUMER"):
+            m = OtelTraceMapping(**self._kwargs(span_kind=kind))
+            assert m.span_kind == kind
+
+    def test_serialization(self):
+        m = OtelTraceMapping(**self._kwargs(gen_ai_system="weaver"))
+        data = asdict(m)
+        json.dumps(data)
+        assert data["gen_ai_system"] == "weaver"

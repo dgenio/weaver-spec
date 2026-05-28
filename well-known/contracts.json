@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_version": "0.5.0",
+  "contract_version": "0.6.0",
   "core": [
     {
       "name": "capability",
@@ -82,11 +82,32 @@
       "sha256": "2352e7f2e848500a0b670657fa9716d3b1758e56ffb685876a0f82e2bb64cb49"
     },
     {
+      "name": "capability_token_signature",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/capability_token_signature.schema.json",
+      "path": "contracts/json/extended/capability_token_signature.schema.json",
+      "sha256": "70e9492cc4a6cecedccccaba34d9c355e9fb740451d4ea50570ae9449af6399b"
+    },
+    {
       "name": "evaluation_artifact",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/evaluation_artifact.schema.json",
       "path": "contracts/json/extended/evaluation_artifact.schema.json",
       "sha256": "11b7a02fd3d13881ccfcc85e22e57cf5292411e23f80993d7956d5c474a6af52"
+    },
+    {
+      "name": "extended_frame_metadata",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_frame_metadata.schema.json",
+      "path": "contracts/json/extended/extended_frame_metadata.schema.json",
+      "sha256": "67f18a8030ffa37ab9df07898814e65925c714bd30edda29481e8808c65ec3ca"
+    },
+    {
+      "name": "extended_selectable_item_metadata",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_selectable_item_metadata.schema.json",
+      "path": "contracts/json/extended/extended_selectable_item_metadata.schema.json",
+      "sha256": "86c42335dcb1d5fe2935978ab766be97e727ee4d85c39fe448b13f2117165841"
     },
     {
       "name": "lesson_card",
@@ -103,11 +124,39 @@
       "sha256": "5c469d4a3d825be40ac848db79bccef08e5accec5c9cf97318f7f7fa9b174aea"
     },
     {
+      "name": "otel_trace_mapping",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/otel_trace_mapping.schema.json",
+      "path": "contracts/json/extended/otel_trace_mapping.schema.json",
+      "sha256": "5bbb1083ba706826979e3e141c6a4b59ee3435e36e844f3e9f9ad1b290c7475d"
+    },
+    {
+      "name": "redaction_policy",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/redaction_policy.schema.json",
+      "path": "contracts/json/extended/redaction_policy.schema.json",
+      "sha256": "6adca8aaf365ebbb5d95e6a28d04e4e337ccd2d95036db43d62c55b31f29b0c3"
+    },
+    {
       "name": "review_artifact",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/review_artifact.schema.json",
       "path": "contracts/json/extended/review_artifact.schema.json",
       "sha256": "9ac740c96079862dfe047e60084050279167f44ee5e983e1205070988d059bbe"
+    },
+    {
+      "name": "risk_assessment",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/risk_assessment.schema.json",
+      "path": "contracts/json/extended/risk_assessment.schema.json",
+      "sha256": "a42717f80f37070bd24dd97c9a7486901416bab488b90fdc5e7e61990c5cc061"
+    },
+    {
+      "name": "schema_fingerprint",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/schema_fingerprint.schema.json",
+      "path": "contracts/json/extended/schema_fingerprint.schema.json",
+      "sha256": "fa76eedf784941986431697e00a9c9d504911f56c5adf6fbbeb42cc8f4216271"
     },
     {
       "name": "session_handoff",
@@ -122,6 +171,20 @@
       "$id": "https://weaver-spec.dev/contracts/v0/extended/skill_card.schema.json",
       "path": "contracts/json/extended/skill_card.schema.json",
       "sha256": "964833d0835a01172686611bdda74757166822d6aed47156c612f7c063c85559"
+    },
+    {
+      "name": "telemetry_hint",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/telemetry_hint.schema.json",
+      "path": "contracts/json/extended/telemetry_hint.schema.json",
+      "sha256": "84e31eb6f441a2f79b2ab65b1f487af73da6473ba6b3c2434f1d51813ce3c33c"
+    },
+    {
+      "name": "ui_hint",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/ui_hint.schema.json",
+      "path": "contracts/json/extended/ui_hint.schema.json",
+      "sha256": "2f487617ddae026f16b7cac1de3e1b9d4eb489eefc025adc229d5fe29ac12b78"
     }
   ]
 }

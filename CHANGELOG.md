@@ -10,6 +10,42 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **v0.6.0 — Extended schema retrofit + signing + OpenTelemetry mapping.**
+  Bumps `CONTRACT_VERSION` and the Python package to `0.6.0` and lands three
+  related issues in one PR.
+  - **JSON Schemas for the seven original Extended metadata types**
+    (`TelemetryHint`, `SchemaFingerprint`, `RedactionPolicy`, `UIHint`,
+    `RiskAssessment`, `ExtendedFrameMetadata`,
+    `ExtendedSelectableItemMetadata`). Their `$id` URIs live under the
+    `extended/` namespace; `ExtendedFrameMetadata` and
+    `ExtendedSelectableItemMetadata` reference their child schemas via
+    `$ref` resolved by the existing local schema store. The
+    Python-source-of-truth carve-out in `AGENTS.md` and
+    `docs/agent-context/workflows.md` is removed. Closes #46.
+  - **`CapabilityTokenSignature` Extended contract** for RFC 8785 JCS
+    canonicalization plus `ed25519` / `es256` detached signatures, attached
+    to a `CapabilityToken` under the namespaced extension key
+    `x_weaver_signature` (Core schema unchanged). New ADR
+    `docs/adr/001-capability-token-signing.md` and verification guide
+    `docs/SIGNING.md`. Two new sample payloads
+    (`capability_token_signature.json`, `capability_token_signed.json`).
+    The `AGENTS.md` "Domain clarifications" entry for `CapabilityToken` is
+    updated to reflect that the word "signed" is accurate when the
+    extension is present. Closes #44.
+  - **`OtelTraceMapping` Extended contract** carrying W3C Trace Context
+    identifiers and OTel GenAI semconv attributes
+    (`gen_ai.operation.name`, `gen_ai.tool.name`, `gen_ai.agent.id`,
+    `gen_ai.agent.name`, `gen_ai.system`). New normative mapping doc
+    `docs/OTEL_MAPPING.md` (pinned to OTel semconv snapshot `1.30.0`) with
+    a CI-validated inline payload, plus a sample payload. Closes #47.
+  - Tests: `test_extended.py` gains `TestCapabilityTokenSignature` and
+    `TestOtelTraceMapping` (8 + 9 cases each, including JCS/algorithm
+    registry enforcement, W3C trace/span hex-format checks, and all five
+    OTel span kinds). `test_extended_schema_alignment.py` adds the nine
+    new schemas to its parametrized list plus six new negative cases
+    (unknown signing algorithm, unknown canonicalization, signed
+    CapabilityToken validation, invalid OTel span kind, malformed
+    `trace_id`, missing fingerprint required fields).
 - `compatibility.yaml` — machine-readable manifest of sibling-repository
   compatibility with each weaver-spec contract version (`contextweaver`,
   `agent-kernel`, `ChainWeaver`). Declares per-repo `status`

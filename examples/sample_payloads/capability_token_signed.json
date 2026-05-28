@@ -1,0 +1,23 @@
+{
+  "token_id": "tok-20260528-signed-001",
+  "principal": "agent-session-7f3a",
+  "scope": [
+    "org.myapp.search_docs",
+    "org.myapp.fetch_doc_page"
+  ],
+  "issued_at": "2026-05-28T08:00:00Z",
+  "expires_at": "2026-05-28T09:00:00Z",
+  "single_use": false,
+  "issuer": "agent-kernel-prod-1",
+  "metadata": {
+    "session_id": "sess-20260528-xyz",
+    "request_id": "req-20260528-001"
+  },
+  "x_weaver_signature": {
+    "alg": "ed25519",
+    "kid": "agent-kernel-2026-05-key-01",
+    "sig": "MEUCIQDxQ7w4_4Tq3rH9aJZQz9wHvN9p2lYkM7Z5oXrLg8b7nQIgZ8u3oXNl6sR4yKqJ0fY7m2bH8nQrL4kPzM5o9XaB7tY",
+    "canonicalization": "JCS",
+    "signed_at": "2026-05-28T08:00:00Z"
+  }
+}

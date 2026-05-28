@@ -17,12 +17,12 @@ CI runs the same script with `--check` and fails if this file is stale.
 
 ## Summary
 
-- Total contract types: **24**
-- JSON Schemas: **17 / 24**
-- Python classes: **24 / 24**
-- Sample payloads: **24 / 24**
-- Roundtrip tests: **24 / 24**
-- Schema validation tests: **11 / 24**
+- Total contract types: **26**
+- JSON Schemas: **26 / 26**
+- Python classes: **26 / 26**
+- Sample payloads: **26 / 26**
+- Roundtrip tests: **26 / 26**
+- Schema validation tests: **20 / 26**
 
 ## Coverage table
 
@@ -37,13 +37,13 @@ CI runs the same script with `--check` and fails if this file is stale.
 | Core | `Frame` | OK | OK | OK | OK | OK |
 | Core | `Handle` | OK | OK | OK | OK | -- |
 | Core | `TraceEvent` | OK | OK | OK | OK | -- |
-| Extended | `TelemetryHint` | -- | OK | OK | OK | -- |
-| Extended | `SchemaFingerprint` | -- | OK | OK | OK | -- |
-| Extended | `RedactionPolicy` | -- | OK | OK | OK | -- |
-| Extended | `UIHint` | -- | OK | OK | OK | -- |
-| Extended | `RiskAssessment` | -- | OK | OK | OK | -- |
-| Extended | `ExtendedFrameMetadata` | -- | OK | OK | OK | -- |
-| Extended | `ExtendedSelectableItemMetadata` | -- | OK | OK | OK | -- |
+| Extended | `TelemetryHint` | OK | OK | OK | OK | OK |
+| Extended | `SchemaFingerprint` | OK | OK | OK | OK | OK |
+| Extended | `RedactionPolicy` | OK | OK | OK | OK | OK |
+| Extended | `UIHint` | OK | OK | OK | OK | OK |
+| Extended | `RiskAssessment` | OK | OK | OK | OK | OK |
+| Extended | `ExtendedFrameMetadata` | OK | OK | OK | OK | OK |
+| Extended | `ExtendedSelectableItemMetadata` | OK | OK | OK | OK | OK |
 | Extended | `ReviewArtifact` | OK | OK | OK | OK | OK |
 | Extended | `MemoryArtifact` | OK | OK | OK | OK | OK |
 | Extended | `SessionHandoff` | OK | OK | OK | OK | OK |
@@ -52,6 +52,8 @@ CI runs the same script with `--check` and fails if this file is stale.
 | Extended | `EvaluationArtifact` | OK | OK | OK | OK | OK |
 | Extended | `ArtifactSafetyGateRequest` | OK | OK | OK | OK | OK |
 | Extended | `ArtifactSafetyReport` | OK | OK | OK | OK | OK |
+| Extended | `CapabilityTokenSignature` | OK | OK | OK | OK | OK |
+| Extended | `OtelTraceMapping` | OK | OK | OK | OK | OK |
 
 ## Legend
 

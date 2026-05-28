@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/redaction_policy.schema.json",
+  "title": "RedactionPolicy",
+  "description": "Extended. Describes the redaction rules applied by the firewall when producing a Frame. Identifies which fields were redacted or truncated and whether PII was detected.",
+  "type": "object",
+  "required": ["policy_id"],
+  "properties": {
+    "policy_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier of the redaction policy that produced this record."
+    },
+    "redacted_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Field paths whose values were redacted (removed or masked)."
+    },
+    "truncated_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Field paths whose values were truncated to a length bound."
+    },
+    "redaction_reason": {
+      "type": ["string", "null"],
+      "description": "Short human-readable reason the policy was applied."
+    },
+    "pii_detected": {
+      "type": "boolean",
+      "description": "True if any PII-class data was detected in the payload.",
+      "default": false
+    },
+    "pii_types": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Categories of PII that were detected (e.g., person_name, credential)."
+    }
+  },
+  "additionalProperties": true
+}

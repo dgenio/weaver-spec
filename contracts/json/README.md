@@ -25,8 +25,31 @@ contracts (not required for spec compliance; see invariant I-04). Their `$id`
 URIs live under the `extended/` namespace, e.g.
 `https://weaver-spec.dev/contracts/v0/extended/memory_artifact.schema.json`.
 Extended schemas follow the same design principles below and are picked up
-automatically by `scripts/generate_contracts_index.py`. See
-[`../../docs/ARTIFACT_CONTRACTS.md`](../../docs/ARTIFACT_CONTRACTS.md) for the
+automatically by `scripts/generate_contracts_index.py`.
+
+Extended schemas currently published:
+
+| Schema | Description |
+| -------- | ------------- |
+| `telemetry_hint.schema.json` | Optional telemetry metadata attached to any event |
+| `schema_fingerprint.schema.json` | Schema version + content hash for compatibility checking |
+| `redaction_policy.schema.json` | Firewall redaction rules applied when producing a Frame |
+| `ui_hint.schema.json` | Optional UI rendering hints for SelectableItems |
+| `risk_assessment.schema.json` | Optional risk metadata for a capability invocation |
+| `extended_frame_metadata.schema.json` | Enriched Frame metadata (telemetry, fingerprint, redaction) |
+| `extended_selectable_item_metadata.schema.json` | UI + risk hints for a SelectableItem |
+| `capability_token_signature.schema.json` | RFC 8785 JCS detached signature for a CapabilityToken (see [docs/SIGNING.md](../../docs/SIGNING.md)) |
+| `otel_trace_mapping.schema.json` | TraceEvent → OpenTelemetry GenAI semantic-convention mapping (see [docs/OTEL_MAPPING.md](../../docs/OTEL_MAPPING.md)) |
+| `review_artifact.schema.json` | Cross-project trace/review interchange envelope |
+| `memory_artifact.schema.json` | Durable / semi-durable agent memory record |
+| `session_handoff.schema.json` | Compact continuity pack between sessions |
+| `lesson_card.schema.json` | Reviewed, reusable lesson derived from traces |
+| `skill_card.schema.json` | Reviewed, reusable procedure derived from traces |
+| `evaluation_artifact.schema.json` | Statistical / model-evaluation decision report |
+| `artifact_safety_gate_request.schema.json` | Inputs to an artifact safety gate capability |
+| `artifact_safety_report.schema.json` | Output of an artifact safety gate run |
+
+See [`../../docs/ARTIFACT_CONTRACTS.md`](../../docs/ARTIFACT_CONTRACTS.md) for the
 cross-project artifact vocabulary.
 
 ## Usage

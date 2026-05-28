@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_frame_metadata.schema.json",
+  "title": "ExtendedFrameMetadata",
+  "description": "Extended. Optional enriched metadata for a Frame, beyond the Core contract: redaction policy, telemetry hint, schema fingerprint, confidence score, and source capability version.",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "redaction_policy": {
+      "anyOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/redaction_policy.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Optional embedded RedactionPolicy describing how the Frame was redacted."
+    },
+    "telemetry": {
+      "anyOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/telemetry_hint.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Optional TelemetryHint for observability enrichment."
+    },
+    "schema_fingerprint": {
+      "anyOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/schema_fingerprint.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Optional SchemaFingerprint identifying the schema the Frame's body validates against."
+    },
+    "confidence_score": {
+      "type": ["number", "null"],
+      "description": "Optional confidence score in [0.0, 1.0] for the upstream capability's result."
+    },
+    "source_capability_version": {
+      "type": ["string", "null"],
+      "description": "Optional version of the capability that produced the Frame."
+    },
+    "extra": {
+      "type": "object",
+      "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

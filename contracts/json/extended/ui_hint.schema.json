@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/ui_hint.schema.json",
+  "title": "UIHint",
+  "description": "Extended. Optional rendering hints for UI layers that display ChoiceCards or SelectableItems. All fields are optional; an empty object is valid.",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "icon": {
+      "type": ["string", "null"],
+      "description": "Optional icon identifier (vocabulary is implementation-defined)."
+    },
+    "color": {
+      "type": ["string", "null"],
+      "description": "Optional color identifier or token."
+    },
+    "priority": {
+      "type": ["integer", "null"],
+      "description": "Optional sort/priority order for rendering. Higher means more prominent."
+    },
+    "group": {
+      "type": ["string", "null"],
+      "description": "Optional group identifier for clustering related items in the UI."
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "If true, the UI should render the item as disabled.",
+      "default": false
+    },
+    "tooltip": {
+      "type": ["string", "null"],
+      "description": "Optional tooltip / hover text."
+    }
+  },
+  "additionalProperties": true
+}

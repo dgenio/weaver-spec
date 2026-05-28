@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/schema_fingerprint.schema.json",
+  "title": "SchemaFingerprint",
+  "description": "Extended. Records the schema version and content hash for a contract payload, enabling schema-evolution and compatibility checking across producers and consumers.",
+  "type": "object",
+  "required": ["schema_id", "schema_version"],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The $id URI of the schema this fingerprint refers to."
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Semver version of the schema, matching CONTRACT_VERSION at the time of emission."
+    },
+    "content_hash": {
+      "type": ["string", "null"],
+      "description": "Optional content hash of the payload (e.g., SHA-256 hex of canonical JSON)."
+    },
+    "hash_algorithm": {
+      "type": "string",
+      "description": "Hash algorithm used to compute content_hash. Defaults to sha256.",
+      "default": "sha256"
+    }
+  },
+  "additionalProperties": true
+}

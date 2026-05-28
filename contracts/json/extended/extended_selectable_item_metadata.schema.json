@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_selectable_item_metadata.schema.json",
+  "title": "ExtendedSelectableItemMetadata",
+  "description": "Extended. Optional UI and risk hints for a SelectableItem: a UI hint, a risk assessment, an estimated duration, and a confirmation requirement.",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "ui_hint": {
+      "anyOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/ui_hint.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Optional UIHint guiding how the item should be rendered."
+    },
+    "risk_assessment": {
+      "anyOf": [
+        { "$ref": "https://weaver-spec.dev/contracts/v0/extended/risk_assessment.schema.json" },
+        { "type": "null" }
+      ],
+      "description": "Optional RiskAssessment for the selectable item."
+    },
+    "estimated_duration_ms": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Optional estimated execution duration in milliseconds."
+    },
+    "requires_confirmation": {
+      "type": "boolean",
+      "description": "If true, the UI must obtain explicit user confirmation before invoking the item.",
+      "default": false
+    },
+    "extra": {
+      "type": "object",
+      "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
