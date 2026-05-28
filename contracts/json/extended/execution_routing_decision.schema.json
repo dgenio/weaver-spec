@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_routing_decision.schema.json",
+  "title": "ExecutionRoutingDecision",
+  "description": "Extended. A router's advisory recommendation of an ExecutionCandidate, implementation-neutral with respect to the routing algorithm. Advisory by default: it does NOT grant execution rights — the execution/policy layer still records a PolicyDecision and emits a TraceEvent before running the candidate (invariants I-02, I-07). Distinct from the Core RoutingDecision (the contextweaver ChoiceCard wrapper). See docs/EXECUTION_BOUNDARY.md.",
+  "type": "object",
+  "required": ["decision_id", "candidate"],
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable ID correlating this decision with downstream execution traces and ExecutionFeedback."
+    },
+    "candidate": {
+      "$ref": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json",
+      "description": "The selected ExecutionCandidate."
+    },
+    "confidence": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Optional confidence score in [0.0, 1.0]."
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Machine-readable reasons for the decision (e.g. `capability_match`, `low_latency`)."
+    },
+    "reason": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable explanation."
+    },
+    "fallback_candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json"
+      },
+      "description": "Ordered list of alternative candidates the runtime may fall back to."
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Relevant constraints used by the router, such as cost, latency, policy, or user context.",
+      "additionalProperties": true
+    },
+    "policy_context_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference to the policy/auth context the router considered. Advisory only — does not grant authorization."
+    },
+    "trace_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference to router-side trace/observability data, e.g. `router:trace:abc123`."
+    },
+    "created_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Optional ISO 8601 timestamp of when the decision was produced."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -10,6 +10,41 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **Selection ↔ execution boundary Extended contracts.** Four new
+  implementation-neutral Extended contracts describing the boundary between
+  selecting a unit of work and executing it, so static routers, the
+  `contextweaver` ChoiceCard layer, and feedback-aware external routers can all
+  describe a selection the same way instead of each integration inventing its
+  own router-to-executor payload.
+  - **`ExecutionCandidate`** — something selectable for execution; `candidate_type`
+    is a fixed enum (`tool` / `flow` / `capability` / `agent` / `workflow`).
+  - **`CompiledFlow`** — a compiled flow (e.g. a ChainWeaver flow) exposed as a
+    routable, executable item. References (does not inline) its input/output
+    schemas, lists internal `tool_dependencies`, and carries derived
+    `sensitivity` / `side_effects`. `requires_authorization` defaults to `true`:
+    a pre-compiled flow does not bypass the kernel authorization path
+    (invariant I-07). It attaches to an `ExecutionCandidate` (when
+    `candidate_type` is `flow`) via `$ref`.
+  - **`ExecutionRoutingDecision`** — a router's **advisory** recommendation of an
+    `ExecutionCandidate`. Named distinctly from the Core `RoutingDecision` (the
+    `contextweaver` ChoiceCard wrapper, kept separate per AGENTS.md "Design
+    decisions not to reopen"). It does not grant execution rights; the
+    execution/policy layer still records a `PolicyDecision` and emits a
+    `TraceEvent` (invariant I-02). `confidence` is standardized to `[0.0, 1.0]`.
+  - **`ExecutionFeedback`** — the observed outcome of executing a candidate,
+    correlated by `decision_id` / `candidate_id` and preserving the execution
+    runtime's `trace_ref`. `quality_score` is standardized to `[0.0, 1.0]`.
+    Consuming feedback is optional, keeping deterministic routers deterministic.
+  - JSON Schemas under `contracts/json/extended/`, Python dataclasses in
+    `extended.py` (with `__post_init__` range/enum validation mirroring the
+    schemas), four sample payloads (including a `contextweaver` → ChainWeaver
+    routing example and an external-router → ChainWeaver → feedback example),
+    roundtrip tests in `test_extended.py`, schema-alignment + negative tests in
+    `test_extended_schema_alignment.py`, and the normative
+    `docs/EXECUTION_BOUNDARY.md`. `contracts/COVERAGE.md` and
+    `well-known/contracts.json` regenerated. These are additive Extended
+    contracts (no Core change), folded into the unreleased `0.6.0` set.
+    Closes #61. Closes #66.
 - **v0.6.0 — Extended schema retrofit + signing + OpenTelemetry mapping.**
   Bumps `CONTRACT_VERSION` and the Python package to `0.6.0` and lands three
   related issues in one PR.

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_feedback.schema.json",
+  "title": "ExecutionFeedback",
+  "description": "Extended. The observed outcome of executing (or attempting to execute) a selected candidate. Links back to the originating decision and candidate so a router or evaluator can correlate recommendation, execution, and result. Sending feedback is optional — a deterministic router need not consume it. See docs/EXECUTION_BOUNDARY.md.",
+  "type": "object",
+  "required": ["decision_id", "candidate_id", "success", "timestamp"],
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Links feedback to the originating ExecutionRoutingDecision."
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Links feedback to the selected ExecutionCandidate."
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Whether execution completed successfully."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the feedback was created."
+    },
+    "latency_ms": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Optional execution latency in milliseconds."
+    },
+    "cost": {
+      "type": "object",
+      "description": "Optional structured cost payload (e.g. tokens or USD saved/spent).",
+      "additionalProperties": true
+    },
+    "quality_score": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Optional caller/evaluator/user-provided quality signal in [0.0, 1.0]."
+    },
+    "error_type": {
+      "type": ["string", "null"],
+      "description": "Optional normalized error class when success is false."
+    },
+    "error_message": {
+      "type": ["string", "null"],
+      "description": "Optional short error message."
+    },
+    "trace_ref": {
+      "type": ["string", "null"],
+      "description": "Reference to the execution trace, e.g. a ChainWeaver `chainweaver:trace_id:abc123`."
+    },
+    "execution_summary": {
+      "type": "object",
+      "description": "Optional compact summary of the execution result.",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

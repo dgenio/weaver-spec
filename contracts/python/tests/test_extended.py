@@ -11,7 +11,11 @@ from weaver_contracts.extended import (
     ArtifactSafetyGateRequest,
     ArtifactSafetyReport,
     CapabilityTokenSignature,
+    CompiledFlow,
     EvaluationArtifact,
+    ExecutionCandidate,
+    ExecutionFeedback,
+    ExecutionRoutingDecision,
     ExtendedFrameMetadata,
     ExtendedSelectableItemMetadata,
     LessonCard,
@@ -942,3 +946,204 @@ class TestOtelTraceMapping:
         data = asdict(m)
         json.dumps(data)
         assert data["gen_ai_system"] == "weaver"
+
+
+# ---------------------------------------------------------------------------
+# Selection ↔ execution boundary contracts (#61, #66)
+# ---------------------------------------------------------------------------
+
+
+class TestCompiledFlow:
+    def test_valid_from_payload(self):
+        p = load_payload("compiled_flow")
+        flow = CompiledFlow(
+            flow_id=p["flow_id"],
+            name=p.get("name"),
+            version=p.get("version"),
+            description=p.get("description"),
+            input_schema_ref=p.get("input_schema_ref"),
+            output_schema_ref=p.get("output_schema_ref"),
+            tool_dependencies=p.get("tool_dependencies", []),
+            sensitivity=p.get("sensitivity"),
+            side_effects=p.get("side_effects", []),
+            requires_authorization=p.get("requires_authorization", True),
+            metadata=p.get("metadata", {}),
+        )
+        assert flow.flow_id == "invoice_reminder_flow"
+        assert flow.requires_authorization is True
+        assert "org.email.send_reminder" in flow.tool_dependencies
+
+    def test_defaults(self):
+        flow = CompiledFlow(flow_id="f1")
+        assert flow.requires_authorization is True
+        assert flow.tool_dependencies == []
+        assert flow.sensitivity is None
+
+    def test_empty_flow_id_raises(self):
+        with pytest.raises(ValueError, match="flow_id must be non-empty"):
+            CompiledFlow(flow_id="")
+
+    def test_invalid_sensitivity_raises(self):
+        with pytest.raises(ValueError, match="sensitivity must be one of"):
+            CompiledFlow(flow_id="f1", sensitivity="top-secret")
+
+    def test_serialization(self):
+        flow = CompiledFlow(flow_id="f1", side_effects=["data_write"])
+        data = asdict(flow)
+        json.dumps(data)
+        assert data["side_effects"] == ["data_write"]
+
+
+class TestExecutionCandidate:
+    def test_valid_from_payload(self):
+        p = load_payload("execution_candidate")
+        cf = p.get("compiled_flow")
+        candidate = ExecutionCandidate(
+            candidate_id=p["candidate_id"],
+            candidate_type=p["candidate_type"],
+            name=p.get("name"),
+            version=p.get("version"),
+            description=p.get("description"),
+            compiled_flow=CompiledFlow(
+                flow_id=cf["flow_id"],
+                name=cf.get("name"),
+                version=cf.get("version"),
+                description=cf.get("description"),
+                tool_dependencies=cf.get("tool_dependencies", []),
+                sensitivity=cf.get("sensitivity"),
+                side_effects=cf.get("side_effects", []),
+                requires_authorization=cf.get("requires_authorization", True),
+            )
+            if cf is not None
+            else None,
+            metadata=p.get("metadata", {}),
+        )
+        assert candidate.candidate_type == "flow"
+        assert candidate.compiled_flow is not None
+        assert candidate.compiled_flow.flow_id == "invoice_reminder_flow"
+
+    def test_minimal_non_flow_candidate(self):
+        candidate = ExecutionCandidate(
+            candidate_id="send_invoice_reminder", candidate_type="tool"
+        )
+        assert candidate.compiled_flow is None
+
+    def test_empty_candidate_id_raises(self):
+        with pytest.raises(ValueError, match="candidate_id must be non-empty"):
+            ExecutionCandidate(candidate_id="", candidate_type="tool")
+
+    def test_invalid_candidate_type_raises(self):
+        with pytest.raises(ValueError, match="candidate_type must be one of"):
+            ExecutionCandidate(candidate_id="c1", candidate_type="macro")
+
+
+class TestExecutionRoutingDecision:
+    def _candidate(self) -> ExecutionCandidate:
+        return ExecutionCandidate(candidate_id="c1", candidate_type="flow")
+
+    def test_valid_from_payload(self):
+        p = load_payload("execution_routing_decision")
+        c = p["candidate"]
+        decision = ExecutionRoutingDecision(
+            decision_id=p["decision_id"],
+            candidate=ExecutionCandidate(
+                candidate_id=c["candidate_id"],
+                candidate_type=c["candidate_type"],
+                name=c.get("name"),
+                version=c.get("version"),
+            ),
+            confidence=p.get("confidence"),
+            reason_codes=p.get("reason_codes", []),
+            reason=p.get("reason"),
+            fallback_candidates=[
+                ExecutionCandidate(
+                    candidate_id=fc["candidate_id"],
+                    candidate_type=fc["candidate_type"],
+                    name=fc.get("name"),
+                )
+                for fc in p.get("fallback_candidates", [])
+            ],
+            constraints=p.get("constraints", {}),
+            policy_context_ref=p.get("policy_context_ref"),
+            trace_ref=p.get("trace_ref"),
+            created_at=p.get("created_at"),
+            metadata=p.get("metadata", {}),
+        )
+        assert decision.decision_id == "dec_123"
+        assert decision.candidate.candidate_id == "invoice_reminder_flow"
+        assert decision.confidence == 0.86
+        assert len(decision.fallback_candidates) == 1
+
+    def test_empty_decision_id_raises(self):
+        with pytest.raises(ValueError, match="decision_id must be non-empty"):
+            ExecutionRoutingDecision(decision_id="", candidate=self._candidate())
+
+    def test_confidence_above_range_raises(self):
+        with pytest.raises(ValueError, match="confidence must be in"):
+            ExecutionRoutingDecision(
+                decision_id="d1", candidate=self._candidate(), confidence=1.5
+            )
+
+    def test_confidence_below_range_raises(self):
+        with pytest.raises(ValueError, match="confidence must be in"):
+            ExecutionRoutingDecision(
+                decision_id="d1", candidate=self._candidate(), confidence=-0.1
+            )
+
+
+class TestExecutionFeedback:
+    def _kwargs(self, **overrides):
+        base = dict(
+            decision_id="dec_123",
+            candidate_id="invoice_reminder_flow",
+            success=True,
+            timestamp="2026-05-25T08:00:00Z",
+        )
+        base.update(overrides)
+        return base
+
+    def test_valid_from_payload(self):
+        p = load_payload("execution_feedback")
+        fb = ExecutionFeedback(
+            decision_id=p["decision_id"],
+            candidate_id=p["candidate_id"],
+            success=p["success"],
+            timestamp=p["timestamp"],
+            latency_ms=p.get("latency_ms"),
+            cost=p.get("cost", {}),
+            quality_score=p.get("quality_score"),
+            error_type=p.get("error_type"),
+            error_message=p.get("error_message"),
+            trace_ref=p.get("trace_ref"),
+            execution_summary=p.get("execution_summary", {}),
+            metadata=p.get("metadata", {}),
+        )
+        assert fb.success is True
+        assert fb.latency_ms == 842
+        assert fb.trace_ref == "chainweaver:trace_id:abc123"
+
+    def test_empty_decision_id_raises(self):
+        with pytest.raises(ValueError, match="decision_id must be non-empty"):
+            ExecutionFeedback(**self._kwargs(decision_id=""))
+
+    def test_empty_candidate_id_raises(self):
+        with pytest.raises(ValueError, match="candidate_id must be non-empty"):
+            ExecutionFeedback(**self._kwargs(candidate_id=""))
+
+    def test_empty_timestamp_raises(self):
+        with pytest.raises(ValueError, match="timestamp must be non-empty"):
+            ExecutionFeedback(**self._kwargs(timestamp=""))
+
+    def test_negative_latency_raises(self):
+        with pytest.raises(ValueError, match="latency_ms must be >= 0"):
+            ExecutionFeedback(**self._kwargs(latency_ms=-1))
+
+    def test_quality_score_out_of_range_raises(self):
+        with pytest.raises(ValueError, match="quality_score must be in"):
+            ExecutionFeedback(**self._kwargs(quality_score=1.1))
+
+    def test_serialization(self):
+        fb = ExecutionFeedback(**self._kwargs(success=False, error_type="timeout"))
+        data = asdict(fb)
+        json.dumps(data)
+        assert data["error_type"] == "timeout"

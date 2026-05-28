@@ -217,6 +217,7 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) | `$id` URL pattern, immutability rule, content-addressed index |
 | [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) | Markup convention for normative requirements vs informative notes vs examples |
 | [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) | Cross-project Extended artifact vocabulary (memory, session handoff, lesson/skill cards, evaluation, safety gate) |
+| [docs/EXECUTION_BOUNDARY.md](docs/EXECUTION_BOUNDARY.md) | Selection ↔ execution boundary Extended contracts (ExecutionCandidate, CompiledFlow, ExecutionRoutingDecision, ExecutionFeedback) |
 | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) | Derived ecosystem boundary map (owns/consumes/emits per project, end-to-end lifecycle); points to BOUNDARIES.md/LIFECYCLE.md as canonical |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |

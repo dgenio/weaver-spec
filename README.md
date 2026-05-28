@@ -54,6 +54,7 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 | End-to-end lifecycle | [docs/LIFECYCLE.md](docs/LIFECYCLE.md) |
 | Cross-repo integration map | [docs/INTEGRATION_MAP.md](docs/INTEGRATION_MAP.md) |
 | Cross-project artifact contracts | [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) |
+| Selection ↔ execution boundary | [docs/EXECUTION_BOUNDARY.md](docs/EXECUTION_BOUNDARY.md) |
 | Term definitions | [docs/GLOSSARY.md](docs/GLOSSARY.md) |
 | Sequence diagrams | [docs/SEQUENCE_DIAGRAMS.md](docs/SEQUENCE_DIAGRAMS.md) |
 | Versioning rules | [docs/VERSIONING.md](docs/VERSIONING.md) |

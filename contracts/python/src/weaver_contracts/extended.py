@@ -664,3 +664,182 @@ class OtelTraceMapping:
             raise ValueError(
                 "OtelTraceMapping.parent_span_id must be 16 lowercase hex characters"
             )
+
+
+# ===========================================================================
+# Selection ↔ execution boundary contracts
+#
+# These contracts describe the boundary between *selecting* a unit of work and
+# *executing* it, without prescribing a routing algorithm or execution engine
+# (#61). They are implementation-neutral: a static router, a contextweaver
+# ChoiceCard layer, or a learned/feedback-aware external router can all produce
+# an ExecutionRoutingDecision; agent-kernel, ChainWeaver, or any compatible
+# runtime can consume it.
+#
+# Naming: the generic decision type is ExecutionRoutingDecision, NOT
+# RoutingDecision. The Core RoutingDecision (core.py) is the contextweaver
+# ChoiceCard wrapper and is deliberately separate (see AGENTS.md "Design
+# decisions not to reopen"); reusing the name would conflate the two.
+#
+# CompiledFlow (#66) is the candidate detail for a compiled ChainWeaver flow.
+# It is referenced by ExecutionCandidate when candidate_type == "flow".
+#
+# Authorization boundary: an ExecutionRoutingDecision is advisory. It does NOT
+# grant execution rights. Authorization, policy enforcement, audit logging, and
+# firewalling remain with the execution/policy layer (agent-kernel or another
+# Weaver-compatible runtime), per invariants I-02 and I-07. See
+# docs/EXECUTION_BOUNDARY.md for the full boundary description and examples.
+# ===========================================================================
+
+# Candidate kinds an external router may select for execution. Fixed set: a
+# runtime is not required to support every kind (see docs/EXECUTION_BOUNDARY.md).
+_CANDIDATE_TYPES = frozenset({"tool", "flow", "capability", "agent", "workflow"})
+
+
+# ---------------------------------------------------------------------------
+# CompiledFlow — a compiled ChainWeaver flow exposed as a selectable item
+# ---------------------------------------------------------------------------
+
+@dataclass
+class CompiledFlow:
+    """A compiled flow (e.g. a ChainWeaver flow) exposed as a Weaver ecosystem
+    item that can be routed to and executed like a capability.
+
+    Implementation-neutral: it references (does not inline) its input/output
+    schemas, lists the capability IDs it depends on internally, and carries
+    sensitivity/side-effect metadata derived from those tools. ``requires_authorization``
+    defaults to ``True`` because a flow step that invokes a tool must still go
+    through the kernel authorization/audit path (invariant I-07); the flow being
+    pre-compiled does not bypass execution authorization.
+    """
+
+    flow_id: str
+    name: Optional[str] = None
+    version: Optional[str] = None
+    description: Optional[str] = None
+    input_schema_ref: Optional[str] = None
+    output_schema_ref: Optional[str] = None
+    tool_dependencies: List[str] = field(default_factory=list)
+    sensitivity: Optional[str] = None
+    side_effects: List[str] = field(default_factory=list)
+    requires_authorization: bool = True
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.flow_id:
+            raise ValueError("CompiledFlow.flow_id must be non-empty")
+        if self.sensitivity is not None and self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"CompiledFlow.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# ExecutionCandidate — something a router can select for execution
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ExecutionCandidate:
+    """Something that can be selected for execution: a tool, flow, capability,
+    agent, or workflow.
+
+    When ``candidate_type == "flow"`` the candidate may carry a ``compiled_flow``
+    detail (#66); for other kinds the candidate is identified by ``candidate_id``
+    plus optional ``version`` and the runtime resolves it. ``metadata`` carries
+    implementation-specific fields (namespace project-specific keys).
+    """
+
+    candidate_id: str
+    candidate_type: str
+    name: Optional[str] = None
+    version: Optional[str] = None
+    description: Optional[str] = None
+    compiled_flow: Optional[CompiledFlow] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.candidate_id:
+            raise ValueError("ExecutionCandidate.candidate_id must be non-empty")
+        if self.candidate_type not in _CANDIDATE_TYPES:
+            raise ValueError(
+                f"ExecutionCandidate.candidate_type must be one of {_CANDIDATE_TYPES}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# ExecutionRoutingDecision — a router's advisory recommendation
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ExecutionRoutingDecision:
+    """A router's recommendation of an ExecutionCandidate.
+
+    Advisory by default: it does NOT grant execution rights. The execution/policy
+    layer (agent-kernel or another compatible runtime) still decides whether the
+    caller may run the selected candidate, records a PolicyDecision, and emits a
+    TraceEvent (invariants I-02, I-07). ``decision_id`` correlates this decision
+    with downstream execution traces and ExecutionFeedback. Distinct from the
+    Core ``RoutingDecision`` (the contextweaver ChoiceCard wrapper).
+    """
+
+    decision_id: str
+    candidate: ExecutionCandidate
+    confidence: Optional[float] = None
+    reason_codes: List[str] = field(default_factory=list)
+    reason: Optional[str] = None
+    fallback_candidates: List[ExecutionCandidate] = field(default_factory=list)
+    constraints: Dict[str, Any] = field(default_factory=dict)
+    policy_context_ref: Optional[str] = None
+    trace_ref: Optional[str] = None
+    created_at: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.decision_id:
+            raise ValueError("ExecutionRoutingDecision.decision_id must be non-empty")
+        if self.confidence is not None and not 0.0 <= self.confidence <= 1.0:
+            raise ValueError(
+                "ExecutionRoutingDecision.confidence must be in [0.0, 1.0]"
+            )
+
+
+# ---------------------------------------------------------------------------
+# ExecutionFeedback — the observed outcome of executing a candidate
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ExecutionFeedback:
+    """The observed outcome of executing (or attempting to execute) a candidate.
+
+    Links back to the originating decision via ``decision_id`` and to the
+    selected item via ``candidate_id`` so a router or evaluator can correlate
+    recommendation, execution, and result. ``trace_ref`` preserves the execution
+    runtime's trace identifier (e.g. a ChainWeaver ``trace_id``) for end-to-end
+    correlation. Sending feedback is optional: a deterministic router need not
+    consume it (see docs/EXECUTION_BOUNDARY.md).
+    """
+
+    decision_id: str
+    candidate_id: str
+    success: bool
+    timestamp: str
+    latency_ms: Optional[int] = None
+    cost: Dict[str, Any] = field(default_factory=dict)
+    quality_score: Optional[float] = None
+    error_type: Optional[str] = None
+    error_message: Optional[str] = None
+    trace_ref: Optional[str] = None
+    execution_summary: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.decision_id:
+            raise ValueError("ExecutionFeedback.decision_id must be non-empty")
+        if not self.candidate_id:
+            raise ValueError("ExecutionFeedback.candidate_id must be non-empty")
+        if not self.timestamp:
+            raise ValueError("ExecutionFeedback.timestamp must be non-empty")
+        if self.latency_ms is not None and self.latency_ms < 0:
+            raise ValueError("ExecutionFeedback.latency_ms must be >= 0")
+        if self.quality_score is not None and not 0.0 <= self.quality_score <= 1.0:
+            raise ValueError("ExecutionFeedback.quality_score must be in [0.0, 1.0]")
