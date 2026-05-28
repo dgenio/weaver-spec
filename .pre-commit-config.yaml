@@ -38,7 +38,7 @@ repos:
     hooks:
       - id: yamllint
         args: ["-c", ".yamllint.yml", "-s"]
-        files: '^(\.github/ISSUE_TEMPLATE/.*\.ya?ml|\.github/workflows/.*\.ya?ml|\.yamllint\.yml|\.pre-commit-config\.yaml)$'
+        files: '^(\.github/ISSUE_TEMPLATE/.*\.ya?ml|\.github/workflows/.*\.ya?ml|\.yamllint\.yml|\.pre-commit-config\.yaml|compatibility\.yaml)$'
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.14.0
@@ -81,3 +81,27 @@ repos:
         pass_filenames: false
         files: '^(contracts/python/.*\.(py|toml)|contracts/json/.*\.schema\.json|examples/sample_payloads/.*\.json)$'
         stages: [pre-push]
+
+      - id: compatibility-manifest
+        name: compatibility.yaml structure + matrix consistency
+        description: |
+          Mirrors the validate-compatibility CI job locally: runs the
+          validator self-test and validates compatibility.yaml against
+          docs/VERSIONING.md. PyYAML is installed in the hook's isolated env
+          so scripts/validate_compatibility.py stays stdlib-only.
+        entry: |-
+          python -c "
+          import sys; sys.path.insert(0, 'scripts')
+          from pathlib import Path
+          import yaml
+          from validate_compatibility import self_test, validate
+          manifest = yaml.safe_load(Path('compatibility.yaml').read_text(encoding='utf-8'))
+          errors = ['self-test: ' + p for p in self_test()] + validate(manifest, Path('docs/VERSIONING.md').read_text(encoding='utf-8'))
+          for e in errors:
+              print('FAIL:', e, file=sys.stderr)
+          sys.exit(1 if errors else 0)
+          "
+        language: python
+        additional_dependencies: ["pyyaml"]
+        pass_filenames: false
+        files: '^(compatibility\.yaml|docs/VERSIONING\.md|scripts/validate_compatibility\.py)$'

@@ -38,6 +38,57 @@ jobs:
           print(f'Validated {len(files)} payload(s)')
           "
 
+  validate-compatibility:
+    name: Validate Compatibility Manifest
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate compatibility.yaml structure and matrix consistency
+        run: |
+          python << 'PYEOF'
+          import sys
+          from pathlib import Path
+
+          import yaml
+
+          sys.path.insert(0, "scripts")
+          from validate_compatibility import self_test, validate
+
+          # The validator's own rejection paths are guarded by a self-test, so a
+          # future edit that weakens a check fails CI even though the live
+          # manifest still parses.
+          problems = self_test()
+          for problem in problems:
+              print(f"FAIL (self-test): {problem}", file=sys.stderr)
+          if problems:
+              sys.exit(1)
+
+          manifest = yaml.safe_load(Path("compatibility.yaml").read_text(encoding="utf-8"))
+          versioning_md = Path("docs/VERSIONING.md").read_text(encoding="utf-8")
+          errors = validate(manifest, versioning_md)
+          if errors:
+              for e in errors:
+                  print(f"FAIL: {e}", file=sys.stderr)
+              sys.exit(1)
+
+          count = len(manifest["repositories"])
+          print(
+              f"OK: compatibility.yaml valid — {count} repositories, status vocabulary "
+              "and version consistency enforced; validator self-test passed."
+          )
+          PYEOF
+
   validate-contracts-index:
     name: Validate Contracts Index
     runs-on: ubuntu-latest
@@ -212,7 +263,8 @@ jobs:
             .github/ISSUE_TEMPLATE/ \
             .github/workflows/ \
             .yamllint.yml \
-            .pre-commit-config.yaml
+            .pre-commit-config.yaml \
+            compatibility.yaml
 
   coverage-table:
     name: Validate Coverage Table

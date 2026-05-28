@@ -88,13 +88,34 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full process. In summary:
 
 ## Compatibility Matrix
 
-This table tracks which versions of the sibling repositories are known-compatible with each contract version.
+This table tracks which versions of the sibling repositories are known-compatible with each contract version. The machine-readable source of truth is [`compatibility.yaml`](../compatibility.yaml) at the repository root; this table is the human-readable view of it.
+
+### Status vocabulary
+
+| Status | Meaning |
+| ------ | ------- |
+| `verified` | The sibling repo has declared support **and** backed it with passing tests/conformance against this contract version. |
+| `provisional` | The sibling repo claims support, but it is not yet test-verified. |
+| `unverified` | No compatibility declaration has been published yet (default). |
+| `incompatible` | Known not to work against this contract version. |
+
+> [!IMPORTANT]
+> A cell may be `verified` or `provisional` only when backed by a real declaration recorded in `compatibility.yaml` (the `declaration` field). Unknown compatibility MUST be recorded as `unverified` — never assume or invent a version claim.
+
+### Current matrix (contract version 0.5.0)
 
 | Contract Version | contextweaver | agent-kernel | ChainWeaver |
 | ----------------- | -------------- | ------------- | ------------- |
-| 0.1.0 | — (TBD) | — (TBD) | — (TBD) |
+| 0.5.0 (current) | `unverified` | `unverified` | `unverified` |
 
-*Entries marked "—" indicate that the sibling repository has not yet declared compatibility. Maintainers should update this table when a sibling repository publishes a compatibility declaration.*
+All `0.x` contract versions share MAJOR version `0` and are mutually compatible (see [Semantic Versioning](#semantic-versioning) and `weaver_contracts.version.is_compatible`). No sibling repository has published a compatibility declaration yet, so every cell is `unverified`.
+
+### How a sibling repository declares compatibility
+
+1. Test the sibling repo against a specific weaver-spec contract version (ideally via the contract round-trip tests or a conformance check).
+2. Add or update the repo's entry in [`compatibility.yaml`](../compatibility.yaml): set `supported_spec_versions`, `tested_version`, `status`, `declaration` (a URL or commit ref backing the claim), and any `known_limitations`.
+3. Update the matching cell in the matrix above so the human-readable view stays in sync with the manifest.
+4. Open a PR. The `validate-compatibility` CI job (`.github/workflows/ci.yml`) checks the manifest structure and that every repository in the manifest is referenced in this document.
 
 ---
 
