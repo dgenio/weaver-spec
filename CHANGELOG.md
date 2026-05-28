@@ -17,7 +17,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   describe a selection the same way instead of each integration inventing its
   own router-to-executor payload.
   - **`ExecutionCandidate`** — something selectable for execution; `candidate_type`
-    is a fixed enum (`tool` / `flow` / `capability` / `agent` / `workflow`).
+    is a fixed enum (`tool` / `flow` / `capability` / `agent` / `workflow`). A
+    `compiled_flow` detail is only valid when `candidate_type` is `flow`
+    (enforced in both the JSON Schema and the Python dataclass).
   - **`CompiledFlow`** — a compiled flow (e.g. a ChainWeaver flow) exposed as a
     routable, executable item. References (does not inline) its input/output
     schemas, lists internal `tool_dependencies`, and carries derived

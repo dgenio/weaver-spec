@@ -1036,6 +1036,14 @@ class TestExecutionCandidate:
         with pytest.raises(ValueError, match="candidate_type must be one of"):
             ExecutionCandidate(candidate_id="c1", candidate_type="macro")
 
+    def test_compiled_flow_on_non_flow_candidate_raises(self):
+        with pytest.raises(ValueError, match="compiled_flow is only valid"):
+            ExecutionCandidate(
+                candidate_id="c1",
+                candidate_type="tool",
+                compiled_flow=CompiledFlow(flow_id="f1"),
+            )
+
 
 class TestExecutionRoutingDecision:
     def _candidate(self) -> ExecutionCandidate:

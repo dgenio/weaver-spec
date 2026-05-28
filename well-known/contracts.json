@@ -107,7 +107,7 @@
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json",
       "path": "contracts/json/extended/execution_candidate.schema.json",
-      "sha256": "3fd869e5c0b5bda9a8d847fe93980959c5d8a31d8dd5fdd34c590df20fc26ba1"
+      "sha256": "55425ac4bb62a9e2e2466a88af270827c77953232d6b0c302ce18c4c336b4c0a"
     },
     {
       "name": "execution_feedback",

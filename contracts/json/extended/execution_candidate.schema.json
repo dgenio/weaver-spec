@@ -33,12 +33,23 @@
         { "$ref": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json" },
         { "type": "null" }
       ],
-      "description": "Optional CompiledFlow detail, present when candidate_type is `flow`."
+      "description": "Optional CompiledFlow detail. Only valid when candidate_type is `flow`."
     },
     "metadata": {
       "type": "object",
       "description": "Implementation-specific extension bag. Namespace project-specific keys to avoid collisions.",
       "additionalProperties": true
+    }
+  },
+  "if": {
+    "required": ["compiled_flow"],
+    "properties": {
+      "compiled_flow": { "type": "object" }
+    }
+  },
+  "then": {
+    "properties": {
+      "candidate_type": { "const": "flow" }
     }
   },
   "additionalProperties": true

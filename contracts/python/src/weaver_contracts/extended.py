@@ -743,10 +743,11 @@ class ExecutionCandidate:
     """Something that can be selected for execution: a tool, flow, capability,
     agent, or workflow.
 
-    When ``candidate_type == "flow"`` the candidate may carry a ``compiled_flow``
-    detail (#66); for other kinds the candidate is identified by ``candidate_id``
-    plus optional ``version`` and the runtime resolves it. ``metadata`` carries
-    implementation-specific fields (namespace project-specific keys).
+    A ``compiled_flow`` detail (#66) is only valid when
+    ``candidate_type == "flow"``; for other kinds the candidate is identified by
+    ``candidate_id`` plus optional ``version`` and the runtime resolves it.
+    ``metadata`` carries implementation-specific fields (namespace
+    project-specific keys).
     """
 
     candidate_id: str
@@ -763,6 +764,11 @@ class ExecutionCandidate:
         if self.candidate_type not in _CANDIDATE_TYPES:
             raise ValueError(
                 f"ExecutionCandidate.candidate_type must be one of {_CANDIDATE_TYPES}"
+            )
+        if self.compiled_flow is not None and self.candidate_type != "flow":
+            raise ValueError(
+                "ExecutionCandidate.compiled_flow is only valid when "
+                'candidate_type == "flow"'
             )
 
 

@@ -307,6 +307,17 @@ class TestExtendedNegativeCases:
         payload = load_payload("execution_candidate")
         validate(payload, schema)
 
+    def test_execution_candidate_compiled_flow_on_non_flow_fails(self):
+        # compiled_flow is only valid when candidate_type == "flow" (if/then).
+        schema = load_extended_schema("execution_candidate")
+        bad = {
+            "candidate_id": "c1",
+            "candidate_type": "tool",
+            "compiled_flow": {"flow_id": "f1"},
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
     def test_execution_routing_decision_missing_candidate_fails(self):
         # candidate is required; a decision without one is invalid.
         schema = load_extended_schema("execution_routing_decision")
