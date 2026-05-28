@@ -22,16 +22,18 @@ After completing all six artifacts, run the local validation checks before submi
 
 ## Extended contract change workflow
 
-Extended contracts may define JSON Schemas under `contracts/json/extended/`.
-Newer Extended types ship a schema; the original metadata types remain
-Python-source-of-truth pending their schema retrofit (#46).
+Extended contracts define JSON Schemas under `contracts/json/extended/`.
+Every Extended type ships the full eight-artifact set; the original metadata
+types (`TelemetryHint`, `SchemaFingerprint`, `RedactionPolicy`, `UIHint`,
+`RiskAssessment`, `ExtendedFrameMetadata`, `ExtendedSelectableItemMetadata`)
+were retrofitted with schemas in v0.6.0 (#46).
 When adding or modifying an Extended contract, complete all of the following in a single PR:
 
 1. **Update the Python dataclass** in `contracts/python/src/weaver_contracts/extended.py`.
-2. **Add or update the JSON Schema** under `contracts/json/extended/` (for types that have one).
+2. **Add or update the JSON Schema** under `contracts/json/extended/`.
 3. **Update or create a sample payload** in `examples/sample_payloads/`.
 4. **Add or update a roundtrip test** in `contracts/python/tests/test_extended.py`.
-5. **Add or update a schema-alignment test** in `contracts/python/tests/test_extended_schema_alignment.py` (for types with a schema).
+5. **Add or update a schema-alignment test** in `contracts/python/tests/test_extended_schema_alignment.py`.
 6. **Add a CHANGELOG entry** under the appropriate version section.
 7. **Bump the version** in both `contracts/python/src/weaver_contracts/version.py` and `contracts/python/pyproject.toml`.
 8. **Regenerate** `contracts/COVERAGE.md` (`scripts/generate_coverage_table.py`) and `well-known/contracts.json` (`scripts/generate_contracts_index.py`); CI checks both with `--check`.

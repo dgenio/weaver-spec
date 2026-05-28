@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/risk_assessment.schema.json",
+  "title": "RiskAssessment",
+  "description": "Extended. Optional risk metadata for a capability invocation. Encodes the assessed risk level, reasons, whether human approval is required, and any mitigations in place.",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "description": "Assessed risk class. Mirrors RiskAssessment._VALID_LEVELS in extended.py.",
+      "default": "low"
+    },
+    "risk_reasons": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Short human-readable reasons that produced this risk level."
+    },
+    "requires_human_approval": {
+      "type": "boolean",
+      "description": "If true, execution should not proceed without approval by the principal named in approval_principal.",
+      "default": false
+    },
+    "approval_principal": {
+      "type": ["string", "null"],
+      "description": "Optional identifier of the principal expected to approve."
+    },
+    "mitigations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Mitigations in place that reduce the risk (e.g., sandboxed execution, dry-run available)."
+    }
+  },
+  "additionalProperties": true
+}

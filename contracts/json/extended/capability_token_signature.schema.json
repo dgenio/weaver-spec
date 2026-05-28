@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/capability_token_signature.schema.json",
+  "title": "CapabilityTokenSignature",
+  "description": "Extended. A detached signature over a JCS-canonicalized (RFC 8785) CapabilityToken payload. Attached to the token under the namespaced extension key `x_weaver_signature`. Verifiers MUST reject signatures whose `alg` or `canonicalization` is not in the published registry. See docs/SIGNING.md and docs/adr/001-capability-token-signing.md.",
+  "type": "object",
+  "required": ["alg", "kid", "sig"],
+  "properties": {
+    "alg": {
+      "type": "string",
+      "enum": ["ed25519", "es256"],
+      "description": "Signature algorithm. Must be one of the algorithms in the published registry (docs/SIGNING.md). Verifiers MUST reject unknown algorithms."
+    },
+    "kid": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Key identifier. Opaque to the spec; resolves against the verifier's keyring."
+    },
+    "sig": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{86}$",
+      "description": "Base64url-encoded signature bytes (RFC 4648 §5, no padding). For ed25519 this is 64 bytes (86 base64url chars). For es256 this is the IEEE P1363 concatenated (r||s) form, 64 bytes (86 base64url chars). The schema enforces the 86-char length; verifiers MUST still decode and validate cryptographically per docs/SIGNING.md."
+    },
+    "canonicalization": {
+      "type": "string",
+      "enum": ["JCS"],
+      "description": "Canonicalization scheme applied to the token payload before signing. JCS = JSON Canonicalization Scheme (RFC 8785). The `x_weaver_signature` field itself is excluded from the canonical form before hashing.",
+      "default": "JCS"
+    },
+    "signed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Optional ISO 8601 timestamp at which the signature was produced. Informational; verification does not depend on it."
+    }
+  },
+  "additionalProperties": true
+}

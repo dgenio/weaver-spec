@@ -122,6 +122,12 @@ class ExtendedFrameMetadata:
     source_capability_version: Optional[str] = None
     extra: Dict[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        if self.confidence_score is not None and not 0.0 <= self.confidence_score <= 1.0:
+            raise ValueError(
+                "ExtendedFrameMetadata.confidence_score must be in [0.0, 1.0]"
+            )
+
 
 # ---------------------------------------------------------------------------
 # ExtendedSelectableItemMetadata — UI and risk hints for a SelectableItem
@@ -136,6 +142,12 @@ class ExtendedSelectableItemMetadata:
     estimated_duration_ms: Optional[int] = None
     requires_confirmation: bool = False
     extra: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if self.estimated_duration_ms is not None and self.estimated_duration_ms < 0:
+            raise ValueError(
+                "ExtendedSelectableItemMetadata.estimated_duration_ms must be >= 0"
+            )
 
 
 # ===========================================================================
@@ -517,4 +529,138 @@ class ArtifactSafetyReport:
         if self.mode not in self._MODES:
             raise ValueError(
                 f"ArtifactSafetyReport.mode must be one of {self._MODES}"
+            )
+
+
+# ===========================================================================
+# Cryptographic and observability bindings
+#
+# CapabilityTokenSignature (#44) defines a detached signature over a
+# JCS-canonicalized CapabilityToken payload; the signature attaches to the
+# Core token under the namespaced extension key `x_weaver_signature` so Core
+# stays unchanged. OtelTraceMapping (#47) carries the OTel identifiers and
+# GenAI semantic-convention attributes that a Weaver TraceEvent maps to.
+# Field-by-field documentation:
+#   - docs/SIGNING.md and docs/adr/001-capability-token-signing.md
+#   - docs/OTEL_MAPPING.md
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# CapabilityTokenSignature — RFC 8785 JCS detached signature for tokens
+# ---------------------------------------------------------------------------
+
+@dataclass
+class CapabilityTokenSignature:
+    """Detached signature over a JCS-canonicalized CapabilityToken payload.
+
+    Attached to a CapabilityToken under the namespaced extension key
+    ``x_weaver_signature``. Verifiers MUST reject signatures whose ``alg`` or
+    ``canonicalization`` is not in the published registry. See
+    ``docs/SIGNING.md`` for verification pseudocode and ``docs/adr/001-capability-token-signing.md``
+    for the design decision.
+    """
+
+    alg: str
+    kid: str
+    sig: str
+    canonicalization: str = "JCS"
+    signed_at: Optional[str] = None
+
+    _VALID_ALGS = frozenset({"ed25519", "es256"})
+    _VALID_CANONICALIZATIONS = frozenset({"JCS"})
+    # Both registered algorithms produce 64-byte raw signatures (ed25519 RFC 8032
+    # raw, or es256 IEEE P1363 r||s), which encode to exactly 86 base64url chars
+    # without padding. See docs/SIGNING.md for the algorithm registry.
+    _SIG_BASE64URL_LEN = 86
+    _SIG_BASE64URL_ALPHABET = frozenset(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    )
+
+    def __post_init__(self) -> None:
+        if self.alg not in self._VALID_ALGS:
+            raise ValueError(
+                f"CapabilityTokenSignature.alg must be one of {self._VALID_ALGS}"
+            )
+        if not self.kid:
+            raise ValueError("CapabilityTokenSignature.kid must be non-empty")
+        if not self.sig:
+            raise ValueError("CapabilityTokenSignature.sig must be non-empty")
+        if (
+            len(self.sig) != self._SIG_BASE64URL_LEN
+            or not all(c in self._SIG_BASE64URL_ALPHABET for c in self.sig)
+        ):
+            raise ValueError(
+                "CapabilityTokenSignature.sig must be 86 base64url characters "
+                "(64 raw bytes, RFC 4648 §5 no padding); see docs/SIGNING.md"
+            )
+        if self.canonicalization not in self._VALID_CANONICALIZATIONS:
+            raise ValueError(
+                "CapabilityTokenSignature.canonicalization must be one of "
+                f"{self._VALID_CANONICALIZATIONS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# OtelTraceMapping — TraceEvent → OpenTelemetry GenAI span attributes
+# ---------------------------------------------------------------------------
+
+@dataclass
+class OtelTraceMapping:
+    """Mapping of a Weaver TraceEvent onto an OpenTelemetry span.
+
+    Carries the OTel trace/span identifiers and the GenAI semantic-convention
+    attributes downstream observability tools consume (e.g. Datadog,
+    Honeycomb, New Relic). The full field-by-field mapping lives in
+    ``docs/OTEL_MAPPING.md``, pinned to a specific OTel semconv snapshot.
+    """
+
+    trace_id: str
+    span_id: str
+    span_kind: str
+    gen_ai_operation_name: Optional[str] = None
+    gen_ai_agent_id: Optional[str] = None
+    gen_ai_agent_name: Optional[str] = None
+    gen_ai_tool_name: Optional[str] = None
+    gen_ai_system: Optional[str] = None
+    parent_span_id: Optional[str] = None
+    semconv_version: Optional[str] = None
+
+    _VALID_SPAN_KINDS = frozenset(
+        {"INTERNAL", "CLIENT", "SERVER", "PRODUCER", "CONSUMER"}
+    )
+    _TRACE_ID_LEN = 32  # 16 bytes hex per W3C Trace Context
+    _SPAN_ID_LEN = 16  # 8 bytes hex per W3C Trace Context
+
+    def __post_init__(self) -> None:
+        if not self.trace_id:
+            raise ValueError("OtelTraceMapping.trace_id must be non-empty")
+        # W3C Trace Context requires lowercase hex; producers must normalize
+        # before constructing this object (https://www.w3.org/TR/trace-context/#trace-id).
+        if len(self.trace_id) != self._TRACE_ID_LEN or not all(
+            c in "0123456789abcdef" for c in self.trace_id
+        ):
+            raise ValueError(
+                "OtelTraceMapping.trace_id must be 32 lowercase hex characters "
+                "(W3C Trace Context)"
+            )
+        if not self.span_id:
+            raise ValueError("OtelTraceMapping.span_id must be non-empty")
+        if len(self.span_id) != self._SPAN_ID_LEN or not all(
+            c in "0123456789abcdef" for c in self.span_id
+        ):
+            raise ValueError(
+                "OtelTraceMapping.span_id must be 16 lowercase hex characters "
+                "(W3C Trace Context)"
+            )
+        if self.span_kind not in self._VALID_SPAN_KINDS:
+            raise ValueError(
+                f"OtelTraceMapping.span_kind must be one of {self._VALID_SPAN_KINDS}"
+            )
+        if self.parent_span_id is not None and (
+            len(self.parent_span_id) != self._SPAN_ID_LEN
+            or not all(c in "0123456789abcdef" for c in self.parent_span_id)
+        ):
+            raise ValueError(
+                "OtelTraceMapping.parent_span_id must be 16 lowercase hex characters"
             )

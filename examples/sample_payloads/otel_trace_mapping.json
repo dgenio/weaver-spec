@@ -1,0 +1,12 @@
+{
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "span_kind": "INTERNAL",
+  "gen_ai_operation_name": "execute_tool",
+  "gen_ai_agent_id": "agent-kernel-prod-1",
+  "gen_ai_agent_name": "agent-kernel",
+  "gen_ai_tool_name": "org.myapp.search_docs",
+  "gen_ai_system": "weaver",
+  "parent_span_id": "b9c7c989f97918e1",
+  "semconv_version": "1.30.0"
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/telemetry_hint.schema.json",
+  "title": "TelemetryHint",
+  "description": "Extended. Optional telemetry metadata that can be attached to any event or contract for observability enrichment. All fields are optional; an empty object is valid.",
+  "type": "object",
+  "required": [],
+  "properties": {
+    "trace_id": {
+      "type": ["string", "null"],
+      "description": "Optional distributed-trace identifier. Free-form; commonly a W3C traceparent trace-id or vendor-specific string."
+    },
+    "span_id": {
+      "type": ["string", "null"],
+      "description": "Optional span identifier within the trace."
+    },
+    "baggage": {
+      "type": "object",
+      "description": "Optional key/value baggage propagated alongside the trace. Values must be strings.",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}
