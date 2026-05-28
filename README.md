@@ -18,9 +18,9 @@ This repository is the single source of truth for the vocabulary, invariants, re
 | **[agent-kernel](https://github.com/dgenio/agent-kernel)** | Capability authZ/authN, execution, firewalling, audit. | Execution |
 | **[ChainWeaver](https://github.com/dgenio/ChainWeaver)** | Deterministic DAG / flow orchestration. | Orchestration |
 | **AgentFence** | External policy firewall / proxy for tool calls. Optional; complements (does not replace) the agent-kernel firewall. | Adjacent — policy edge |
-| **VibeGuard** | Pre-merge checks for AI-generated code risks. Adjacent to the runtime stack; not on the request path. | Adjacent — dev workflow |
+| **vibeguard** | Pre-merge checks for AI-generated code risks. Adjacent to the runtime stack; not on the request path. | Adjacent — dev workflow |
 
-Only the first three repos are on the runtime request path. AgentFence and VibeGuard are adjacent tools that share contracts and conventions but are not required for a working Weaver stack.
+Only the first three repos are on the runtime request path. AgentFence and vibeguard are adjacent tools that share contracts and conventions but are not required for a working Weaver stack.
 
 For the full boundary map (owns / consumes / emits per project, plus an end-to-end lifecycle), see [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md).
 

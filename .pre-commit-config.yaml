@@ -97,7 +97,8 @@ repos:
           from validate_compatibility import self_test, validate
           manifest = yaml.safe_load(Path('compatibility.yaml').read_text(encoding='utf-8'))
           errors = ['self-test: ' + p for p in self_test()] + validate(manifest, Path('docs/VERSIONING.md').read_text(encoding='utf-8'))
-          [print('FAIL:', e, file=sys.stderr) for e in errors]
+          for e in errors:
+              print('FAIL:', e, file=sys.stderr)
           sys.exit(1 if errors else 0)
           "
         language: python
