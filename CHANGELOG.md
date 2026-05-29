@@ -10,6 +10,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **Audit-chain and replayable-failure Extended contracts.** Two new
+  implementation-neutral Extended contracts, folded into the unreleased `0.6.0`
+  set (additive, no Core change, no version bump — consistent with the prior
+  Extended-contract additions in this release window).
+  - **`TraceBundle`** — a tamper-evident audit-chain envelope that *inlines* one
+    request's Core artifacts (`routing_decision`, `policy_decisions`, `frames`,
+    `handles`, `trace_events`) so the chain can be canonicalized (RFC 8785 JCS)
+    and optionally signed. The full chain is required (a bundle describes a
+    complete request); each member is validated against its Core schema via
+    `$ref`. The optional `signature` reuses the `CapabilityTokenSignature`
+    shape applied to the canonicalized bundle rather than inventing a second
+    signature type; an absent signature means unsigned. Redefines no invariant
+    (Frames stay free of raw output, I-01; each PolicyDecision is still expected
+    to have a matching TraceEvent, I-02). Signed + unsigned sample payloads and
+    the normative `docs/TRACE_BUNDLE.md`. Part of #50 — the contract, schema,
+    payloads, and an interim I-01/I-02 sample test land here; conformance-runner
+    verification of bundle integrity + invariants is tracked in #74 (depends on
+    the conformance runner, #43).
+  - **`FailureCaseArtifact`** — a small record of a replayable failure
+    discovered by fuzzing / property testing / replay, capturing the failed
+    `property_name`, reproduction inputs (`seed`, `generator_config`,
+    `trace_ref`), `minimized` provenance, and a lifecycle `status`
+    (`candidate` / `regression` / `ignored` / `fixed`). It *references* large
+    artifacts rather than inlining them and is explicitly reproducible evidence,
+    not proof of a bug. Documented in `docs/ARTIFACT_CONTRACTS.md` alongside the
+    rest of the cross-project artifact family. Closes #72.
+  - JSON Schemas under `contracts/json/extended/`, Python dataclasses in
+    `extended.py` (with `__post_init__` enum/non-empty validation mirroring the
+    schemas), sample payloads, roundtrip tests in `test_extended.py`,
+    schema-alignment + negative tests in `test_extended_schema_alignment.py`.
+    `contracts/COVERAGE.md` and `well-known/contracts.json` regenerated.
+    Cross-repo impact: Extended/opt-in only — contextweaver, agent-kernel, and
+    ChainWeaver may emit these but are not required to; no migration needed.
 - **Selection ↔ execution boundary Extended contracts.** Four new
   implementation-neutral Extended contracts describing the boundary between
   selecting a unit of work and executing it, so static routers, the

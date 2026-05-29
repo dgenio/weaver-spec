@@ -17,12 +17,12 @@ CI runs the same script with `--check` and fails if this file is stale.
 
 ## Summary
 
-- Total contract types: **30**
-- JSON Schemas: **30 / 30**
-- Python classes: **30 / 30**
-- Sample payloads: **30 / 30**
-- Roundtrip tests: **30 / 30**
-- Schema validation tests: **24 / 30**
+- Total contract types: **32**
+- JSON Schemas: **32 / 32**
+- Python classes: **32 / 32**
+- Sample payloads: **32 / 32**
+- Roundtrip tests: **32 / 32**
+- Schema validation tests: **26 / 32**
 
 ## Coverage table
 
@@ -58,6 +58,8 @@ CI runs the same script with `--check` and fails if this file is stale.
 | Extended | `ExecutionCandidate` | OK | OK | OK | OK | OK |
 | Extended | `ExecutionRoutingDecision` | OK | OK | OK | OK | OK |
 | Extended | `ExecutionFeedback` | OK | OK | OK | OK | OK |
+| Extended | `TraceBundle` | OK | OK | OK | OK | OK |
+| Extended | `FailureCaseArtifact` | OK | OK | OK | OK | OK |
 
 ## Legend
 

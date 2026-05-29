@@ -50,6 +50,7 @@ contracts. Pick the narrowest type that fits:
 | `SkillCard` | A reviewed, reusable procedure derived from traces. | A flow definition or a Core `Capability`. |
 | `EvaluationArtifact` | A statistical evaluation report with semantics. | Proof of statistical validity; a deploy approval. |
 | `ArtifactSafetyGateRequest` / `ArtifactSafetyReport` | Inputs/outputs of an artifact safety gate. | A specific scanner or rule set. |
+| `FailureCaseArtifact` | A reference to a replayable failure (fuzz/property/replay). | Proof of a bug; a `TraceBundle` (which *inlines* an audit chain). |
 
 ---
 
@@ -231,13 +232,57 @@ agent-kernel as the policy gate that acts on the result.
 }
 ```
 
+## FailureCaseArtifact
+
+A small, language-neutral record of a **replayable failure** discovered by
+fuzzing, property-based testing, replay, or trace analysis. It captures which
+`property_name` (property or invariant) failed, what is needed to reproduce it
+(`seed`, `generator_config`, `trace_ref`), whether it was `minimized`, and its
+lifecycle `status` (`candidate` → `regression` / `ignored` / `fixed`). It
+*references* large artifacts (traces) via `trace_ref` / `evidence_refs` rather
+than inlining them.
+
+> [!IMPORTANT]
+> A `FailureCaseArtifact` is **reproducible evidence, not proof of a bug**.
+> Triage decides whether a real defect exists; a failing property may itself be
+> wrong. This is why the default `status` is `candidate`.
+
+It is distinct from a [`TraceBundle`](TRACE_BUNDLE.md) (which *inlines* a full
+audit chain and may be the artifact a `FailureCaseArtifact` points at), from a
+raw trace (which a `trace_ref` points to), and from a `ReviewArtifact` (a
+generic review/trace interchange shape with no reproduction metadata).
+
+**Produced/consumed by:** ChainWeaver, agent-kernel, contextweaver,
+lessonweaver (producers via fuzz/replay harnesses); regression-test and audit
+tooling (consumers).
+
+<!-- schema: failure_case_artifact -->
+```json
+{
+  "failure_case_id": "fc-20260528-001",
+  "created_at": "2026-05-28T14:12:00Z",
+  "source_project": "ChainWeaver",
+  "property_name": "I-02-policy-decision-has-trace-event",
+  "status": "candidate",
+  "severity": "high",
+  "seed": "0x9f3a21c8",
+  "generator_config": {"strategy": "stateful_flow_replay", "max_steps": 32},
+  "trace_ref": "chainweaver:trace_id:abc123",
+  "minimized": true,
+  "minimized_from_ref": "fc-20260528-000",
+  "expected_failure_mode": "PolicyDecision(decision=deny) present with no matching TraceEvent",
+  "evidence_refs": ["chainweaver:trace_id:abc123"]
+}
+```
+
 ---
 
 ## Status and versioning
 
 These types are **Extended**: optional and opt-in. Per `docs/VERSIONING.md`,
 Extended contracts may change (including breaking changes) in a MINOR version.
-They were introduced in contract version `0.5.0`. Full sample payloads live in
+The original artifacts were introduced in contract version `0.5.0`;
+`FailureCaseArtifact` was added in the `0.6.0` set. Full sample payloads live in
 [`examples/sample_payloads/`](../examples/sample_payloads/) and are validated in
 CI against the schemas under
 [`contracts/json/extended/`](../contracts/json/extended/).

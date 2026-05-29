@@ -1,0 +1,28 @@
+{
+  "failure_case_id": "fc-20260528-001",
+  "created_at": "2026-05-28T14:12:00Z",
+  "source_project": "ChainWeaver",
+  "property_name": "I-02-policy-decision-has-trace-event",
+  "status": "candidate",
+  "property_description": "Every PolicyDecision must have a matching TraceEvent. The replayed flow emitted a deny PolicyDecision with no corresponding TraceEvent.",
+  "severity": "high",
+  "seed": "0x9f3a21c8",
+  "generator_config": {
+    "strategy": "stateful_flow_replay",
+    "max_steps": 32,
+    "framework": "hypothesis@6.103.0"
+  },
+  "trace_ref": "chainweaver:trace_id:abc123",
+  "minimized": true,
+  "minimized_from_ref": "fc-20260528-000",
+  "expected_failure_mode": "PolicyDecision(decision=deny) present with no TraceEvent referencing its decision_id",
+  "evidence_refs": ["chainweaver:trace_id:abc123", "tb-20260308-001"],
+  "sensitivity": "internal",
+  "provenance": {
+    "discovered_by": "nightly-fuzz",
+    "run_id": "fuzz-20260528-02"
+  },
+  "metadata": {
+    "flow_id": "invoice_reminder_flow"
+  }
+}

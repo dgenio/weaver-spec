@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/failure_case_artifact.schema.json",
+  "title": "FailureCaseArtifact",
+  "description": "Extended. A small, language-neutral record of a replayable failure discovered by fuzzing, property-based testing, replay, or trace analysis. It captures which property/invariant failed, what is needed to reproduce it (seed, generator config, trace reference), whether it was minimized, and its lifecycle status. It references large artifacts (traces) rather than inlining them. A FailureCaseArtifact is reproducible evidence, NOT proof of a bug by itself; triage decides whether a real defect exists. Distinct from a TraceBundle (which inlines a full audit chain) and from a ReviewArtifact (a generic review/trace interchange shape). See docs/ARTIFACT_CONTRACTS.md.",
+  "type": "object",
+  "required": ["failure_case_id", "created_at", "source_project", "property_name", "status"],
+  "properties": {
+    "failure_case_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique stable identifier for this failure case."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the failure case was captured."
+    },
+    "source_project": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Project that discovered/produced this failure case (e.g. ChainWeaver, agent-kernel, contextweaver, lessonweaver)."
+    },
+    "property_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Machine-readable name of the property or invariant that failed (e.g. `I-02-policy-decision-has-trace-event`, `flow_is_idempotent`)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "regression", "ignored", "fixed"],
+      "description": "Lifecycle state. `candidate` = newly discovered / under review; `regression` = promoted into a regression test; `ignored` = triaged as not actionable; `fixed` = the underlying defect has been resolved."
+    },
+    "property_description": {
+      "type": ["string", "null"],
+      "description": "Optional human-readable description of the property/invariant and how it was violated."
+    },
+    "severity": {
+      "type": ["string", "null"],
+      "enum": ["low", "medium", "high", "critical", null],
+      "description": "Optional triage severity."
+    },
+    "seed": {
+      "type": ["string", "null"],
+      "description": "Optional generator/fuzzer seed needed to reproduce the case. A string to stay language-neutral across arbitrarily large seeds."
+    },
+    "generator_config": {
+      "type": "object",
+      "description": "Optional generator/fuzzer configuration needed to reproduce the case (e.g. strategy, size bounds, framework version). Namespace project-specific keys.",
+      "additionalProperties": true
+    },
+    "trace_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference to where the captured trace lives (e.g. `chainweaver:trace_id:abc123`). Replayable cases should set this; manually captured cases may rely on `evidence_refs` instead."
+    },
+    "minimized": {
+      "type": "boolean",
+      "description": "Whether the case has been minimized/shrunk to a smaller reproducer.",
+      "default": false
+    },
+    "minimized_from_ref": {
+      "type": ["string", "null"],
+      "description": "Optional reference to the original, un-minimized failure case this was reduced from."
+    },
+    "expected_failure_mode": {
+      "type": ["string", "null"],
+      "description": "Optional description of how the failure manifests when replayed (e.g. `raises TimeoutError`, `frame contains raw_output marker`)."
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to supporting evidence (traces, logs, payloads, TraceBundles)."
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "confidential", "restricted"],
+      "description": "Sensitivity of the failure case (a reproducer may embed sensitive inputs).",
+      "default": "internal"
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Optional structured record of how/why the artifact was derived.",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata. Namespace project-specific keys.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

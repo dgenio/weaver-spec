@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/trace_bundle.schema.json",
+  "title": "TraceBundle",
+  "description": "Extended. A tamper-evident audit-chain envelope that gathers one end-to-end request's Core artifacts into a single document: the RoutingDecision, every PolicyDecision, every Frame, every Handle, and every TraceEvent. The bundle is canonicalized (RFC 8785 JCS) so it can be hashed and, optionally, signed with the same detached-signature shape as a CapabilityToken (CapabilityTokenSignature). It does not redefine any invariant: Frames remain free of raw output (I-01) and each PolicyDecision is still expected to have a matching TraceEvent (I-02). Distinct from a FailureCaseArtifact (which references rather than inlines a trace). See docs/TRACE_BUNDLE.md.",
+  "type": "object",
+  "required": ["bundle_id", "routing_decision", "policy_decisions", "frames", "handles", "trace_events"],
+  "properties": {
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for this bundle."
+    },
+    "routing_decision": {
+      "$ref": "https://weaver-spec.dev/contracts/v0/routing_decision.schema.json",
+      "description": "The Core RoutingDecision that opened this request's audit chain."
+    },
+    "policy_decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/policy_decision.schema.json"
+      },
+      "description": "Every PolicyDecision recorded for this request. May be empty only if no capability was authorized; each entry should have a matching TraceEvent (invariant I-02)."
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/frame.schema.json"
+      },
+      "description": "Every safe-to-display Frame produced during this request. Frames never carry raw output (invariant I-01)."
+    },
+    "handles": {
+      "type": "array",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/handle.schema.json"
+      },
+      "description": "Every opaque Handle referenced by the Frames in this bundle."
+    },
+    "trace_events": {
+      "type": "array",
+      "items": {
+        "$ref": "https://weaver-spec.dev/contracts/v0/trace_event.schema.json"
+      },
+      "description": "The append-only TraceEvents for this request, in emission order."
+    },
+    "canonicalization": {
+      "type": "string",
+      "enum": ["JCS"],
+      "description": "Canonicalization scheme applied to the bundle before hashing/signing. JCS = JSON Canonicalization Scheme (RFC 8785). The `signature` field itself is excluded from the canonical form before hashing.",
+      "default": "JCS"
+    },
+    "signature": {
+      "$ref": "https://weaver-spec.dev/contracts/v0/extended/capability_token_signature.schema.json",
+      "description": "Optional detached signature over the JCS-canonicalized bundle (the same signature shape used for CapabilityTokens). When absent, the bundle is unsigned; producers MUST NOT describe an unsigned bundle as signed."
+    },
+    "created_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Optional ISO 8601 timestamp of when the bundle was assembled."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional implementation-specific metadata. Namespace project-specific keys.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

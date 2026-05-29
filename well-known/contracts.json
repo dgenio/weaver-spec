@@ -138,6 +138,13 @@
       "sha256": "86c42335dcb1d5fe2935978ab766be97e727ee4d85c39fe448b13f2117165841"
     },
     {
+      "name": "failure_case_artifact",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/failure_case_artifact.schema.json",
+      "path": "contracts/json/extended/failure_case_artifact.schema.json",
+      "sha256": "fc658ea70b6637f2f3588dc36524e6407109aa17cdfcb11fa3e3d8b6df649434"
+    },
+    {
       "name": "lesson_card",
       "version": "v0",
       "$id": "https://weaver-spec.dev/contracts/v0/extended/lesson_card.schema.json",
@@ -206,6 +213,13 @@
       "$id": "https://weaver-spec.dev/contracts/v0/extended/telemetry_hint.schema.json",
       "path": "contracts/json/extended/telemetry_hint.schema.json",
       "sha256": "84e31eb6f441a2f79b2ab65b1f487af73da6473ba6b3c2434f1d51813ce3c33c"
+    },
+    {
+      "name": "trace_bundle",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/trace_bundle.schema.json",
+      "path": "contracts/json/extended/trace_bundle.schema.json",
+      "sha256": "781141519743c0f53217937ee3622cf0f69774b0a1dbf402c3d326a067a65ec5"
     },
     {
       "name": "ui_hint",
