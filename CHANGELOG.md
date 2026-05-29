@@ -24,7 +24,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
     signature type; an absent signature means unsigned. Redefines no invariant
     (Frames stay free of raw output, I-01; each PolicyDecision is still expected
     to have a matching TraceEvent, I-02). Signed + unsigned sample payloads and
-    the normative `docs/TRACE_BUNDLE.md`. Closes #50.
+    the normative `docs/TRACE_BUNDLE.md`. Part of #50 — the contract, schema,
+    payloads, and an interim I-01/I-02 sample test land here; conformance-runner
+    verification of bundle integrity + invariants is tracked in #74 (depends on
+    the conformance runner, #43).
   - **`FailureCaseArtifact`** — a small record of a replayable failure
     discovered by fuzzing / property testing / replay, capturing the failed
     `property_name`, reproduction inputs (`seed`, `generator_config`,

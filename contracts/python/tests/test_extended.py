@@ -1314,6 +1314,21 @@ class TestTraceBundle:
         bundle = _trace_bundle_from(p)
         assert all(not hasattr(f, "raw_output") for f in bundle.frames)
 
+    def test_invariant_policy_decisions_have_matching_trace_event(self):
+        # I-02: every PolicyDecision in the bundle has a matching TraceEvent,
+        # linked by decision_id (policy_decisions[*].decision_id is referenced
+        # by some trace_events[*].decision_id). Interim artifact-level lock-in
+        # until the conformance runner enforces this across arbitrary bundles
+        # (#74).
+        p = load_payload("trace_bundle")
+        bundle = _trace_bundle_from(p)
+        traced_decision_ids = {
+            te.decision_id for te in bundle.trace_events if te.decision_id is not None
+        }
+        assert bundle.policy_decisions, "sample bundle should exercise I-02"
+        for pd in bundle.policy_decisions:
+            assert pd.decision_id in traced_decision_ids
+
     def _minimal_kwargs(self, **overrides):
         base = dict(
             bundle_id="tb-1",
