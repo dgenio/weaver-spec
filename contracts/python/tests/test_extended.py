@@ -3,10 +3,20 @@
 import json
 import pathlib
 from dataclasses import asdict
+from datetime import datetime
 from typing import Optional
 
 import pytest
 
+from weaver_contracts.core import (
+    ChoiceCard,
+    Frame,
+    Handle,
+    PolicyDecision,
+    RoutingDecision,
+    SelectableItem,
+    TraceEvent,
+)
 from weaver_contracts.extended import (
     ArtifactSafetyGateRequest,
     ArtifactSafetyReport,
@@ -18,6 +28,7 @@ from weaver_contracts.extended import (
     ExecutionRoutingDecision,
     ExtendedFrameMetadata,
     ExtendedSelectableItemMetadata,
+    FailureCaseArtifact,
     LessonCard,
     MemoryArtifact,
     OtelTraceMapping,
@@ -28,8 +39,14 @@ from weaver_contracts.extended import (
     SessionHandoff,
     SkillCard,
     TelemetryHint,
+    TraceBundle,
     UIHint,
 )
+
+
+def parse_dt(s: str) -> datetime:
+    """Parse an ISO 8601 string to a datetime (UTC)."""
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 REPO_ROOT = pathlib.Path(__file__).parent.parent.parent.parent
 PAYLOADS_DIR = REPO_ROOT / "examples" / "sample_payloads"
@@ -1155,3 +1172,254 @@ class TestExecutionFeedback:
         data = asdict(fb)
         json.dumps(data)
         assert data["error_type"] == "timeout"
+
+
+# ---------------------------------------------------------------------------
+# Audit-chain and replayable-failure artifacts (#50, #72)
+# ---------------------------------------------------------------------------
+
+
+def _routing_decision_from(d: dict) -> RoutingDecision:
+    cards = [
+        ChoiceCard(
+            id=c["id"],
+            items=[
+                SelectableItem(
+                    id=it["id"],
+                    label=it["label"],
+                    description=it["description"],
+                    capability_id=it.get("capability_id"),
+                )
+                for it in c["items"]
+            ],
+            context_hint=c.get("context_hint"),
+        )
+        for c in d["choice_cards"]
+    ]
+    return RoutingDecision(
+        id=d["id"],
+        choice_cards=cards,
+        timestamp=parse_dt(d["timestamp"]),
+        selected_item_id=d.get("selected_item_id"),
+        selected_card_id=d.get("selected_card_id"),
+        context_summary=d.get("context_summary"),
+    )
+
+
+def _policy_decision_from(d: dict) -> PolicyDecision:
+    return PolicyDecision(
+        decision_id=d["decision_id"],
+        decision=d["decision"],
+        capability_id=d["capability_id"],
+        principal=d["principal"],
+        timestamp=parse_dt(d["timestamp"]),
+        token_id=d.get("token_id"),
+        reason=d.get("reason"),
+        metadata=d.get("metadata", {}),
+    )
+
+
+def _frame_from(d: dict) -> Frame:
+    return Frame(
+        frame_id=d["frame_id"],
+        capability_id=d["capability_id"],
+        summary=d["summary"],
+        created_at=parse_dt(d["created_at"]),
+        handle_refs=d.get("handle_refs", []),
+        redaction_notes=d.get("redaction_notes"),
+    )
+
+
+def _handle_from(d: dict) -> Handle:
+    return Handle(
+        handle_id=d["handle_id"],
+        capability_id=d["capability_id"],
+        artifact_type=d["artifact_type"],
+        created_at=parse_dt(d["created_at"]),
+        expires_at=parse_dt(d["expires_at"]) if d.get("expires_at") else None,
+        access_policy=d.get("access_policy"),
+        byte_size=d.get("byte_size"),
+        metadata=d.get("metadata", {}),
+    )
+
+
+def _trace_event_from(d: dict) -> TraceEvent:
+    return TraceEvent(
+        event_id=d["event_id"],
+        event_type=d["event_type"],
+        timestamp=parse_dt(d["timestamp"]),
+        capability_id=d.get("capability_id"),
+        principal=d.get("principal"),
+        decision_id=d.get("decision_id"),
+        frame_id=d.get("frame_id"),
+        handle_id=d.get("handle_id"),
+        outcome=d.get("outcome"),
+        error_message=d.get("error_message"),
+        metadata=d.get("metadata", {}),
+    )
+
+
+def _trace_bundle_from(p: dict) -> TraceBundle:
+    sig = p.get("signature")
+    return TraceBundle(
+        bundle_id=p["bundle_id"],
+        routing_decision=_routing_decision_from(p["routing_decision"]),
+        policy_decisions=[_policy_decision_from(d) for d in p["policy_decisions"]],
+        frames=[_frame_from(d) for d in p["frames"]],
+        handles=[_handle_from(d) for d in p["handles"]],
+        trace_events=[_trace_event_from(d) for d in p["trace_events"]],
+        canonicalization=p.get("canonicalization", "JCS"),
+        signature=(
+            CapabilityTokenSignature(
+                alg=sig["alg"],
+                kid=sig["kid"],
+                sig=sig["sig"],
+                canonicalization=sig.get("canonicalization", "JCS"),
+                signed_at=sig.get("signed_at"),
+            )
+            if sig is not None
+            else None
+        ),
+        created_at=p.get("created_at"),
+        metadata=p.get("metadata", {}),
+    )
+
+
+class TestTraceBundle:
+    # Core artifacts carry datetimes, so (like the Core roundtrip tests) this
+    # constructs from the payload and asserts; it does not asdict/json.dumps.
+    def test_unsigned_from_payload(self):
+        p = load_payload("trace_bundle")
+        bundle = _trace_bundle_from(p)
+        assert bundle.bundle_id == "tb-20260308-001"
+        assert bundle.routing_decision.id == "rd-20260308-001"
+        assert len(bundle.policy_decisions) == 1
+        assert bundle.policy_decisions[0].decision == "allow"
+        assert bundle.frames[0].frame_id == "frame-20260308-001"
+        assert bundle.handles[0].handle_id == "handle-rawresult-20260308-001"
+        assert bundle.trace_events[0].outcome == "success"
+        assert bundle.canonicalization == "JCS"
+        assert bundle.signature is None
+
+    def test_signed_from_payload(self):
+        p = load_payload("trace_bundle_signed")
+        bundle = _trace_bundle_from(p)
+        assert bundle.signature is not None
+        assert bundle.signature.alg == "ed25519"
+        assert bundle.signature.canonicalization == "JCS"
+
+    def test_invariant_frames_have_no_raw_output(self):
+        # I-01: Frames in a bundle expose no raw_output attribute.
+        p = load_payload("trace_bundle")
+        bundle = _trace_bundle_from(p)
+        assert all(not hasattr(f, "raw_output") for f in bundle.frames)
+
+    def _minimal_kwargs(self, **overrides):
+        base = dict(
+            bundle_id="tb-1",
+            routing_decision=_routing_decision_from(
+                load_payload("trace_bundle")["routing_decision"]
+            ),
+            policy_decisions=[],
+            frames=[],
+            handles=[],
+            trace_events=[],
+        )
+        base.update(overrides)
+        return base
+
+    def test_empty_bundle_id_raises(self):
+        with pytest.raises(ValueError, match="bundle_id must be non-empty"):
+            TraceBundle(**self._minimal_kwargs(bundle_id=""))
+
+    def test_invalid_canonicalization_raises(self):
+        with pytest.raises(ValueError, match="canonicalization must be one of"):
+            TraceBundle(**self._minimal_kwargs(canonicalization="sorted-keys"))
+
+    def test_defaults(self):
+        bundle = TraceBundle(**self._minimal_kwargs())
+        assert bundle.canonicalization == "JCS"
+        assert bundle.signature is None
+        assert bundle.created_at is None
+        assert bundle.metadata == {}
+
+
+class TestFailureCaseArtifact:
+    def _kwargs(self, **overrides):
+        base = dict(
+            failure_case_id="fc-1",
+            created_at="2026-05-28T14:12:00Z",
+            source_project="ChainWeaver",
+            property_name="flow_is_idempotent",
+            status="candidate",
+        )
+        base.update(overrides)
+        return base
+
+    def test_valid_from_payload(self):
+        p = load_payload("failure_case_artifact")
+        fc = FailureCaseArtifact(
+            failure_case_id=p["failure_case_id"],
+            created_at=p["created_at"],
+            source_project=p["source_project"],
+            property_name=p["property_name"],
+            status=p["status"],
+            property_description=p.get("property_description"),
+            severity=p.get("severity"),
+            seed=p.get("seed"),
+            generator_config=p.get("generator_config", {}),
+            trace_ref=p.get("trace_ref"),
+            minimized=p.get("minimized", False),
+            minimized_from_ref=p.get("minimized_from_ref"),
+            expected_failure_mode=p.get("expected_failure_mode"),
+            evidence_refs=p.get("evidence_refs", []),
+            sensitivity=p.get("sensitivity", "internal"),
+            provenance=p.get("provenance", {}),
+            metadata=p.get("metadata", {}),
+        )
+        assert fc.failure_case_id == "fc-20260528-001"
+        assert fc.status == "candidate"
+        assert fc.severity == "high"
+        assert fc.minimized is True
+        assert fc.trace_ref == "chainweaver:trace_id:abc123"
+
+    def test_empty_failure_case_id_raises(self):
+        with pytest.raises(ValueError, match="failure_case_id must be non-empty"):
+            FailureCaseArtifact(**self._kwargs(failure_case_id=""))
+
+    def test_empty_property_name_raises(self):
+        with pytest.raises(ValueError, match="property_name must be non-empty"):
+            FailureCaseArtifact(**self._kwargs(property_name=""))
+
+    def test_invalid_status_raises(self):
+        with pytest.raises(ValueError, match="status must be one of"):
+            FailureCaseArtifact(**self._kwargs(status="open"))
+
+    def test_invalid_severity_raises(self):
+        with pytest.raises(ValueError, match="severity must be one of"):
+            FailureCaseArtifact(**self._kwargs(severity="extreme"))
+
+    def test_invalid_sensitivity_raises(self):
+        with pytest.raises(ValueError, match="sensitivity must be one of"):
+            FailureCaseArtifact(**self._kwargs(sensitivity="secret"))
+
+    def test_all_statuses_accepted(self):
+        for status in ("candidate", "regression", "ignored", "fixed"):
+            fc = FailureCaseArtifact(**self._kwargs(status=status))
+            assert fc.status == status
+
+    def test_defaults(self):
+        fc = FailureCaseArtifact(**self._kwargs())
+        assert fc.severity is None
+        assert fc.minimized is False
+        assert fc.evidence_refs == []
+        assert fc.sensitivity == "internal"
+        assert fc.generator_config == {}
+
+    def test_serialization(self):
+        fc = FailureCaseArtifact(
+            **self._kwargs(status="regression", evidence_refs=["trace:x"])
+        )
+        data = asdict(fc)
+        json.dumps(data)
+        assert data["evidence_refs"] == ["trace:x"]

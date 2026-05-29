@@ -216,8 +216,9 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/DEPRECATIONS.md](docs/DEPRECATIONS.md) | Deprecation register and removal policy |
 | [docs/SCHEMA_HOSTING.md](docs/SCHEMA_HOSTING.md) | `$id` URL pattern, immutability rule, content-addressed index |
 | [docs/DOCS_CONVENTIONS.md](docs/DOCS_CONVENTIONS.md) | Markup convention for normative requirements vs informative notes vs examples |
-| [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) | Cross-project Extended artifact vocabulary (memory, session handoff, lesson/skill cards, evaluation, safety gate) |
+| [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) | Cross-project Extended artifact vocabulary (memory, session handoff, lesson/skill cards, evaluation, safety gate, failure case) |
 | [docs/EXECUTION_BOUNDARY.md](docs/EXECUTION_BOUNDARY.md) | Selection ↔ execution boundary Extended contracts (ExecutionCandidate, CompiledFlow, ExecutionRoutingDecision, ExecutionFeedback) |
+| [docs/TRACE_BUNDLE.md](docs/TRACE_BUNDLE.md) | TraceBundle Extended contract: end-to-end audit-chain envelope (inlines RoutingDecision + PolicyDecisions + Frames + Handles + TraceEvents; optional JCS signature) |
 | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) | Derived ecosystem boundary map (owns/consumes/emits per project, end-to-end lifecycle); points to BOUNDARIES.md/LIFECYCLE.md as canonical |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |

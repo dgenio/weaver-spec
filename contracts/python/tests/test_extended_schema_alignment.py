@@ -27,7 +27,8 @@ PAYLOADS_DIR = REPO_ROOT / "examples" / "sample_payloads"
 # ReviewArtifact, MemoryArtifact, SessionHandoff, LessonCard, SkillCard,
 # EvaluationArtifact, ArtifactSafetyGateRequest, ArtifactSafetyReport,
 # CapabilityTokenSignature, OtelTraceMapping, CompiledFlow,
-# ExecutionCandidate, ExecutionRoutingDecision, ExecutionFeedback.
+# ExecutionCandidate, ExecutionRoutingDecision, ExecutionFeedback,
+# TraceBundle, FailureCaseArtifact.
 EXTENDED_TYPES = [
     ("TelemetryHint", "telemetry_hint"),
     ("SchemaFingerprint", "schema_fingerprint"),
@@ -50,6 +51,8 @@ EXTENDED_TYPES = [
     ("ExecutionCandidate", "execution_candidate"),
     ("ExecutionRoutingDecision", "execution_routing_decision"),
     ("ExecutionFeedback", "execution_feedback"),
+    ("TraceBundle", "trace_bundle"),
+    ("FailureCaseArtifact", "failure_case_artifact"),
 ]
 
 
@@ -350,6 +353,90 @@ class TestExtendedNegativeCases:
             "success": True,
             "timestamp": "2026-05-25T08:00:00Z",
             "latency_ms": -1,
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_trace_bundle_signed_payload_validates(self):
+        # #50: a signed bundle embeds a `signature` resolved via $ref to the
+        # CapabilityTokenSignature schema; the nested Core artifacts resolve
+        # via the local schema store. The whole document must validate.
+        schema = load_extended_schema("trace_bundle")
+        payload = load_payload("trace_bundle_signed")
+        validate(payload, schema)
+
+    def test_trace_bundle_missing_required_chain_fails(self):
+        # #50: the full audit chain is required; a bundle missing the array
+        # members must be rejected.
+        schema = load_extended_schema("trace_bundle")
+        bad = {
+            "bundle_id": "tb-1",
+            "routing_decision": {
+                "id": "rd-1",
+                "choice_cards": [
+                    {
+                        "id": "card-1",
+                        "items": [
+                            {"id": "i1", "label": "L", "description": "D"}
+                        ],
+                    }
+                ],
+                "timestamp": "2026-03-08T06:00:00Z",
+            },
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_trace_bundle_bad_canonicalization_fails(self):
+        # canonicalization is constrained to the JCS registry.
+        schema = load_extended_schema("trace_bundle")
+        bad = {
+            "bundle_id": "tb-1",
+            "routing_decision": {
+                "id": "rd-1",
+                "choice_cards": [
+                    {"id": "c1", "items": [{"id": "i1", "label": "L", "description": "D"}]}
+                ],
+                "timestamp": "2026-03-08T06:00:00Z",
+            },
+            "policy_decisions": [],
+            "frames": [],
+            "handles": [],
+            "trace_events": [],
+            "canonicalization": "sorted-keys",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_failure_case_artifact_missing_required_fails(self):
+        # #72: failure_case_id/created_at/source_project/property_name/status
+        # are all required.
+        schema = load_extended_schema("failure_case_artifact")
+        bad = {"failure_case_id": "fc-1"}
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_failure_case_artifact_bad_status_fails(self):
+        schema = load_extended_schema("failure_case_artifact")
+        bad = {
+            "failure_case_id": "fc-1",
+            "created_at": "2026-05-28T14:12:00Z",
+            "source_project": "ChainWeaver",
+            "property_name": "p",
+            "status": "open",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_failure_case_artifact_bad_severity_fails(self):
+        schema = load_extended_schema("failure_case_artifact")
+        bad = {
+            "failure_case_id": "fc-1",
+            "created_at": "2026-05-28T14:12:00Z",
+            "source_project": "ChainWeaver",
+            "property_name": "p",
+            "status": "candidate",
+            "severity": "extreme",
         }
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(bad, schema)

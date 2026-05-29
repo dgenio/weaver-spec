@@ -14,6 +14,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from .core import Frame, Handle, PolicyDecision, RoutingDecision, TraceEvent
+
 
 # ---------------------------------------------------------------------------
 # TelemetryHint — attached to any contract for observability enrichment
@@ -849,3 +851,120 @@ class ExecutionFeedback:
             raise ValueError("ExecutionFeedback.latency_ms must be >= 0")
         if self.quality_score is not None and not 0.0 <= self.quality_score <= 1.0:
             raise ValueError("ExecutionFeedback.quality_score must be in [0.0, 1.0]")
+
+
+# ===========================================================================
+# Audit-chain and replayable-failure artifacts
+#
+# TraceBundle (#50) is a tamper-evident envelope that *inlines* one request's
+# Core audit chain (RoutingDecision + PolicyDecisions + Frames + Handles +
+# TraceEvents) so it can be canonicalized (RFC 8785 JCS) and optionally signed
+# with the same detached-signature shape as a CapabilityToken. It redefines no
+# invariant: Frames stay free of raw output (I-01) and each PolicyDecision is
+# still expected to have a matching TraceEvent (I-02).
+#
+# FailureCaseArtifact (#72) is the complement: a small record that *references*
+# a replayable failure (seed, generator config, trace ref) rather than inlining
+# it. It is reproducible evidence, not proof of a bug. Field-by-field docs:
+#   - docs/TRACE_BUNDLE.md
+#   - docs/ARTIFACT_CONTRACTS.md
+# ===========================================================================
+
+
+# ---------------------------------------------------------------------------
+# TraceBundle — signed, JCS-canonicalized end-to-end audit-chain envelope
+# ---------------------------------------------------------------------------
+
+@dataclass
+class TraceBundle:
+    """A tamper-evident audit-chain envelope for one end-to-end request.
+
+    Gathers the Core artifacts of a single request — the ``routing_decision``,
+    every ``policy_decisions`` entry, every ``frames`` entry, every ``handles``
+    entry, and every ``trace_events`` entry — so the chain can be canonicalized
+    (RFC 8785 JCS) and optionally signed. The full audit chain is required: a
+    TraceBundle describes a complete request, not a fragment. ``signature``
+    reuses the ``CapabilityTokenSignature`` shape; when absent the bundle is
+    unsigned and must not be described as signed. See ``docs/TRACE_BUNDLE.md``.
+    """
+
+    bundle_id: str
+    routing_decision: RoutingDecision
+    policy_decisions: List[PolicyDecision]
+    frames: List[Frame]
+    handles: List[Handle]
+    trace_events: List[TraceEvent]
+    canonicalization: str = "JCS"
+    signature: Optional[CapabilityTokenSignature] = None
+    created_at: Optional[str] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    _VALID_CANONICALIZATIONS = frozenset({"JCS"})
+
+    def __post_init__(self) -> None:
+        if not self.bundle_id:
+            raise ValueError("TraceBundle.bundle_id must be non-empty")
+        if self.canonicalization not in self._VALID_CANONICALIZATIONS:
+            raise ValueError(
+                "TraceBundle.canonicalization must be one of "
+                f"{self._VALID_CANONICALIZATIONS}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# FailureCaseArtifact — replayable failure discovered by fuzzing/replay/review
+# ---------------------------------------------------------------------------
+
+@dataclass
+class FailureCaseArtifact:
+    """A replayable failure discovered by fuzzing, property testing, or replay.
+
+    Captures which ``property_name`` failed, what is needed to reproduce it
+    (``seed``, ``generator_config``, ``trace_ref``), whether it was
+    ``minimized``, and its lifecycle ``status``. References large artifacts
+    rather than inlining them. It is reproducible evidence, not proof of a bug
+    by itself — triage decides whether a real defect exists.
+    """
+
+    failure_case_id: str
+    created_at: str
+    source_project: str
+    property_name: str
+    status: str
+    property_description: Optional[str] = None
+    severity: Optional[str] = None
+    seed: Optional[str] = None
+    generator_config: Dict[str, Any] = field(default_factory=dict)
+    trace_ref: Optional[str] = None
+    minimized: bool = False
+    minimized_from_ref: Optional[str] = None
+    expected_failure_mode: Optional[str] = None
+    evidence_refs: List[str] = field(default_factory=list)
+    sensitivity: str = "internal"
+    provenance: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    _STATUSES = frozenset({"candidate", "regression", "ignored", "fixed"})
+    _SEVERITIES = frozenset({"low", "medium", "high", "critical"})
+
+    def __post_init__(self) -> None:
+        if not self.failure_case_id:
+            raise ValueError("FailureCaseArtifact.failure_case_id must be non-empty")
+        if not self.created_at:
+            raise ValueError("FailureCaseArtifact.created_at must be non-empty")
+        if not self.source_project:
+            raise ValueError("FailureCaseArtifact.source_project must be non-empty")
+        if not self.property_name:
+            raise ValueError("FailureCaseArtifact.property_name must be non-empty")
+        if self.status not in self._STATUSES:
+            raise ValueError(
+                f"FailureCaseArtifact.status must be one of {self._STATUSES}"
+            )
+        if self.severity is not None and self.severity not in self._SEVERITIES:
+            raise ValueError(
+                f"FailureCaseArtifact.severity must be one of {self._SEVERITIES}"
+            )
+        if self.sensitivity not in _SENSITIVITY_LEVELS:
+            raise ValueError(
+                f"FailureCaseArtifact.sensitivity must be one of {_SENSITIVITY_LEVELS}"
+            )
