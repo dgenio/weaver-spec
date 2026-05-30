@@ -95,6 +95,14 @@ def test_i04_baseline_matches_and_detects_drift():
     assert conf.core_required_surface_stable(drifted, SCHEMAS)
 
 
+def test_i04_reordering_required_is_a_no_op():
+    # `required` is an unordered set; a reordered baseline must still pass.
+    inv = yaml.safe_load((REPO_ROOT / "conformance" / "invariants.yaml").read_text())
+    baseline = next(i["baseline"] for i in inv["invariants"] if i["id"] == "I-04")
+    reordered = {stem: list(reversed(fields)) for stem, fields in baseline.items()}
+    assert conf.core_required_surface_stable(reordered, SCHEMAS) == []
+
+
 def test_i06_flags_empty_scope_and_missing_expiry():
     assert conf.capability_token_scoped(_load("examples/sample_payloads/capability_token.json")) == []
     assert conf.capability_token_scoped(
@@ -121,6 +129,14 @@ def test_tampered_bundle_fails_verification():
     keyring = conf.load_keyring(conf.DEFAULT_KEYRING)
     errs, _ = conf.check_trace_bundle(bundle, SCHEMAS, REGISTRY, keyring)
     assert any("verification FAILED" in e for e in errs)
+
+
+def test_keyring_alg_mismatch_is_rejected():
+    bundle = _load("conformance/fixtures/trace_bundle_signed_valid.json")
+    kid = bundle["signature"]["kid"]
+    mismatched = {kid: {"kid": kid, "alg": "es256", "public_key_b64url": "AAAA"}}
+    errs, _ = conf.check_trace_bundle(bundle, SCHEMAS, REGISTRY, mismatched)
+    assert any("alg" in e and kid in e for e in errs)
 
 
 def test_unsigned_bundle_recomputes_canonical_form_without_error():

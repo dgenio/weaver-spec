@@ -144,10 +144,12 @@ def core_required_surface_stable(baseline: dict, schemas_by_stem: dict[str, dict
         if schema is None:
             violations.append(f"Core schema {stem!r} not found")
             continue
-        actual = list(schema.get("required", []))
-        if actual != list(expected):
+        # `required` is an unordered set in JSON Schema, so compare as sets:
+        # reordering fields in a schema file is a semantic no-op.
+        actual = sorted(schema.get("required", []))
+        if actual != sorted(expected):
             violations.append(
-                f"{stem}: required surface drifted — expected {expected}, found {actual}"
+                f"{stem}: required surface drifted — expected {sorted(expected)}, found {actual}"
             )
     return violations
 
@@ -232,6 +234,12 @@ def check_trace_bundle(
     key_entry = keyring.get(kid)
     if key_entry is None:
         notes.append(f"signature envelope valid; crypto verify skipped (kid {kid!r} not in keyring)")
+        return errors, notes
+    if key_entry.get("alg") != signature["alg"]:
+        errors.append(
+            f"keyring entry for kid {kid!r} is alg {key_entry.get('alg')!r}, "
+            f"but the signature declares alg {signature['alg']!r}"
+        )
         return errors, notes
     try:
         _crypto_verify(signature["alg"], key_entry, canonical, _b64url_decode(signature["sig"]))
