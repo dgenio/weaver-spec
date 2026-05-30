@@ -281,3 +281,9 @@ jobs:
 
       - name: Check contracts/COVERAGE.md is up to date
         run: python scripts/generate_coverage_table.py --check
+
+  conformance:
+    name: Conformance Suite
+    permissions:
+      contents: read
+    uses: ./.github/workflows/conformance.yml

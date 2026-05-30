@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "choice_cards": [
+    {
+      "id": "card-1",
+      "items": [
+        {
+          "id": "i-1",
+          "label": "L",
+          "description": "D"
+        }
+      ]
+    }
+  ],
+  "timestamp": "2026-03-08T06:00:00Z"
+}

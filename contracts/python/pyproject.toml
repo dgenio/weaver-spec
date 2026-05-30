@@ -14,11 +14,17 @@ dependencies = []
 [project.optional-dependencies]
 dev = [
     "pytest>=7.4",
-    "jsonschema>=4.17",
+    "jsonschema>=4.18",
+    "referencing>=0.30",
     "mypy>=1.0",
     "pytest-cov>=4.0",
     "pre-commit>=3.5",
     "yamllint>=1.35",
+    # Conformance runner (conformance/run.py) extras — build-time/CI only,
+    # never imported by weaver_contracts.
+    "PyYAML>=6.0",
+    "jcs>=0.2.1",
+    "cryptography>=41.0",
 ]
 
 [tool.setuptools.packages.find]

@@ -1,0 +1,15 @@
+{
+  "id": "rd-neg-001",
+  "choice_cards": [
+    {
+      "id": "card-1",
+      "items": [
+        {
+          "id": "i-1",
+          "label": "L",
+          "description": "D"
+        }
+      ]
+    }
+  ]
+}

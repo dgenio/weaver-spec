@@ -1,0 +1,33 @@
+name: Conformance
+
+# Reusable conformance suite (issues #43, #74). Sibling repos call it with:
+#
+#   jobs:
+#     weaver-conformance:
+#       uses: dgenio/weaver-spec/.github/workflows/conformance.yml@v0.6.0
+#
+# It is also invoked from this repo's ci.yml. See docs/CONFORMANCE.md.
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  conformance:
+    name: Run Conformance Suite
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install conformance dependencies
+        run: pip install jsonschema referencing PyYAML jcs cryptography
+
+      - name: Run conformance runner
+        run: python conformance/run.py

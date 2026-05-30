@@ -70,7 +70,7 @@ If the change affects a contract that a sibling repo produces or consumes, coord
 
 ## Local validation commands
 
-Run all five before submitting any PR. CI enforces all five.
+Run all six before submitting any PR. CI enforces all six.
 
 ```bash
 # 1. Python tests (with coverage)
@@ -90,6 +90,9 @@ python scripts/generate_contracts_index.py --check
 
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
+
+# 6. Conformance suite (corpus + executable invariants + TraceBundle signatures)
+python conformance/run.py
 ```
 
 If step 4 fails, regenerate the index and commit the result:

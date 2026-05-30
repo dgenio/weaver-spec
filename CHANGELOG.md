@@ -10,6 +10,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **Conformance suite (`conformance/`).** A build-time / CI runner that defines
+  what "spec-compliant" means as a runnable check, resolving #43 and #74. No
+  contract changed, so no version bump (consistent with this release window's
+  additive-tooling practice); this is CI tooling, never imported by
+  `weaver_contracts` and never published.
+  - `conformance/run.py` validates a **positive corpus** (sample payloads must
+    validate), asserts a **negative corpus** is rejected (≥3 fixtures each for
+    Frame, RoutingDecision, CapabilityToken, PolicyDecision, TraceEvent — by
+    JSON Schema, or by invariant for schema-valid-but-invalid payloads), and
+    evaluates `conformance/invariants.yaml` — executable assertions for **I-01,
+    I-02, I-04, I-06** (I-03/I-05/I-07 remain layer-behaviour invariants checked
+    by sibling harnesses).
+  - **TraceBundle integrity verification (#74):** for every `TraceBundle` the
+    runner recomputes the RFC 8785 (JCS) canonical form excluding `signature`,
+    validates the detached-signature envelope against the
+    `CapabilityTokenSignature` schema and algorithm registry, then
+    **cryptographically verifies** the signature
+    when the `kid` resolves in the keyring. Ships a real ed25519-signed fixture
+    (`conformance/fixtures/trace_bundle_signed_valid.json`) with its public key
+    in `conformance/keyring/`; unknown-key signatures are reported as *skipped*,
+    never as verified.
+  - Reusable workflow `.github/workflows/conformance.yml` (siblings adopt with
+    one `uses:` line) plus a `conformance` job in `ci.yml`; package test
+    `test_conformance.py`; and `docs/CONFORMANCE.md`. The original conformance
+    issue #4 was already closed (not planned) and is superseded by this work.
 - **Audit-chain and replayable-failure Extended contracts.** Two new
   implementation-neutral Extended contracts, folded into the unreleased `0.6.0`
   set (additive, no Core change, no version bump — consistent with the prior
