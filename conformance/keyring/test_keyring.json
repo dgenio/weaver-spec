@@ -1,0 +1,9 @@
+{
+  "keys": [
+    {
+      "kid": "conformance-test-ed25519-2026-01",
+      "alg": "ed25519",
+      "public_key_b64url": "qs-PkKBMWTOlYYi8vLNwVSEISlYETpqlWtu9e_fJ4F0"
+    }
+  ]
+}

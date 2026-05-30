@@ -13,6 +13,7 @@ This repository is **documentation + contracts only**.
 - It contains JSON Schemas (language-agnostic source of truth), a Python `weaver_contracts` package (stdlib dataclasses mirroring the schemas), specification docs, and examples.
 - **Never add runtime logic, adopter-facing CLI tools, adopter-facing helper utilities, or business logic to this repository.** Validation is limited to construction-time checks in dataclass `__post_init__`.
 - **Build-time spec-maintenance tooling is permitted** under `scripts/`, narrowly scoped: stdlib-only Python that consumes the spec and emits or validates artifacts checked into this repo (e.g., the content-addressed schema index). Such tooling must not be imported by `weaver_contracts` and must not be published to PyPI. Any new script must be added to the repo map below with that scope explicitly stated.
+- **The conformance suite under `conformance/` is build-time / CI tooling**, not runtime code. Unlike `scripts/` it may use the schema-validation/signing dependencies (`jsonschema`, `referencing`, `PyYAML`, `jcs`, `cryptography`), because it defines what "spec-compliant" means as a runnable check (positive/negative corpus + executable invariant assertions + TraceBundle signature verification). The same constraints apply: it is never imported by `weaver_contracts` and never published. See [docs/CONFORMANCE.md](docs/CONFORMANCE.md).
 
 ---
 
@@ -48,6 +49,7 @@ This repository is **documentation + contracts only**.
 | `well-known/contracts.json` | Generated content-addressed schema index (SHA-256 per file) | Regenerate via `scripts/generate_contracts_index.py` after any `contracts/json/` change |
 | `compatibility.yaml` | Machine-readable sibling-repo compatibility manifest (human-readable view in `docs/VERSIONING.md`). Validated by the `validate-compatibility` CI job | When a sibling repo declares or changes its supported spec versions |
 | `scripts/` | Build-time, stdlib-only utilities (e.g., index generator, coverage table generator). Not runtime code. | When the build-time tooling itself changes |
+| `conformance/` | Build-time / CI conformance suite: `run.py` runner, `corpus.yaml` (positive + negative payloads), `invariants.yaml` (executable I-01/I-02/I-04/I-06 assertions), negative fixtures, and a signed TraceBundle fixture + test keyring. Consumes the schema-validation/signing deps; never imported by `weaver_contracts`, never published. | When changing what spec-compliance verifies, or adding fixtures/invariant checks |
 | `CHARTER.md` | Governance roles, decision flow, Working Groups | When governance roles or process change |
 
 ---
@@ -192,6 +194,9 @@ python scripts/generate_contracts_index.py --check
 
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
+
+# 6. Conformance suite (positive/negative corpus + invariants + signature checks)
+python conformance/run.py
 ```
 
 Or, if pre-commit is installed (recommended): `pre-commit run --all-files` runs checks 3–5 automatically. Add `pre-commit install --hook-type pre-push` to also gate check 1 on push.
@@ -219,6 +224,7 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/ARTIFACT_CONTRACTS.md](docs/ARTIFACT_CONTRACTS.md) | Cross-project Extended artifact vocabulary (memory, session handoff, lesson/skill cards, evaluation, safety gate, failure case) |
 | [docs/EXECUTION_BOUNDARY.md](docs/EXECUTION_BOUNDARY.md) | Selection ↔ execution boundary Extended contracts (ExecutionCandidate, CompiledFlow, ExecutionRoutingDecision, ExecutionFeedback) |
 | [docs/TRACE_BUNDLE.md](docs/TRACE_BUNDLE.md) | TraceBundle Extended contract: end-to-end audit-chain envelope (inlines RoutingDecision + PolicyDecisions + Frames + Handles + TraceEvents; optional JCS signature) |
+| [docs/CONFORMANCE.md](docs/CONFORMANCE.md) | Conformance suite: what spec-compliance checks (positive/negative corpus, executable invariant assertions, TraceBundle signature verification) and how siblings adopt the reusable workflow |
 | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) | Derived ecosystem boundary map (owns/consumes/emits per project, end-to-end lifecycle); points to BOUNDARIES.md/LIFECYCLE.md as canonical |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |

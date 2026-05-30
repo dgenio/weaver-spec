@@ -1,0 +1,8 @@
+{
+  "token_id": "tok-neg-003",
+  "scope": [
+    "org.myapp.search_docs"
+  ],
+  "issued_at": "2026-03-08T06:00:00Z",
+  "single_use": true
+}

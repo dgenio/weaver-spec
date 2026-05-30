@@ -1,0 +1,6 @@
+{
+  "decision": "allow",
+  "capability_id": "org.myapp.search_docs",
+  "principal": "agent-7",
+  "timestamp": "2026-03-08T06:00:01Z"
+}

@@ -1,0 +1,49 @@
+# Executable invariant assertions for the Weaver conformance runner.
+#
+# Each block declares one invariant and binds it to a NAMED CHECK implemented in
+# conformance/run.py. The "assertion DSL" is intentionally a named-check registry
+# rather than an embedded expression language: every assertion is real, tested
+# Python, so a sibling repo running this manifest gets the same verdict the spec
+# repo does.
+#
+# Descriptions are one-line pointers only. The normative text lives in
+# docs/INVARIANTS.md and is NOT restated here (per AGENTS.md).
+#
+# I-03, I-05, and I-07 are layer-behaviour invariants (routing / ingestion /
+# orchestration runtime). They cannot be asserted against a static artifact and
+# are checked by the sibling-repo conformance harnesses, not here. See
+# docs/CONFORMANCE.md.
+
+invariants:
+  - id: I-01
+    description: "No Frame exposes raw tool output. See docs/INVARIANTS.md."
+    applies_to: [trace_bundle]
+    assertion: frames_have_no_raw_output
+
+  - id: I-02
+    description: "Every PolicyDecision has a matching TraceEvent. See docs/INVARIANTS.md."
+    applies_to: [trace_bundle]
+    assertion: policy_decisions_are_traced
+
+  - id: I-04
+    description: "Core contract required-field surface stays minimal and stable. See docs/INVARIANTS.md."
+    applies_to: [core_schemas]
+    assertion: core_required_surface_stable
+    # Pinned baseline of the Core required-field surface. Growing this set is a
+    # minimality regression (I-04) and must be a deliberate, reviewed change.
+    # This is a focused minimality lock, not a full schema diff (tracked in #45).
+    baseline:
+      capability: [id, name, version, description]
+      capability_token: [token_id, principal, scope, issued_at]
+      choice_card: [id, items]
+      frame: [frame_id, capability_id, summary, created_at]
+      handle: [handle_id, capability_id, artifact_type, created_at]
+      policy_decision: [decision_id, decision, capability_id, principal, timestamp]
+      routing_decision: [id, choice_cards, timestamp]
+      selectable_item: [id, label, description]
+      trace_event: [event_id, event_type, timestamp]
+
+  - id: I-06
+    description: "CapabilityTokens are scoped and single-use or expiring. See docs/INVARIANTS.md."
+    applies_to: [capability_token]
+    assertion: capability_token_scoped

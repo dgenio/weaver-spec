@@ -1,0 +1,51 @@
+# Conformance corpus: the payloads the runner checks.
+#
+# `positive` payloads MUST validate against their named schema (and, where an
+# invariant applies, MUST satisfy it).
+#
+# `negative` payloads MUST be rejected. `by` says how:
+#   - schema    : the payload fails JSON Schema validation.
+#   - invariant : the payload is schema-VALID but violates `violates` (an
+#                 invariant id evaluated by conformance/run.py).
+#
+# Paths are repo-relative. Schema names are the schema file stems (Core or
+# Extended), e.g. `frame`, `trace_bundle`.
+
+positive:
+  - {payload: examples/sample_payloads/routing_decision.json, schema: routing_decision}
+  - {payload: examples/sample_payloads/frame_with_handles.json, schema: frame}
+  - {payload: examples/sample_payloads/capability.json, schema: capability}
+  - {payload: examples/sample_payloads/capability_token.json, schema: capability_token}
+  - {payload: examples/sample_payloads/choice_card.json, schema: choice_card}
+  - {payload: examples/sample_payloads/selectable_item.json, schema: selectable_item}
+  - {payload: examples/sample_payloads/handle.json, schema: handle}
+  - {payload: examples/sample_payloads/policy_decision.json, schema: policy_decision}
+  - {payload: examples/sample_payloads/trace_event.json, schema: trace_event}
+  - {payload: examples/sample_payloads/trace_bundle.json, schema: trace_bundle}
+  - {payload: examples/sample_payloads/trace_bundle_signed.json, schema: trace_bundle}
+  - {payload: conformance/fixtures/trace_bundle_signed_valid.json, schema: trace_bundle}
+
+negative:
+  # Frame
+  - {payload: conformance/negative/frame/missing_summary.json, schema: frame, by: schema, violates: "required:summary"}
+  - {payload: conformance/negative/frame/empty_frame_id.json, schema: frame, by: schema, violates: "minLength:frame_id"}
+  - {payload: conformance/negative/frame/non_string_created_at.json, schema: frame, by: schema, violates: "type:created_at"}
+  # RoutingDecision
+  - {payload: conformance/negative/routing_decision/missing_timestamp.json, schema: routing_decision, by: schema, violates: "required:timestamp"}
+  - {payload: conformance/negative/routing_decision/empty_choice_cards.json, schema: routing_decision, by: schema, violates: "minItems:choice_cards"}
+  - {payload: conformance/negative/routing_decision/empty_id.json, schema: routing_decision, by: schema, violates: "minLength:id"}
+  # CapabilityToken
+  - {payload: conformance/negative/capability_token/empty_scope.json, schema: capability_token, by: schema, violates: "minItems:scope"}
+  - {payload: conformance/negative/capability_token/no_expiry_no_single_use.json, schema: capability_token, by: schema, violates: "anyOf:expiry-or-single-use"}
+  - {payload: conformance/negative/capability_token/missing_principal.json, schema: capability_token, by: schema, violates: "required:principal"}
+  # PolicyDecision
+  - {payload: conformance/negative/policy_decision/bad_decision_enum.json, schema: policy_decision, by: schema, violates: "enum:decision"}
+  - {payload: conformance/negative/policy_decision/missing_decision_id.json, schema: policy_decision, by: schema, violates: "required:decision_id"}
+  - {payload: conformance/negative/policy_decision/empty_capability_id.json, schema: policy_decision, by: schema, violates: "minLength:capability_id"}
+  # TraceEvent
+  - {payload: conformance/negative/trace_event/bad_event_type.json, schema: trace_event, by: schema, violates: "enum:event_type"}
+  - {payload: conformance/negative/trace_event/missing_timestamp.json, schema: trace_event, by: schema, violates: "required:timestamp"}
+  - {payload: conformance/negative/trace_event/empty_event_id.json, schema: trace_event, by: schema, violates: "minLength:event_id"}
+  # TraceBundle — schema-valid but invariant-violating (exercises #74 checks)
+  - {payload: conformance/negative/trace_bundle/i01_frame_carries_raw_output.json, schema: trace_bundle, by: invariant, violates: I-01}
+  - {payload: conformance/negative/trace_bundle/i02_policy_decision_without_trace_event.json, schema: trace_bundle, by: invariant, violates: I-02}
