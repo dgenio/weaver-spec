@@ -69,6 +69,31 @@ def test_negative_is_rejected(entry):
         assert check(payload), f"{entry['payload']} should violate {entry['violates']}"
 
 
+@pytest.mark.parametrize(
+    "entry",
+    [e for e in CORPUS["negative"] if e["by"] == "schema"],
+    ids=lambda e: e["payload"],
+)
+def test_negative_schema_fails_by_declared_reason(entry):
+    # The fixture must fail for the *reason* named in `violates`, not just fail
+    # somehow — this guards against fixtures rotting into the wrong failure.
+    details = conf.schema_error_details(_load(entry["payload"]), SCHEMAS[entry["schema"]], REGISTRY)
+    assert conf.negative_schema_reason_met(entry["violates"], details), (
+        f"{entry['payload']} expected to fail by {entry['violates']!r}, "
+        f"observed {sorted({kw for kw, _, _ in details})}"
+    )
+
+
+def test_negative_reason_mismatch_is_detected():
+    # A fixture that fails by a different keyword than declared must NOT be
+    # accepted as matching.
+    details = conf.schema_error_details(
+        _load("conformance/negative/frame/missing_summary.json"), SCHEMAS["frame"], REGISTRY
+    )
+    assert conf.negative_schema_reason_met("required:summary", details)
+    assert not conf.negative_schema_reason_met("minLength:frame_id", details)
+
+
 # ---------------------------------------------------------------------------
 # Invariant checks (unit level)
 # ---------------------------------------------------------------------------

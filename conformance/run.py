@@ -39,7 +39,7 @@ import base64
 import json
 import sys
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 import jcs
 import yaml
@@ -93,6 +93,46 @@ def schema_errors(payload: dict, schema: dict, registry: Registry) -> list[str]:
         loc = "/".join(str(p) for p in err.absolute_path) or "<root>"
         out.append(f"{loc}: {err.message}")
     return out
+
+
+def schema_error_details(
+    payload: dict, schema: dict, registry: Registry
+) -> list[tuple[str, str, str]]:
+    """Return (keyword, location, message) per validation error (empty == valid).
+
+    Unlike :func:`schema_errors`, this preserves the failing JSON Schema keyword
+    (``required``, ``minLength``, ``enum``, …) so a negative fixture can be
+    checked against the *reason* it is supposed to fail, not merely that it
+    fails somehow.
+    """
+    validator = Draft202012Validator(
+        schema, registry=registry, format_checker=Draft202012Validator.FORMAT_CHECKER
+    )
+    details = []
+    for err in validator.iter_errors(payload):
+        loc = "/".join(str(p) for p in err.absolute_path) or "<root>"
+        details.append((str(err.validator), loc, err.message))
+    return details
+
+
+def negative_schema_reason_met(violates: str, details: list[tuple[str, str, str]]) -> bool:
+    """True if some validation error matches the declared ``violates`` reason.
+
+    ``violates`` is ``"<keyword>:<target>"`` (e.g. ``"required:summary"``,
+    ``"minLength:frame_id"``). The keyword must match a failing keyword; the
+    target must appear in that error's location or message — except for keywords
+    like ``anyOf`` whose target is a human label rather than a field path.
+    """
+    keyword, _, target = violates.partition(":")
+    label_only = {"anyOf", "oneOf", "allOf", "not"}
+    for kw, loc, msg in details:
+        if kw != keyword:
+            continue
+        if not target or keyword in label_only:
+            return True
+        if target in loc or target in msg:
+            return True
+    return False
 
 
 # ---------------------------------------------------------------------------
@@ -220,7 +260,14 @@ def check_trace_bundle(
         return errors, notes
 
     # Validate the detached-signature envelope against its Extended schema.
-    sig_errs = schema_errors(signature, schemas_by_stem["capability_token_signature"], registry)
+    sig_schema = schemas_by_stem.get("capability_token_signature")
+    if sig_schema is None:
+        errors.append(
+            "Extended schema 'capability_token_signature' not found; "
+            "cannot validate the signature envelope"
+        )
+        return errors, notes
+    sig_errs = schema_errors(signature, sig_schema, registry)
     if sig_errs:
         errors.extend(f"signature envelope invalid: {e}" for e in sig_errs)
     if signature.get("alg") not in SIGNATURE_ALG_REGISTRY:
@@ -280,9 +327,16 @@ def run(keyring_path: Optional[Path]) -> int:
         payload = load(entry["payload"])
         schema = schemas_by_stem[entry["schema"]]
         if entry["by"] == "schema":
-            if not schema_errors(payload, schema, registry):
+            details = schema_error_details(payload, schema, registry)
+            if not details:
                 failures.append(
                     f"NEGATIVE {entry['payload']} should fail schema ({entry['violates']}) but validated"
+                )
+            elif not negative_schema_reason_met(entry["violates"], details):
+                observed = sorted({kw for kw, _, _ in details})
+                failures.append(
+                    f"NEGATIVE {entry['payload']} should fail by {entry['violates']!r} "
+                    f"but failed by {observed} instead"
                 )
         elif entry["by"] == "invariant":
             # Must be schema-valid first, then rejected by the named invariant.
