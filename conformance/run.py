@@ -37,7 +37,9 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -302,7 +304,13 @@ def check_trace_bundle(
 # Runner
 # ---------------------------------------------------------------------------
 
-def run(keyring_path: Optional[Path]) -> int:
+def run(keyring_path: Optional[Path]) -> tuple[int, list[str]]:
+    """Run the full corpus + invariants + bundle checks.
+
+    Returns ``(checks_run, failures)``. Reporting and exit-code handling are the
+    caller's responsibility (see :func:`main`), so the result can also be
+    serialized via ``--emit-result`` / ``--emit-badge``.
+    """
     schemas_by_stem, registry = load_schemas()
     corpus = yaml.safe_load((CONF_DIR / "corpus.yaml").read_text(encoding="utf-8"))
     invariants_doc = yaml.safe_load((CONF_DIR / "invariants.yaml").read_text(encoding="utf-8"))
@@ -387,15 +395,114 @@ def run(keyring_path: Optional[Path]) -> int:
         if errs:
             failures.append(f"TRACEBUNDLE {bundle.get('bundle_id')!r}: {errs}")
 
-    # Report.
-    print(f"\nConformance: ran {checks} checks.")
-    if failures:
-        print(f"FAILED ({len(failures)}):", file=sys.stderr)
-        for f in failures:
-            print(f"  - {f}", file=sys.stderr)
-        return 1
-    print("All conformance checks passed.")
-    return 0
+    return checks, failures
+
+
+# ---------------------------------------------------------------------------
+# External-bundle mode (#51 scoreboard reuses this)
+# ---------------------------------------------------------------------------
+
+def verify_external_bundle(
+    bundle: dict,
+    schemas_by_stem: dict[str, dict],
+    registry: Registry,
+    keyring: dict[str, dict],
+) -> tuple[int, list[str], list[str]]:
+    """Conformance-check a single externally supplied TraceBundle.
+
+    Validates it against the ``trace_bundle`` schema, runs the TraceBundle
+    integrity + signature checks (#74), and asserts I-01/I-02. Returns
+    ``(checks_run, failures, notes)``. This is what the scoreboard (#51) runs
+    against each sibling's published bundle.
+    """
+    checks = 0
+    failures: list[str] = []
+    notes: list[str] = []
+
+    schema = schemas_by_stem.get("trace_bundle")
+    if schema is None:  # pragma: no cover - extended schema is always present
+        return 0, ["Extended schema 'trace_bundle' not found"], notes
+
+    checks += 1
+    errs = schema_errors(bundle, schema, registry)
+    if errs:
+        failures.extend(f"schema: {e}" for e in errs)
+        # A schema-invalid bundle can't be meaningfully invariant-checked.
+        return checks, failures, notes
+
+    checks += 1
+    integrity_errs, integrity_notes = check_trace_bundle(bundle, schemas_by_stem, registry, keyring)
+    failures.extend(integrity_errs)
+    notes.extend(integrity_notes)
+
+    for name, check in BUNDLE_INVARIANTS.items():
+        checks += 1
+        for v in check(bundle):
+            failures.append(f"{name}: {v}")
+
+    return checks, failures, notes
+
+
+# ---------------------------------------------------------------------------
+# Machine-readable result + badge (#77 / #51)
+# ---------------------------------------------------------------------------
+
+def _now_z() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def contract_version() -> str:
+    """Read CONTRACT_VERSION without importing the package (the conformance
+    workflow installs only the runner's deps, not ``weaver_contracts``)."""
+    version_py = REPO_ROOT / "contracts" / "python" / "src" / "weaver_contracts" / "version.py"
+    try:
+        text = version_py.read_text(encoding="utf-8")
+    except OSError:
+        return "unknown"
+    match = re.search(r'CONTRACT_VERSION\s*=\s*"([^"]+)"', text)
+    return match.group(1) if match else "unknown"
+
+
+def build_result(
+    status: str,
+    checks: int,
+    failures: list[str],
+    *,
+    mode: str = "corpus",
+    target: Optional[str] = None,
+) -> dict:
+    """Build the machine-readable conformance result consumed by the badge (#77)
+    and the scoreboard (#51). This is CI tooling output, not a Weaver contract."""
+    return {
+        "result_version": "1",
+        "contract_version": contract_version(),
+        "mode": mode,
+        "target": target,
+        "status": status,
+        "checks_run": checks,
+        "failures": len(failures),
+        "failure_detail": failures,
+        "generated_at": _now_z(),
+        "runner": "weaver-spec conformance/run.py",
+    }
+
+
+def build_shields_endpoint(result: dict) -> dict:
+    """Render a shields.io endpoint badge (https://shields.io/endpoint) from a
+    conformance result so the badge and the scoreboard can never disagree."""
+    passed = result["status"] == "pass"
+    return {
+        "schemaVersion": 1,
+        "label": "weaver-compatible",
+        "message": f"v{result['contract_version']}" if passed else "failing",
+        "color": "brightgreen" if passed else "red",
+        "isError": not passed,
+    }
+
+
+def _write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def _assertion_for(invariants_doc: dict, invariant_id: str) -> str:
@@ -403,6 +510,17 @@ def _assertion_for(invariants_doc: dict, invariant_id: str) -> str:
         if inv["id"] == invariant_id:
             return str(inv["assertion"])
     raise KeyError(f"no invariant block for {invariant_id!r}")
+
+
+def _report(checks: int, failures: list[str], header: str) -> int:
+    print(f"\n{header}: ran {checks} checks.")
+    if failures:
+        print(f"FAILED ({len(failures)}):", file=sys.stderr)
+        for f in failures:
+            print(f"  - {f}", file=sys.stderr)
+        return 1
+    print("All conformance checks passed.")
+    return 0
 
 
 def main(argv: Optional[list[str]] = None) -> int:
@@ -413,8 +531,56 @@ def main(argv: Optional[list[str]] = None) -> int:
         default=DEFAULT_KEYRING,
         help="JSON keyring (kid -> public key) for signature verification.",
     )
+    parser.add_argument(
+        "--bundle",
+        type=Path,
+        default=None,
+        help="Conformance-check a single external TraceBundle JSON file instead "
+        "of the built-in corpus (used by the scoreboard, #51).",
+    )
+    parser.add_argument(
+        "--emit-result",
+        type=Path,
+        default=None,
+        help="Write the machine-readable conformance result JSON to this path (#77).",
+    )
+    parser.add_argument(
+        "--emit-badge",
+        type=Path,
+        default=None,
+        help="Write a shields.io endpoint badge JSON to this path (#77).",
+    )
     args = parser.parse_args(argv)
-    return run(args.keyring)
+
+    keyring = load_keyring(args.keyring)
+
+    if args.bundle is not None:
+        schemas_by_stem, registry = load_schemas()
+        bundle = json.loads(args.bundle.read_text(encoding="utf-8"))
+        checks, failures, notes = verify_external_bundle(
+            bundle, schemas_by_stem, registry, keyring
+        )
+        for note in notes:
+            print(f"  bundle: {note}")
+        exit_code = _report(checks, failures, f"Bundle conformance ({args.bundle})")
+        mode, target = "bundle", str(args.bundle)
+    else:
+        checks, failures = run(args.keyring)
+        exit_code = _report(checks, failures, "Conformance")
+        mode, target = "corpus", None
+
+    if args.emit_result is not None or args.emit_badge is not None:
+        result = build_result(
+            "pass" if not failures else "fail", checks, failures, mode=mode, target=target
+        )
+        if args.emit_result is not None:
+            _write_json(args.emit_result, result)
+            print(f"Wrote conformance result to {args.emit_result}")
+        if args.emit_badge is not None:
+            _write_json(args.emit_badge, build_shields_endpoint(result))
+            print(f"Wrote badge endpoint to {args.emit_badge}")
+
+    return exit_code
 
 
 if __name__ == "__main__":

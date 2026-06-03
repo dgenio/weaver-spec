@@ -1,0 +1,22 @@
+# Scoreboard registry (issue #51).
+#
+# Each entry names a sibling repository and the URL at which it publishes a
+# signed TraceBundle (the Extended audit-chain envelope, see docs/TRACE_BUNDLE.md)
+# for the public conformance scoreboard. Participation is OPT-IN: a repo appears
+# on the scoreboard only once it is listed here AND serves a bundle at its URL.
+#
+# The scoreboard fetches each URL on a schedule and runs the conformance pack
+# (conformance/run.py --bundle) against the fetched bundle. A repo whose URL is
+# unreachable, missing, or non-JSON is reported as `not-submitted-this-week`,
+# never as a failure — the scoreboard is a report, not a CI gate.
+#
+# See docs/SCOREBOARD.md for the participation guide and the well-known URL
+# convention.
+
+siblings:
+  - repo: contextweaver
+    url: https://contextweaver.dev/.well-known/conformance.json
+  - repo: agent-kernel
+    url: https://agent-kernel.dev/.well-known/conformance.json
+  - repo: ChainWeaver
+    url: https://chainweaver.dev/.well-known/conformance.json
