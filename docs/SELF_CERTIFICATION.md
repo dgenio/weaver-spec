@@ -31,13 +31,19 @@ conformance result, so it cannot disagree with what the suite actually checks.
      "result_version": "1",
      "contract_version": "0.6.0",
      "mode": "corpus",
+     "target": null,
      "status": "pass",
      "checks_run": 40,
      "failures": 0,
+     "failure_detail": [],
      "generated_at": "2026-06-03T12:00:00Z",
      "runner": "weaver-spec conformance/run.py"
    }
    ```
+
+   `failures` is the failure *count*; `failure_detail` is the list of failure
+   messages (empty when `status` is `pass`). `target` is `null` in `corpus` mode
+   and the bundle URL/path in `bundle` mode.
 
 3. **Display the badge.** Host the emitted endpoint JSON and reference it via the
    [shields.io endpoint](https://shields.io/badges/endpoint-badge):

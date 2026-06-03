@@ -51,6 +51,11 @@ SELF_REPO = "weaver-spec"
 
 STATUS_ICON = {"pass": "✅ pass", "fail": "❌ fail", "not-submitted": "⚪ not-submitted"}
 
+# Cap on a fetched sibling bundle. The scoreboard fetches whatever a registered
+# sibling publishes, on a schedule in CI; an oversized response must not be able
+# to exhaust memory before we even attempt to parse it.
+MAX_BUNDLE_BYTES = 5 * 1024 * 1024  # 5 MiB
+
 
 @dataclass
 class Row:
@@ -63,12 +68,23 @@ class Row:
 
 def fetch_json(url: str, timeout: float) -> tuple[Optional[dict], str]:
     """Fetch and parse JSON from ``url``. Returns ``(payload, note)``; payload is
-    ``None`` when the URL is unreachable / missing / non-JSON (note explains)."""
+    ``None`` when the URL is refused / unreachable / oversized / non-JSON (note
+    explains).
+
+    Only ``https://`` URLs are dereferenced — a registry entry pointing at
+    ``http://`` or any other scheme is refused rather than fetched, so a bad
+    entry can't make the scheduled CI job reach an internal/plaintext endpoint.
+    At most ``MAX_BUNDLE_BYTES`` are read before parsing, so a hostile or
+    accidental giant response can't exhaust memory."""
+    if not url.lower().startswith("https://"):
+        return None, "refused: non-https URL"
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310 (https URLs only)
-            raw = resp.read()
+        with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310 (https enforced above)
+            raw = resp.read(MAX_BUNDLE_BYTES + 1)
     except (urllib.error.URLError, TimeoutError, ValueError) as exc:
         return None, f"unreachable: {exc}"
+    if len(raw) > MAX_BUNDLE_BYTES:
+        return None, f"refused: response exceeds {MAX_BUNDLE_BYTES} bytes"
     try:
         return json.loads(raw), "fetched"
     except json.JSONDecodeError as exc:
@@ -84,15 +100,32 @@ def self_row() -> Row:
                url="https://github.com/dgenio/weaver-spec")
 
 
+def _signature_status(notes: list[str]) -> str:
+    """Condense ``check_trace_bundle`` notes into a short signature status for the
+    scoreboard, so a passing row never implies provenance was verified when the
+    crypto check was actually skipped (unknown ``kid``) or the bundle is unsigned."""
+    for note in notes:
+        if "cryptographically verified" in note:
+            return "signature verified"
+        if "unsigned bundle" in note:
+            return "unsigned"
+        if "crypto verify skipped" in note:
+            return "signature unverified (signing key not in scoreboard keyring)"
+    return "signature unchecked"
+
+
 def sibling_row(entry: dict, schemas, registry, keyring, timeout: float) -> Row:
     repo = entry["repo"]
     url = entry["url"]
     payload, note = fetch_json(url, timeout)
     if payload is None:
         return Row(repo=repo, status="not-submitted", checks=0, detail=note, url=url)
-    checks, failures, _notes = run.verify_external_bundle(payload, schemas, registry, keyring)
+    checks, failures, notes = run.verify_external_bundle(payload, schemas, registry, keyring)
     status = "pass" if not failures else "fail"
-    detail = "bundle verified" if not failures else f"{len(failures)} failure(s): {failures[0]}"
+    if failures:
+        detail = f"{len(failures)} failure(s): {failures[0]}"
+    else:
+        detail = f"bundle verified; {_signature_status(notes)}"
     return Row(repo=repo, status=status, checks=checks, detail=detail, url=url)
 
 

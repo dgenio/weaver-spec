@@ -34,7 +34,13 @@ whether its published artifacts pass the conformance suite. Participation is
 1. **Publish a bundle.** Serve a conformant `TraceBundle` at a stable URL. The
    convention is `.well-known/conformance.json` on your project domain, e.g.
    `https://your-project.dev/.well-known/conformance.json`. Sign it (see
-   [SIGNING.md](SIGNING.md)) so verifiers can confirm provenance.
+   [SIGNING.md](SIGNING.md)) so verifiers who hold your signing key can confirm
+   provenance. Note: the public scoreboard always validates the signature
+   *envelope*, but only cryptographically verifies it when your signing key
+   (`kid`) is in its keyring. The default scheduled run carries only this repo's
+   test keyring, so a sibling's row currently attests schema + invariant
+   conformance — the row detail states whether the signature was actually
+   verified, left unverified, or the bundle was unsigned.
 2. **Register.** Add an entry to
    [`conformance/siblings.yaml`](../conformance/siblings.yaml):
 
