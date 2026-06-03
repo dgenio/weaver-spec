@@ -49,7 +49,6 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
 )
-from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
@@ -460,11 +459,13 @@ def main() -> int:
         ("trace_event", trace_event_wire(bundle.trace_events[0])),
         ("trace_bundle", signed_wire),
     ]
+    schema_failures = 0
     for stem, payload in to_validate:
         errs = schema_errors(payload, schemas.by_stem[stem], schemas.registry)
         if errs:
+            schema_failures += len(errs)
             failures.extend(f"{stem}: {e}" for e in errs)
-    if not any(f for stem, _ in to_validate for f in failures if f.startswith(stem)):
+    if schema_failures == 0:
         print(f"[4] Validated {len(to_validate)} payloads against contracts/json/ schemas.")
 
     # 6. Assert the cross-field invariants.

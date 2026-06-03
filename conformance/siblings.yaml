@@ -7,7 +7,7 @@
 #
 # The scoreboard fetches each URL on a schedule and runs the conformance pack
 # (conformance/run.py --bundle) against the fetched bundle. A repo whose URL is
-# unreachable, missing, or non-JSON is reported as `not-submitted-this-week`,
+# unreachable, missing, or non-JSON is reported as `not-submitted`,
 # never as a failure — the scoreboard is a report, not a CI gate.
 #
 # See docs/SCOREBOARD.md for the participation guide and the well-known URL

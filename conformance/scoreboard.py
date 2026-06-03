@@ -57,6 +57,20 @@ STATUS_ICON = {"pass": "✅ pass", "fail": "❌ fail", "not-submitted": "⚪ not
 MAX_BUNDLE_BYTES = 5 * 1024 * 1024  # 5 MiB
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Refuse to follow redirects. Enforcing ``https://`` on the registry URL is
+    not enough on its own: ``urllib`` would otherwise follow a 30x to ``http://``
+    or an internal host, re-opening the SSRF/plaintext hole. With this handler a
+    redirect surfaces as an error (caught below) and the sibling is recorded as
+    not-submitted rather than dereferenced."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D401
+        return None
+
+
+_OPENER = urllib.request.build_opener(_NoRedirectHandler)
+
+
 @dataclass
 class Row:
     repo: str
@@ -79,7 +93,10 @@ def fetch_json(url: str, timeout: float) -> tuple[Optional[dict], str]:
     if not url.lower().startswith("https://"):
         return None, "refused: non-https URL"
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310 (https enforced above)
+        # _OPENER refuses redirects (SSRF guard); https is enforced just above.
+        with _OPENER.open(url, timeout=timeout) as resp:  # noqa: S310
+            if getattr(resp, "status", 200) >= 300:
+                return None, f"refused: redirect not followed (status {resp.status})"
             raw = resp.read(MAX_BUNDLE_BYTES + 1)
     except (urllib.error.URLError, TimeoutError, ValueError) as exc:
         return None, f"unreachable: {exc}"
