@@ -43,6 +43,45 @@ This boundary exists for three reasons:
 
 ---
 
+## The Two "Firewalls": the Canonical `Frame` Seam
+
+### Decision
+
+> The unqualified term **"firewall"** refers to the **agent-kernel output
+> firewall** — the choke point that turns raw tool output into a `Frame` (+
+> `Handle`). contextweaver's stage that decides what enters the prompt is
+> **context budgeting / selection over already-safe `Frame`s**, not a second
+> output firewall.
+>
+> The boundary between them is the **`Frame` seam**: agent-kernel *produces* a
+> `Frame` at the firewall; contextweaver *consumes* `Frame`s. contextweaver must
+> not re-derive output-firewalling from raw output on the canonical path.
+
+### Rationale
+
+The stack has historically called two different things a "context firewall": the
+agent-kernel output firewall (above) and contextweaver's budgeted
+selection/packing stage. Conflating them invites an implementer to rebuild
+output-firewalling inside contextweaver from raw output, which would collapse the
+safety boundary this document exists to protect. Naming one canonical seam — and
+reserving "firewall" for the kernel side — keeps the choke point single and
+auditable. This is a clarification of the ownership table above, not a change to
+it. See [ADR 002](adr/002-context-firewall-frame-seam.md) and the cross-repo
+[golden path](GOLDEN_PATH.md); the implementation-side counterpart is
+contextweaver#352.
+
+### What is statically checkable
+
+The *artifact* half of the seam — a `Frame` that crosses it carries no raw output
+— is the same property as invariant
+[I-01](INVARIANTS.md#i-01-llm-never-sees-raw-tool-output-by-default) and is
+asserted by the conformance runner's `frames_have_no_raw_output` check. The
+*behavioral* half — an ingestion interface that refuses raw output — cannot be
+asserted against a static artifact and is checked by sibling-repo harnesses (see
+[`conformance/invariants.yaml`](../conformance/invariants.yaml)).
+
+---
+
 ## Secondary Boundary: Routing Does Not Execute
 
 **contextweaver must not execute tools.** Its output is always a `RoutingDecision` containing `ChoiceCard` objects. The actual capability invocation is always mediated by agent-kernel (or a compatible execution layer).

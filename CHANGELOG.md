@@ -10,6 +10,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **Closed-loop interchange, firewall seam, and cross-repo golden path (#82, #83,
+  #84).** Documentation + examples + conformance fixtures that finalize the
+  cross-repo story. No contract shape changed, so no version bump (consistent
+  with this release window's additive-docs/tooling practice).
+  - **Canonical finding/failure interchange (#83):** `FailureCaseArtifact` (+ the
+    `TraceBundle` it references) is documented in `docs/ARTIFACT_CONTRACTS.md` as
+    the one shape every producer maps into. Added one sample payload per producer
+    — agent-kernel `ActionTrace`, ChainWeaver flow-failure, vibeguard finding,
+    AgentFence audit decision — each a positive conformance fixture and
+    round-tripped in `test_extended.py`. Producer-specific detail rides on
+    namespaced `x_*` `metadata` keys, so no schema change was needed.
+  - **Context-firewall / `Frame` seam (#84), ADR 002:** new boundary section in
+    `docs/BOUNDARIES.md` naming the canonical `Frame` seam and resolving the "two
+    firewalls" overlap; I-05 clarified (canonical Frame path is the default,
+    raw-output ingestion is non-canonical) without weakening any constraint. A
+    seam negative fixture (`conformance/negative/trace_bundle/i05_seam_*`) asserts
+    the statically-checkable half via the existing I-01 check; the behavioral half
+    stays a sibling-harness check.
+  - **Cross-repo golden path (#82):** new `docs/GOLDEN_PATH.md` documents the
+    canonical end-to-end sequence, per-step contract dependencies, and a
+    counterpart-status checklist; linked from `ECOSYSTEM.md` and
+    `SEQUENCE_DIAGRAMS.md`.
 - **Conformance, productized — reference implementation, self-cert badge, and
   public scoreboard (#76, #77, #51).** Three adoption-facing pieces built on the
   now-merged conformance runner (#43/#74). No contract changed, so no version
