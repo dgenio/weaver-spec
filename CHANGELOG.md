@@ -10,6 +10,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **Conformance, productized — reference implementation, self-cert badge, and
+  public scoreboard (#76, #77, #51).** Three adoption-facing pieces built on the
+  now-merged conformance runner (#43/#74). No contract changed, so no version
+  bump (consistent with the conformance-suite release window); all of it is
+  build-time/CI tooling + docs + an example, never imported by
+  `weaver_contracts` and never published.
+  - **Runnable reference implementation (#76):**
+    `examples/reference_impl/reference_impl.py` constructs every Core artifact
+    with `weaver_contracts`, gathers them into a `TraceBundle`, mints a **real**
+    ed25519 signature over the RFC 8785 (JCS) canonical form using an *ephemeral*
+    keypair, verifies it, validates all six payloads against `contracts/json/`,
+    and asserts I-01/I-02 — failing CI if any Core schema drifts. Wired into
+    `ci.yml` as the `reference-impl` job, with a "Become Weaver-compatible in 30
+    minutes" guide. Placed under `examples/` (example tier) per the repo scope
+    rule; it reuses the conformance dev deps and is never published.
+  - **`--bundle` / `--emit-result` / `--emit-badge` on `conformance/run.py`:**
+    the runner can now conformance-check a single external `TraceBundle` and emit
+    a machine-readable result + a shields.io endpoint badge from the same run, so
+    a badge can never disagree with the verdict that produced it.
+  - **Self-certification badge (#77):** `docs/SELF_CERTIFICATION.md` plus this
+    repo's own badge at `docs/badges/weaver-spec.json`, regenerated and
+    staleness-checked by CI.
+  - **Public scoreboard (#51):** `conformance/scoreboard.py` +
+    `conformance/siblings.yaml` registry + `.github/workflows/scoreboard.yml`
+    (scheduled). It fetches each registered sibling's published `TraceBundle`,
+    runs the conformance pack against it, and renders `docs/scoreboard.md` +
+    per-repo badge endpoints. Siblings with no reachable bundle are reported as
+    `not-submitted` (never a failure), so the workflow stays green before any
+    sibling publishes; participation is opt-in (`docs/SCOREBOARD.md`). Wiring the
+    rendered page to GitHub Pages is left as an opt-in repo-admin step.
 - **Conformance suite (`conformance/`).** A build-time / CI runner that defines
   what "spec-compliant" means as a runnable check, resolving #43 and #74. No
   contract changed, so no version bump (consistent with this release window's

@@ -37,7 +37,69 @@ def _load(rel: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def test_full_suite_passes():
-    assert conf.run(conf.DEFAULT_KEYRING) == 0
+    checks, failures = conf.run(conf.DEFAULT_KEYRING)
+    assert failures == []
+    assert checks > 0
+
+
+def test_main_corpus_exit_zero():
+    assert conf.main([]) == 0
+
+
+# ---------------------------------------------------------------------------
+# External-bundle mode + machine-readable result + badge (#51 / #77)
+# ---------------------------------------------------------------------------
+
+def test_verify_external_bundle_passes_signed_fixture():
+    bundle = _load("conformance/fixtures/trace_bundle_signed_valid.json")
+    keyring = conf.load_keyring(conf.DEFAULT_KEYRING)
+    checks, failures, _notes = conf.verify_external_bundle(bundle, SCHEMAS, REGISTRY, keyring)
+    assert checks > 0
+    assert failures == []
+
+
+def test_verify_external_bundle_flags_i01_violation():
+    bundle = _load("conformance/negative/trace_bundle/i01_frame_carries_raw_output.json")
+    checks, failures, _notes = conf.verify_external_bundle(bundle, SCHEMAS, REGISTRY, {})
+    assert any("frames_have_no_raw_output" in f for f in failures)
+
+
+def test_verify_external_bundle_rejects_schema_invalid_bundle():
+    # Missing the required trace_events array: rejected at the schema gate.
+    bundle = {"bundle_id": "b", "routing_decision": {}, "policy_decisions": [],
+              "frames": [], "handles": []}
+    _checks, failures, _notes = conf.verify_external_bundle(bundle, SCHEMAS, REGISTRY, {})
+    assert any(f.startswith("schema:") for f in failures)
+
+
+def test_build_result_and_shields_endpoint_pass():
+    result = conf.build_result("pass", 40, [])
+    assert result["status"] == "pass"
+    assert result["failures"] == 0
+    endpoint = conf.build_shields_endpoint(result)
+    assert endpoint["color"] == "brightgreen"
+    assert endpoint["message"].startswith("v")
+    assert endpoint["isError"] is False
+
+
+def test_build_shields_endpoint_fail():
+    endpoint = conf.build_shields_endpoint(conf.build_result("fail", 40, ["boom"]))
+    assert endpoint["color"] == "red"
+    assert endpoint["message"] == "failing"
+    assert endpoint["isError"] is True
+
+
+def test_main_emits_result_and_badge(tmp_path):
+    result_path = tmp_path / "result.json"
+    badge_path = tmp_path / "badge.json"
+    code = conf.main(["--emit-result", str(result_path), "--emit-badge", str(badge_path)])
+    assert code == 0
+    result = json.loads(result_path.read_text())
+    assert result["status"] == "pass"
+    assert result["mode"] == "corpus"
+    badge = json.loads(badge_path.read_text())
+    assert badge["label"] == "weaver-compatible"
+    assert badge["color"] == "brightgreen"
 
 
 # ---------------------------------------------------------------------------

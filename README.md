@@ -2,6 +2,8 @@
 
 **Canonical specs and shared contracts for the Weaver Stack.**
 
+[![Weaver-compatible](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dgenio/weaver-spec/main/docs/badges/weaver-spec.json)](docs/SELF_CERTIFICATION.md)
+
 This repository is the single source of truth for the vocabulary, invariants, responsibility boundaries, versioning rules, and language-agnostic contract schemas that keep the Weaver ecosystem composable and compatible.
 
 ---
@@ -71,6 +73,10 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 | Python package | [contracts/python/](contracts/python/) |
 | End-to-end examples | [examples/](examples/) |
 | Minimal interoperability examples | [examples/interoperability/](examples/interoperability/) |
+| Runnable reference implementation | [examples/reference_impl/](examples/reference_impl/) |
+| Conformance suite | [docs/CONFORMANCE.md](docs/CONFORMANCE.md) |
+| "Weaver-compatible" badge | [docs/SELF_CERTIFICATION.md](docs/SELF_CERTIFICATION.md) |
+| Public conformance scoreboard | [docs/SCOREBOARD.md](docs/SCOREBOARD.md) |
 
 ---
 

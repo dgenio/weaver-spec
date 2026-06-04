@@ -82,9 +82,40 @@ This runs the spec repo's own corpus against the published schemas. To assert
 conformance of *your* emitted artifacts, point the runner at your payloads via a
 local `corpus.yaml` (same shape) and your own keyring.
 
+## Checking a single external bundle
+
+To conformance-check one externally produced `TraceBundle` (schema validation +
+TraceBundle integrity/signature + I-01/I-02) instead of the built-in corpus:
+
+```bash
+python conformance/run.py --bundle path/to/bundle.json
+```
+
+This is the engine the [scoreboard](SCOREBOARD.md) runs against each sibling's
+published bundle.
+
+## Machine-readable result and badge
+
+The runner can emit a machine-readable conformance result and a shields.io
+endpoint badge from the same run, so a published badge cannot disagree with the
+verdict that produced it:
+
+```bash
+python conformance/run.py \
+  --emit-result conformance-result.json \
+  --emit-badge weaver-compatible.json
+```
+
+The result is CI tooling output, not a Weaver contract. See
+[SELF_CERTIFICATION.md](SELF_CERTIFICATION.md) for the badge flow and
+[SCOREBOARD.md](SCOREBOARD.md) for the public per-repo scoreboard.
+
 ## Related
 
 - [INVARIANTS.md](INVARIANTS.md) — the normative I-01..I-07 definitions.
 - [SIGNING.md](SIGNING.md) — canonicalization + signature algorithm registry.
 - [TRACE_BUNDLE.md](TRACE_BUNDLE.md) — the audit-chain envelope.
+- [SELF_CERTIFICATION.md](SELF_CERTIFICATION.md) — the "Weaver-compatible" badge.
+- [SCOREBOARD.md](SCOREBOARD.md) — the public conformance scoreboard.
+- [examples/reference_impl/](../examples/reference_impl/) — runnable reference.
 - [AGENTS.md](../AGENTS.md) — repo scope rule covering `conformance/`.

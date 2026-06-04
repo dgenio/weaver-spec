@@ -1,0 +1,45 @@
+name: Scoreboard
+
+# Public conformance scoreboard (issue #51). Runs on a weekly schedule and on
+# demand. For each sibling registered in conformance/siblings.yaml it fetches
+# the published TraceBundle and runs the conformance pack against it; siblings
+# with no reachable bundle are reported as not-submitted (never a failure), so
+# this workflow stays green. Renders docs/scoreboard.md + docs/badges/*.json and
+# publishes them as a build artifact + job summary. See docs/SCOREBOARD.md.
+
+on:
+  schedule:
+    # Weekly, Mondays 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  scoreboard:
+    name: Build Conformance Scoreboard
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install conformance dependencies
+        run: pip install jsonschema==4.26.0 referencing==0.37.0 PyYAML==6.0.1 jcs==0.2.1 cryptography==48.0.0
+
+      - name: Build scoreboard
+        run: python conformance/scoreboard.py --timeout 10
+
+      - name: Write job summary
+        run: cat docs/scoreboard.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload scoreboard artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-scoreboard
+          path: |
+            docs/scoreboard.md
+            docs/badges/

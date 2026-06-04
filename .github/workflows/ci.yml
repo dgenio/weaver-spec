@@ -287,3 +287,32 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/conformance.yml
+
+  reference-impl:
+    name: Reference Implementation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package with dev dependencies
+        working-directory: contracts/python
+        run: pip install -e ".[dev]"
+
+      - name: "Run the reference implementation (issue #76)"
+        run: python examples/reference_impl/reference_impl.py
+
+      - name: "Regenerate scoreboard badge from a real conformance result (#77)"
+        run: |
+          python conformance/run.py \
+            --emit-result /tmp/conformance-result.json \
+            --emit-badge docs/badges/weaver-spec.json
+
+      - name: Fail if the committed self-cert badge is stale
+        run: git diff --exit-code docs/badges/weaver-spec.json
