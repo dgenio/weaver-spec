@@ -277,6 +277,42 @@ tooling (consumers).
 
 ---
 
+## The canonical finding/failure interchange (the closed loop)
+
+The closed learning loop only works if every producer of "a thing went wrong / a
+finding occurred" emits **one** canonical shape that lessonweaver consumes.
+`FailureCaseArtifact` is that interchange; the [`TraceBundle`](TRACE_BUNDLE.md) it
+references is the inlined evidence. Each producer maps its native output into a
+`FailureCaseArtifact` using the existing fields — `source_project` names the
+producer, `trace_ref` / `evidence_refs` point at the producer's native record,
+and namespaced `x_*` keys under `metadata` preserve producer-specific detail
+without bloating the shared shape (no schema change needed). The flow is:
+
+```text
+producer native output → FailureCaseArtifact (+ referenced TraceBundle) → lessonweaver → LessonCard / SkillCard
+```
+
+| Producer | Native output | Maps into | Sample payload |
+| -------- | ------------- | --------- | -------------- |
+| agent-kernel | `ActionTrace` (execution + policy chain) | `FailureCaseArtifact` referencing a `TraceBundle` | [`failure_case_agent_kernel.json`](../examples/sample_payloads/failure_case_agent_kernel.json) |
+| ChainWeaver | flow-failure / replay record | `FailureCaseArtifact` (`trace_ref` → flow trace) | [`failure_case_artifact.json`](../examples/sample_payloads/failure_case_artifact.json) |
+| vibeguard | `ArtifactSafetyReport.finding` | `FailureCaseArtifact` (`property_name` = rule) | [`failure_case_vibeguard.json`](../examples/sample_payloads/failure_case_vibeguard.json) |
+| AgentFence | audit decision (deny/ask) | `FailureCaseArtifact` (`metadata.x_agentfence`) | [`failure_case_agentfence.json`](../examples/sample_payloads/failure_case_agentfence.json) |
+
+> [!IMPORTANT]
+> A `FailureCaseArtifact` is **reproducible evidence, not proof of a bug** (its
+> default `status` is `candidate`). Mapping a producer's output into it does not
+> assert a defect — it routes the finding into the review loop, where lessonweaver
+> decides whether reusable guidance is warranted.
+
+All four mappings are exercised as positive conformance fixtures
+([`conformance/corpus.yaml`](../conformance/corpus.yaml)) and round-tripped in
+`test_extended.py`. The end-to-end loop is tracked in
+[`docs/GOLDEN_PATH.md`](GOLDEN_PATH.md); counterpart issues: lessonweaver#91,
+vibeguard#120, agentfence#77, ChainWeaver#210.
+
+---
+
 ## Status and versioning
 
 These types are **Extended**: optional and opt-in. Per `docs/VERSIONING.md`,

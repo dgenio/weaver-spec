@@ -1,0 +1,25 @@
+{
+  "failure_case_id": "fc-af-20260604-001",
+  "created_at": "2026-06-04T11:45:00Z",
+  "source_project": "AgentFence",
+  "property_name": "external-gate-blocked-destructive-call",
+  "status": "candidate",
+  "property_description": "An AgentFence external-gate deny/ask audit event mapped into the canonical FailureCaseArtifact interchange so the learning loop can reason about blocked tool calls.",
+  "severity": "medium",
+  "trace_ref": "agentfence:audit:af-20260604-431",
+  "expected_failure_mode": "external gate returns decision=ask for a DESTRUCTIVE-class tool call lacking principal acknowledgement",
+  "evidence_refs": ["agentfence:audit:af-20260604-431"],
+  "sensitivity": "internal",
+  "provenance": {
+    "mapped_from": "AgentFence audit decision",
+    "decision": "ask"
+  },
+  "metadata": {
+    "x_agentfence": {
+      "native_type": "AuditDecision",
+      "decision": "ask",
+      "safety_class": "DESTRUCTIVE",
+      "audit_id": "af-20260604-431"
+    }
+  }
+}

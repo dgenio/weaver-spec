@@ -56,6 +56,8 @@ Each project owns a distinct, non-overlapping responsibility. Contract type name
 > [!NOTE]
 > A minimal request can stop after step 4. Steps 5 and 6 belong to adjacent tools and are not part of the runtime request path.
 
+The learning steps form a **closed loop**: agent-kernel `ActionTrace`s, ChainWeaver flow failures, vibeguard findings, and AgentFence audit decisions all map into one canonical interchange — [`FailureCaseArtifact`](ARTIFACT_CONTRACTS.md#the-canonical-findingfailure-interchange-the-closed-loop) referencing a [`TraceBundle`](TRACE_BUNDLE.md) — which lessonweaver reviews into reusable `LessonCard` / `SkillCard` artifacts that re-enter routing. The end-to-end sequence is tracked in [`docs/GOLDEN_PATH.md`](GOLDEN_PATH.md).
+
 ---
 
 ## What lives in weaver-spec vs the individual repos

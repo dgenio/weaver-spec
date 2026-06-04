@@ -1,0 +1,25 @@
+{
+  "failure_case_id": "fc-vg-20260604-001",
+  "created_at": "2026-06-04T10:30:00Z",
+  "source_project": "vibeguard",
+  "property_name": "no-hardcoded-credentials",
+  "status": "candidate",
+  "property_description": "A blocking ArtifactSafetyReport finding (hardcoded credential) mapped into the canonical FailureCaseArtifact interchange so lessonweaver can turn it into reviewed guidance.",
+  "severity": "high",
+  "trace_ref": "vibeguard:report:asg-rep-20260527-001",
+  "expected_failure_mode": "scan_changes gate returns decision=fail on src/handlers/payment.py",
+  "evidence_refs": ["vibeguard:report:asg-rep-20260527-001"],
+  "sensitivity": "confidential",
+  "provenance": {
+    "mapped_from": "vibeguard ArtifactSafetyReport.finding",
+    "gate_id": "org.vibeguard.scan_changes"
+  },
+  "metadata": {
+    "x_vibeguard": {
+      "native_type": "ArtifactSafetyReport.finding",
+      "finding_id": "f-001",
+      "mode": "blocking",
+      "report_id": "asg-rep-20260527-001"
+    }
+  }
+}

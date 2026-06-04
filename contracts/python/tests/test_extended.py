@@ -1438,3 +1438,41 @@ class TestFailureCaseArtifact:
         data = asdict(fc)
         json.dumps(data)
         assert data["evidence_refs"] == ["trace:x"]
+
+    @pytest.mark.parametrize(
+        "name,source_project",
+        [
+            ("failure_case_artifact", "ChainWeaver"),
+            ("failure_case_agent_kernel", "agent-kernel"),
+            ("failure_case_vibeguard", "vibeguard"),
+            ("failure_case_agentfence", "AgentFence"),
+        ],
+    )
+    def test_producer_mappings_roundtrip(self, name, source_project):
+        """#83: each producer's native output maps losslessly into the canonical
+        FailureCaseArtifact interchange (one sample payload per producer)."""
+        p = load_payload(name)
+        fc = FailureCaseArtifact(
+            failure_case_id=p["failure_case_id"],
+            created_at=p["created_at"],
+            source_project=p["source_project"],
+            property_name=p["property_name"],
+            status=p["status"],
+            property_description=p.get("property_description"),
+            severity=p.get("severity"),
+            seed=p.get("seed"),
+            generator_config=p.get("generator_config", {}),
+            trace_ref=p.get("trace_ref"),
+            minimized=p.get("minimized", False),
+            minimized_from_ref=p.get("minimized_from_ref"),
+            expected_failure_mode=p.get("expected_failure_mode"),
+            evidence_refs=p.get("evidence_refs", []),
+            sensitivity=p.get("sensitivity", "internal"),
+            provenance=p.get("provenance", {}),
+            metadata=p.get("metadata", {}),
+        )
+        assert fc.source_project == source_project
+        assert fc.status in ("candidate", "regression", "ignored", "fixed")
+        data = asdict(fc)
+        # Round-trips back to JSON without loss.
+        assert json.loads(json.dumps(data))["source_project"] == source_project

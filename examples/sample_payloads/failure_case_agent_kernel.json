@@ -1,0 +1,24 @@
+{
+  "failure_case_id": "fc-ak-20260604-001",
+  "created_at": "2026-06-04T09:15:00Z",
+  "source_project": "agent-kernel",
+  "property_name": "I-02-policy-decision-has-trace-event",
+  "status": "candidate",
+  "property_description": "An agent-kernel ActionTrace recorded a deny PolicyDecision whose decision_id had no matching TraceEvent. Mapped into the canonical FailureCaseArtifact interchange for the learning loop.",
+  "severity": "high",
+  "trace_ref": "agent-kernel:action_trace:at-20260604-77",
+  "expected_failure_mode": "PolicyDecision(decision=deny) present with no TraceEvent referencing its decision_id",
+  "evidence_refs": ["agent-kernel:action_trace:at-20260604-77", "tb-20260308-001"],
+  "sensitivity": "internal",
+  "provenance": {
+    "mapped_from": "agent-kernel ActionTrace",
+    "captured_by": "kernel-audit-replay"
+  },
+  "metadata": {
+    "x_agent_kernel": {
+      "native_type": "ActionTrace",
+      "action_id": "act-20260604-77",
+      "principal": "agent-session-7f3a"
+    }
+  }
+}

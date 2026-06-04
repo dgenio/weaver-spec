@@ -1,6 +1,6 @@
 # Sequence Diagrams
 
-Mermaid sequence diagrams for the three primary adoption modes. See [ADOPTION_GUIDE.md](ADOPTION_GUIDE.md) for context on when to use each mode.
+Mermaid sequence diagrams for the three primary adoption modes. See [ADOPTION_GUIDE.md](ADOPTION_GUIDE.md) for context on when to use each mode. For the end-to-end cross-repo "golden path" (routing → execution → gating → audit → learning loop) and its per-step contract dependencies, see [GOLDEN_PATH.md](GOLDEN_PATH.md).
 
 ---
 

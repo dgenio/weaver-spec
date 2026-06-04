@@ -24,6 +24,11 @@ positive:
   - {payload: examples/sample_payloads/trace_bundle.json, schema: trace_bundle}
   - {payload: examples/sample_payloads/trace_bundle_signed.json, schema: trace_bundle}
   - {payload: conformance/fixtures/trace_bundle_signed_valid.json, schema: trace_bundle}
+  # FailureCaseArtifact — canonical finding/failure interchange, one per producer (#83)
+  - {payload: examples/sample_payloads/failure_case_artifact.json, schema: failure_case_artifact}
+  - {payload: examples/sample_payloads/failure_case_agent_kernel.json, schema: failure_case_artifact}
+  - {payload: examples/sample_payloads/failure_case_vibeguard.json, schema: failure_case_artifact}
+  - {payload: examples/sample_payloads/failure_case_agentfence.json, schema: failure_case_artifact}
 
 negative:
   # Frame
@@ -49,3 +54,6 @@ negative:
   # TraceBundle — schema-valid but invariant-violating (exercises #74 checks)
   - {payload: conformance/negative/trace_bundle/i01_frame_carries_raw_output.json, schema: trace_bundle, by: invariant, violates: I-01}
   - {payload: conformance/negative/trace_bundle/i02_policy_decision_without_trace_event.json, schema: trace_bundle, by: invariant, violates: I-02}
+  # Frame seam (#84): I-05 is the contextweaver-side restatement of I-01; its
+  # artifact half (a Frame at the seam carries no raw output) is the I-01 check.
+  - {payload: conformance/negative/trace_bundle/i05_seam_frame_carries_raw_output.json, schema: trace_bundle, by: invariant, violates: I-01}
