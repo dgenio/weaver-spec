@@ -62,5 +62,8 @@
       "outcome": "success"
     }
   ],
-  "canonicalization": "JCS"
+  "canonicalization": "JCS",
+  "metadata": {
+    "_conformance_note": "I-05 Frame-seam scenario (#84). I-05 is the contextweaver-side restatement of I-01, so this fixture's statically-checkable half is asserted by the I-01 frames_have_no_raw_output check — hence it is registered as violates: I-01 in corpus.yaml despite the i05_ filename. See docs/BOUNDARIES.md and docs/adr/002-context-firewall-frame-seam.md."
+  }
 }
