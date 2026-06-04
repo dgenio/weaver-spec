@@ -46,8 +46,9 @@ This is recorded as a **clarification** of the existing boundary, not a change t
 it: the artifact ownership table in `BOUNDARIES.md` is unchanged (agent-kernel
 still owns raw output → `Frame`/`Handle`; contextweaver still ingests `Frame`
 only). I-05 is tightened in wording — the canonical `Frame` path is the default
-and any raw-output ingestion is explicitly **non-canonical / non-compliant** —
-without weakening any constraint.
+for first-class ingestion, and any raw-output ingestion *other than* the
+explicit, auditable `raw_passthrough` override of I-01 is **non-canonical /
+non-compliant** — without weakening any constraint.
 
 ## Consequences
 

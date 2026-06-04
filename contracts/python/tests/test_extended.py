@@ -1473,6 +1473,10 @@ class TestFailureCaseArtifact:
         )
         assert fc.source_project == source_project
         assert fc.status in ("candidate", "regression", "ignored", "fixed")
-        data = asdict(fc)
-        # Round-trips back to JSON without loss.
-        assert json.loads(json.dumps(data))["source_project"] == source_project
+        # Round-trips back to JSON, preserving every field present in the source
+        # payload (including nested producer detail under metadata.x_* and
+        # provenance). Default-injected optional fields absent from the payload
+        # are not asserted.
+        data = json.loads(json.dumps(asdict(fc)))
+        for key, value in p.items():
+            assert data[key] == value, f"{name}: {key!r} not preserved on round-trip"
