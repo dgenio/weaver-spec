@@ -2,7 +2,7 @@
 
 Minimal Python contracts for the Weaver Stack.
 
-This package provides dataclasses and type definitions for all Core Weaver contracts. It has **no runtime dependencies** beyond the Python standard library (Python 3.9+).
+This package provides dataclasses and type definitions for all Core Weaver contracts. It has **no runtime dependencies** beyond the Python standard library (Python 3.10+, tested on 3.10–3.14).
 
 ---
 

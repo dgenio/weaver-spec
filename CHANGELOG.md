@@ -10,6 +10,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **`weaver-stack` umbrella meta-package (#80).** New `packaging/weaver-stack/`
+  (a `pyproject.toml` + `README.md`, **no code**) so adopters can
+  `pip install weaver-stack` to get a known-compatible set in one line. The base
+  install pins the published `weaver_contracts` (`>=0.6,<0.7`); `runtime` /
+  `devtools` extras carry the siblings and are the **executable form of
+  `compatibility.yaml`** — a sibling is pinned only once it is `verified` /
+  `provisional` with a `tested_version` there, so no aspirational pins can ship.
+  `scripts/validate_meta_package.py` (new `validate-meta-package` CI job + a
+  `meta-package` pre-commit hook) enforces that the pins and the manifest agree,
+  and the new `build-meta` / `publish-meta` jobs in `publish.yml` build and
+  publish it. The `runtime` extra is empty today (all siblings still
+  `unverified`). Documented scope delta in `AGENTS.md` (a second published
+  artifact alongside `weaver_contracts`, "packaging tier" exception).
+
 - **Ecosystem front door — "What Is the Weaver Stack?" explainer + launch-post
   draft (#5, #6, #79, #81).** Documentation only; no contract shape changed, so
   no version bump (consistent with this release window's additive-docs practice).
@@ -308,6 +322,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Changed
 
+- **Python support window: 3.10–3.14; codified library dependency policy (#85).**
+  `weaver_contracts` now declares `requires-python = ">=3.10"` (dropping 3.9; no
+  upper cap) with trove classifiers for 3.10–3.14, and the CI matrix runs
+  3.10–3.14 plus a no-third-party-deps `import weaver_contracts` smoke step. A
+  new `test_packaging_metadata.py` keeps `requires-python`, classifiers, and the
+  tested matrix aligned and asserts the package stays runtime-dependency free.
+  `CONTRIBUTING.md` now codifies the library dependency rule (lower bounds only,
+  no exact pins, no speculative caps; add a floor + scheduled-latest job when a
+  runtime dependency is first introduced). Docs updated in `docs/QUICKSTART.md`,
+  `docs/FAQ.md`, and `contracts/python/README.md`. No contract shape changed.
 - `.github/workflows/ci.yml` — the `validate-schemas` job now calls `scripts/check_schema_fields.py` instead of an inline `python -c` block (single source of truth for the schema-required-fields check; no behavior change).
 - `markdownlint` CI job now globs `examples/**/*.md` recursively (was `examples/*.md`) and adds `.github/**/*.md` so prompt templates and instruction files are linted alongside the rest of the repo.
 - README Quick Navigation gained links to `docs/LIFECYCLE.md`,
