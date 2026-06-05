@@ -189,10 +189,10 @@ they compose through one shared contract layer.
 
 | Repo | Role |
 | ---- | ---- |
-| [weaver-spec](https://github.com/dgenio/weaver-spec) | Canonical specs + shared contracts |
-| [contextweaver](https://github.com/dgenio/contextweaver) | Context compilation + tool routing |
+| [weaver-spec](https://github.com/dgenio/weaver-spec) | Canonical specs + contracts |
+| [contextweaver](https://github.com/dgenio/contextweaver) | Context compilation + routing |
 | [agent-kernel](https://github.com/dgenio/agent-kernel) | Execution + firewalling + audit |
-| [ChainWeaver](https://github.com/dgenio/ChainWeaver) | Deterministic flow orchestration |
+| [ChainWeaver](https://github.com/dgenio/ChainWeaver) | Flow orchestration |
 
 **Start here:** read [weaver-spec](https://github.com/dgenio/weaver-spec), then
 adopt the layer you need.
@@ -212,6 +212,9 @@ Paste near the top of each repo's `README.md`:
 > | [agent-kernel](https://github.com/dgenio/agent-kernel) | Execution + firewalling + audit |
 > | [ChainWeaver](https://github.com/dgenio/ChainWeaver) | Flow orchestration |
 ```
+
+The `Weaver Stack` link points at `weaver-spec` as the interim front door. Once
+the GitHub Organization exists (#79), repoint it at the org profile.
 
 ### Shared GitHub topics
 
