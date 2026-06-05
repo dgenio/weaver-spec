@@ -3,6 +3,8 @@
 A neutral map of the projects in the Weaver ecosystem: what each one is, where the boundaries are, and which contracts cross between them.
 
 > [!NOTE]
+> For a narrative introduction — the problem, the layered architecture, and the closed learning loop — see [What Is the Weaver Stack?](WEAVER_STACK.md). This page is the boundary-focused companion to that explainer.
+>
 > This page is a **derived, informative** overview. The canonical authorities are [`docs/BOUNDARIES.md`](BOUNDARIES.md) (responsibility boundaries and artifact ownership), [`docs/LIFECYCLE.md`](LIFECYCLE.md) (the normative five-phase lifecycle), and [`docs/ARTIFACT_CONTRACTS.md`](ARTIFACT_CONTRACTS.md) (cross-project artifacts). Where this page and a canonical doc differ, the canonical doc wins.
 
 ---

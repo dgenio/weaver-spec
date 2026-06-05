@@ -4,6 +4,17 @@
 
 [![Weaver-compatible](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dgenio/weaver-spec/main/docs/badges/weaver-spec.json)](docs/SELF_CERTIFICATION.md)
 
+> **Part of the [Weaver Stack](docs/WEAVER_STACK.md)**
+>
+> | Repo | Role |
+> |------|------|
+> | [weaver-spec](https://github.com/dgenio/weaver-spec) | Canonical specs + contracts |
+> | [contextweaver](https://github.com/dgenio/contextweaver) | Context compilation + routing |
+> | [agent-kernel](https://github.com/dgenio/agent-kernel) | Execution + firewalling + audit |
+> | [ChainWeaver](https://github.com/dgenio/ChainWeaver) | Flow orchestration |
+>
+> New here? Start with [What Is the Weaver Stack?](docs/WEAVER_STACK.md).
+
 This repository is the single source of truth for the vocabulary, invariants, responsibility boundaries, versioning rules, and language-agnostic contract schemas that keep the Weaver ecosystem composable and compatible.
 
 ---
@@ -46,8 +57,10 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 
 | What you need | Where to look |
 | --------------- | --------------- |
+| What is the Weaver Stack? (explainer) | [docs/WEAVER_STACK.md](docs/WEAVER_STACK.md) |
 | Ecosystem overview | [docs/VISION.md](docs/VISION.md) |
 | Ecosystem boundary map | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) |
+| Ecosystem launch post (draft) | [docs/WEAVER_STACK_LAUNCH.md](docs/WEAVER_STACK_LAUNCH.md) |
 | Quick-start (Python + JS/TS) | [docs/QUICKSTART.md](docs/QUICKSTART.md) |
 | Contract field reference | [docs/CONTRACT_REFERENCE.md](docs/CONTRACT_REFERENCE.md) |
 | Layer architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
