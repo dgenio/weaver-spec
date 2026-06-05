@@ -230,6 +230,8 @@ For mixed changes, use the prefix for the most impactful change. Mention the sec
 | [docs/TRACE_BUNDLE.md](docs/TRACE_BUNDLE.md) | TraceBundle Extended contract: end-to-end audit-chain envelope (inlines RoutingDecision + PolicyDecisions + Frames + Handles + TraceEvents; optional JCS signature) |
 | [docs/CONFORMANCE.md](docs/CONFORMANCE.md) | Conformance suite: what spec-compliance checks (positive/negative corpus, executable invariant assertions, TraceBundle signature verification) and how siblings adopt the reusable workflow |
 | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) | Derived ecosystem boundary map (owns/consumes/emits per project, end-to-end lifecycle); points to BOUNDARIES.md/LIFECYCLE.md as canonical |
+| [docs/WEAVER_STACK.md](docs/WEAVER_STACK.md) | Ecosystem-level explainer ("What Is the Weaver Stack?"): narrative entry point, derived architecture + closed-loop diagram, and the single source for the reusable front-door / cross-repo README blocks and shared topics. Informative; points to INVARIANTS/BOUNDARIES/ARCHITECTURE as canonical |
+| [docs/WEAVER_STACK_LAUNCH.md](docs/WEAVER_STACK_LAUNCH.md) | Draft ecosystem-level launch-post artifact (distinct from per-repo launches); informative, not a spec |
 | [docs/agent-context/architecture.md](docs/agent-context/architecture.md) | Pointers to canonical architecture and boundary docs |
 | [docs/agent-context/workflows.md](docs/agent-context/workflows.md) | Authoritative commands, change sequences, documentation governance |
 | [docs/agent-context/invariants.md](docs/agent-context/invariants.md) | Hard constraints, forbidden shortcuts, safe-vs-unsafe changes |

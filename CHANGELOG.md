@@ -10,6 +10,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ### Added
 
+- **Ecosystem front door — "What Is the Weaver Stack?" explainer + launch-post
+  draft (#5, #6, #79, #81).** Documentation only; no contract shape changed, so
+  no version bump (consistent with this release window's additive-docs practice).
+  - New [`docs/WEAVER_STACK.md`](docs/WEAVER_STACK.md): the ecosystem-level
+    explainer (#81) — the problem, the layered architecture, and a
+    request-path-plus-closed-learning-loop Mermaid diagram **derived** from
+    `docs/BOUNDARIES.md`/`docs/ARCHITECTURE.md` (canonical). It is also the
+    single source for the reusable **front-door** copy: the org/landing profile
+    README block, the per-repo "Part of the Weaver Stack" block (#6), and the
+    shared topic set, plus a rollout checklist for the out-of-repo steps
+    (org creation #79, sibling-repo edits #6, landing page #5).
+  - New [`docs/WEAVER_STACK_LAUNCH.md`](docs/WEAVER_STACK_LAUNCH.md): a drafted
+    ecosystem-level launch post (#81), honest about maturity, with the
+    cross-repo golden path as the centerpiece proof.
+  - Added the "Part of the Weaver Stack" block + explainer links to
+    `README.md`, and cross-links from `docs/ECOSYSTEM.md`, `docs/VISION.md`, and
+    the `AGENTS.md` documentation map.
 - **Closed-loop interchange, firewall seam, and cross-repo golden path (#82, #83,
   #84).** Documentation + examples + conformance fixtures that finalize the
   cross-repo story. No contract shape changed, so no version bump (consistent

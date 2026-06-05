@@ -1,5 +1,8 @@
 # Vision
 
+> [!NOTE]
+> For the ecosystem-level narrative — how the layers and the closed learning loop fit together — see [What Is the Weaver Stack?](WEAVER_STACK.md).
+
 ## The Problem
 
 Modern LLM-based agents face four compounding problems:
