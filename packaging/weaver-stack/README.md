@@ -44,4 +44,4 @@ the spec has actually vouched for — never an aspirational pin.
 ## Versioning
 
 This meta-package's MINOR tracks the `weaver_contracts` / contract MINOR it
-certifies (currently `0.6.x`).
+certifies (currently `0.7.x`).

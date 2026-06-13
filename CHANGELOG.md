@@ -17,7 +17,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 - **`weaver-stack` umbrella meta-package (#80).** New `packaging/weaver-stack/`
   (a `pyproject.toml` + `README.md`, **no code**) so adopters can
   `pip install weaver-stack` to get a known-compatible set in one line. The base
-  install pins the published `weaver_contracts` (`>=0.6,<0.7`); `runtime` /
+  install pins the published `weaver_contracts` (`>=0.7,<0.8`); `runtime` /
   `devtools` extras carry the siblings and are the **executable form of
   `compatibility.yaml`** — a sibling is pinned only once it is `verified` /
   `provisional` with a `tested_version` there, so no aspirational pins can ship.

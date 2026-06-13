@@ -17,21 +17,21 @@ build-backend = "setuptools.build_meta"
 # scripts/validate_meta_package.py (validate-meta-package CI job).
 #
 # Version policy: this meta-package's MINOR tracks the weaver_contracts /
-# contract MINOR it certifies (currently 0.6.x).
+# contract MINOR it certifies (currently 0.7.x).
 # ---------------------------------------------------------------------------
 [project]
 name = "weaver-stack"
-version = "0.6.0"
+version = "0.7.0"
 description = "Umbrella meta-package pinning a known-compatible set of the Weaver Stack"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.10"
 
 # Base install: the always-published member of the stack — the spec contracts.
-# Pinned to the compatible 0.6.x line (a meta-package is the one place tight
+# Pinned to the compatible 0.7.x line (a meta-package is the one place tight
 # pins belong; weaver_contracts itself stays lower-bound-only — see CONTRIBUTING.md).
 dependencies = [
-    "weaver_contracts>=0.6,<0.7",
+    "weaver_contracts>=0.7,<0.8",
 ]
 
 [project.optional-dependencies]
