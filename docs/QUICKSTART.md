@@ -19,7 +19,7 @@ This guide does **not** add any runtime dependencies to your application beyond 
 
 ## Prerequisites
 
-- For the Python path: Python 3.9 or newer.
+- For the Python path: Python 3.10 or newer (tested on 3.10–3.14).
 - For the JS/TS path: Node.js 18 or newer, with `ajv` for validation.
 - A clone of this repository (for direct schema access) **or** the published JSON Schema files served at the `$id` URIs declared in each schema.
 

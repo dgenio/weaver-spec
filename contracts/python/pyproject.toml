@@ -8,8 +8,24 @@ version = "0.7.0"
 description = "Minimal Python contracts for the Weaver Stack (contextweaver, agent-kernel, ChainWeaver)"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+# Intentionally empty: weaver_contracts is stdlib-only at runtime. Per the
+# dependency policy in CONTRIBUTING.md ("Library dependency constraints"), any
+# future runtime dependency must use a lower bound only (>=), with no exact pin
+# (==) and no speculative upper-bound cap.
 dependencies = []
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+]
 
 [project.optional-dependencies]
 dev = [
@@ -20,6 +36,9 @@ dev = [
     "pytest-cov>=4.0",
     "pre-commit>=3.5",
     "yamllint>=1.35",
+    # TOML reader for the packaging-metadata test; stdlib `tomllib` exists only
+    # on 3.11+, so back-fill it on 3.10. Dev/test only — not a runtime dep.
+    "tomli>=2.0; python_version < '3.11'",
     # Conformance runner (conformance/run.py) extras — build-time/CI only,
     # never imported by weaver_contracts.
     "PyYAML>=6.0",

@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ---------------------------------------------------------------------------
+# weaver-stack — umbrella meta-package for the Weaver Stack (issue #80).
+#
+# This package ships NO code. Its only job is to pin a known-compatible set of
+# the stack so adopters can install it in one line:
+#
+#     pip install weaver-stack            # the spec contracts (weaver_contracts)
+#     pip install weaver-stack[runtime]   # + the runtime siblings, once verified
+#
+# It is a *convenience, not a coupling*: every member remains independently
+# installable and usable on its own. The pinned set is the executable form of
+# the compatibility promise in ../../compatibility.yaml and is kept in sync by
+# scripts/validate_meta_package.py (validate-meta-package CI job).
+#
+# Version policy: this meta-package's MINOR tracks the weaver_contracts /
+# contract MINOR it certifies (currently 0.7.x).
+# ---------------------------------------------------------------------------
+[project]
+name = "weaver-stack"
+version = "0.7.0"
+description = "Umbrella meta-package pinning a known-compatible set of the Weaver Stack"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+
+# Base install: the always-published member of the stack — the spec contracts.
+# Pinned to the compatible 0.7.x line (a meta-package is the one place tight
+# pins belong; weaver_contracts itself stays lower-bound-only — see CONTRIBUTING.md).
+dependencies = [
+    "weaver_contracts>=0.7,<0.8",
+]
+
+[project.optional-dependencies]
+# Runtime siblings on the request path (contextweaver -> agent-kernel ->
+# ChainWeaver). Empty until a sibling is marked verified/provisional with a
+# tested_version in ../../compatibility.yaml; validate_meta_package.py then
+# requires a matching pin here. Do NOT add aspirational pins by hand.
+runtime = []
+
+# Developer / spec-authoring tooling for working against the contracts.
+devtools = []
+
+[project.urls]
+Homepage = "https://github.com/dgenio/weaver-spec"
+Source = "https://github.com/dgenio/weaver-spec/tree/main/packaging/weaver-stack"
+Compatibility = "https://github.com/dgenio/weaver-spec/blob/main/compatibility.yaml"
+
+[tool.setuptools]
+# Meta-package: no importable modules to discover.
+py-modules = []

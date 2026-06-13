@@ -31,7 +31,7 @@ repos:
       - id: check-yaml
         files: '^(\.github/.*\.(ya?ml)|\.yamllint\.yml|\.pre-commit-config\.yaml)$'
       - id: check-toml
-        files: '^contracts/python/pyproject\.toml$'
+        files: '^(contracts/python/pyproject\.toml|packaging/weaver-stack/pyproject\.toml)$'
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
@@ -44,7 +44,7 @@ repos:
     rev: v0.14.0
     hooks:
       - id: markdownlint-cli2
-        files: '^(README\.md|CONTRIBUTING\.md|CHANGELOG\.md|CHARTER\.md|docs/.*\.md|contracts/.*\.md|examples/.*\.md|\.github/.*\.md)$'
+        files: '^(README\.md|CONTRIBUTING\.md|CHANGELOG\.md|CHARTER\.md|docs/.*\.md|contracts/.*\.md|examples/.*\.md|packaging/.*\.md|\.github/.*\.md)$'
 
   # Local hooks — invoke project-local validation scripts so a single
   # `pre-commit run` reproduces the CI gates.
@@ -105,3 +105,32 @@ repos:
         additional_dependencies: ["pyyaml"]
         pass_filenames: false
         files: '^(compatibility\.yaml|docs/VERSIONING\.md|scripts/validate_compatibility\.py)$'
+
+      - id: meta-package
+        name: weaver-stack meta-package consistent with compatibility.yaml
+        description: |
+          Mirrors the validate-meta-package CI job locally: runs the validator
+          self-test and checks the meta-package pins against compatibility.yaml.
+          PyYAML + tomli are installed in the hook's isolated env so
+          scripts/validate_meta_package.py stays stdlib-only.
+        entry: |-
+          python -c "
+          import sys; sys.path.insert(0, 'scripts')
+          from pathlib import Path
+          import yaml
+          try:
+              import tomllib
+          except ModuleNotFoundError:
+              import tomli as tomllib
+          from validate_meta_package import self_test, validate
+          manifest = yaml.safe_load(Path('compatibility.yaml').read_text(encoding='utf-8'))
+          pyproject = tomllib.loads(Path('packaging/weaver-stack/pyproject.toml').read_text(encoding='utf-8'))
+          errors = ['self-test: ' + p for p in self_test()] + validate(manifest, pyproject)
+          for e in errors:
+              print('FAIL:', e, file=sys.stderr)
+          sys.exit(1 if errors else 0)
+          "
+        language: python
+        additional_dependencies: ["pyyaml", "tomli"]
+        pass_filenames: false
+        files: '^(compatibility\.yaml|packaging/weaver-stack/pyproject\.toml|scripts/validate_meta_package\.py)$'

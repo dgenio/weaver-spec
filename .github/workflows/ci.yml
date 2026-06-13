@@ -89,6 +89,59 @@ jobs:
           )
           PYEOF
 
+  validate-meta-package:
+    name: Validate Meta-Package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML and build
+        run: pip install pyyaml build
+
+      - name: Check weaver-stack pins are consistent with compatibility.yaml
+        run: |
+          python << 'PYEOF'
+          import sys
+          import tomllib
+          from pathlib import Path
+
+          import yaml
+
+          sys.path.insert(0, "scripts")
+          from validate_meta_package import self_test, validate
+
+          # The validator's own rejection paths are guarded by a self-test, so a
+          # future edit that weakens a check fails CI even though the live pair
+          # still passes.
+          problems = self_test()
+          for problem in problems:
+              print(f"FAIL (self-test): {problem}", file=sys.stderr)
+          if problems:
+              sys.exit(1)
+
+          manifest = yaml.safe_load(Path("compatibility.yaml").read_text(encoding="utf-8"))
+          pyproject = tomllib.loads(
+              Path("packaging/weaver-stack/pyproject.toml").read_text(encoding="utf-8")
+          )
+          errors = validate(manifest, pyproject)
+          for e in errors:
+              print(f"FAIL: {e}", file=sys.stderr)
+          if errors:
+              sys.exit(1)
+          print("OK: weaver-stack meta-package is consistent with compatibility.yaml.")
+          PYEOF
+
+      - name: Build the meta-package (sdist + wheel)
+        working-directory: packaging/weaver-stack
+        run: python -m build
+
   validate-contracts-index:
     name: Validate Contracts Index
     runs-on: ubuntu-latest
@@ -193,8 +246,9 @@ jobs:
     permissions:
       contents: read
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -203,6 +257,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      - name: Import smoke test with no third-party dependencies
+        working-directory: contracts/python
+        run: |
+          # weaver_contracts is stdlib-only at runtime: a bare install (no
+          # [dev] extras) must import cleanly on every supported Python.
+          pip install .
+          python -c "import weaver_contracts; print(weaver_contracts.__name__, 'imported OK')"
 
       - name: Install package with dev dependencies
         working-directory: contracts/python
@@ -239,6 +302,7 @@ jobs:
             'docs/**/*.md' \
             'contracts/**/*.md' \
             'examples/**/*.md' \
+            'packaging/**/*.md' \
             '.github/**/*.md'
 
   yamllint:

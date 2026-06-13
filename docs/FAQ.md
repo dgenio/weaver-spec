@@ -91,7 +91,7 @@ No. The Python package (`weaver_contracts`) is a convenience layer for Python im
 
 ## What Python versions are supported?
 
-The `weaver_contracts` package requires Python 3.9+. It uses only the standard library at runtime (no third-party dependencies). `jsonschema` is a development/test dependency only.
+The `weaver_contracts` package requires Python 3.10+ and is tested on 3.10–3.14. It uses only the standard library at runtime (no third-party dependencies). `jsonschema` is a development/test dependency only.
 
 ---
 

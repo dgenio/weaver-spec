@@ -57,3 +57,62 @@ jobs:
           # Emit a Sigstore-signed SLSA build provenance attestation alongside
           # the package (PEP 740). Adopters verify with `sigstore verify`.
           attestations: true
+
+  build-meta:
+    name: Build meta-package distribution
+    runs-on: ubuntu-latest
+    # The meta-package versions independently of weaver_contracts, so it is
+    # released under its own `weaver-stack-vX.Y.Z` tag. Guard on that prefix so
+    # a weaver_contracts release does not also (re)build/publish weaver-stack at
+    # an unchanged version (which PyPI would reject as a duplicate upload).
+    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'weaver-stack-v') }}
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build
+        run: pip install build
+
+      - name: Build the weaver-stack meta-package
+        working-directory: packaging/weaver-stack
+        run: python -m build
+
+      - name: Upload meta-package dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-meta
+          path: packaging/weaver-stack/dist/
+
+  publish-meta:
+    name: Publish meta-package to PyPI
+    needs: build-meta
+    runs-on: ubuntu-latest
+    # Same guard as build-meta: only publish on a `weaver-stack-v*` release tag.
+    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'weaver-stack-v') }}
+    environment:
+      name: pypi
+      url: https://pypi.org/project/weaver-stack/
+    permissions:
+      id-token: write       # required for OIDC Trusted Publisher
+      attestations: write   # required for PEP 740 SLSA build provenance attestations
+
+    steps:
+      - name: Download meta-package dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-meta
+          path: dist/
+
+      - name: Publish weaver-stack to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # weaver-stack needs its own PyPI Trusted Publisher (OIDC) configured
+          # for this workflow before the first release.
+          attestations: true

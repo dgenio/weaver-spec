@@ -72,6 +72,18 @@ Deprecations and removals are governed by [`docs/DEPRECATIONS.md`](docs/DEPRECAT
 
 ---
 
+## Library dependency constraints
+
+`weaver_contracts` is a **library**, so it must not over-constrain the adopters that depend on it. The package is stdlib-only today; keep it that way, and if a runtime dependency is ever genuinely required, follow these rules:
+
+- **Lower bounds only.** Declare `dependency>=X.Y` (the minimum version you actually rely on). Never pin an exact version (`==`) and never add a speculative upper-bound cap (`<N`). Caps cause resolver conflicts in adopter environments and are only justified by a *known* incompatibility, documented inline.
+- **Supported Python is a lower bound too.** `requires-python = ">=3.10"` (no upper cap). The trove `classifiers` in `pyproject.toml` and the CI matrix must list every supported minor (currently **3.10–3.14**); keep all three in sync (the `test_packaging_metadata.py` check enforces classifier ⟷ `requires-python` alignment).
+- **When the first runtime dependency is added**, add in the same PR: (1) a floor job that installs the lowest declared versions (e.g. `uv pip install --resolution lowest-direct`, or a `constraints-min.txt`) so the lower bounds are actually tested, and (2) a scheduled latest/pre-release job (`pip install --pre -U`, allow-failure) to catch upstream breakage early. Until then these jobs are moot — the stdlib-only smoke step in CI is the floor.
+
+The `weaver-stack` umbrella meta-package (`packaging/weaver-stack/`) is the **deliberate exception**: a meta-package's job is to pin a known-compatible set, so it may use tight pins. That tightness lives only there — never in `weaver_contracts` itself. See its README for the "convenience, not coupling" stance.
+
+---
+
 ## Local Development
 
 All commands below assume dev dependencies are installed (`pip install -e ".[dev]"` in `contracts/python/`).
@@ -134,7 +146,7 @@ Run from the repository root (not from `contracts/python/`):
 npm install -g markdownlint-cli
 markdownlint \
   README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
-  'docs/**/*.md' 'contracts/**/*.md' 'examples/**/*.md' '.github/**/*.md'
+  'docs/**/*.md' 'contracts/**/*.md' 'examples/**/*.md' 'packaging/**/*.md' '.github/**/*.md'
 ```
 
 Rules are configured in `.markdownlint.json` at the repo root.
