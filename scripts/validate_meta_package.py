@@ -45,6 +45,21 @@ def _dist_for(name):
     return DIST_NAME.get(name, str(name).lower())
 
 
+def _admits_version(requirement, version):
+    """Best-effort stdlib check: does ``requirement`` admit ``version``?
+
+    A full PEP 440 parser is out of scope (stdlib-only ``scripts/`` rule), so we
+    require the tested version to appear behind an inclusive lower-bound/exact
+    operator (``==`` or ``>=``). This rejects pins that *exclude* the tested
+    version — e.g. ``contextweaver<0.3.0`` or ``contextweaver>0.3.0`` — which a
+    plain substring test (``version in requirement``) would wrongly accept. The
+    trailing ``(?!\\d)`` guards against a shorter version matching a longer one
+    (e.g. tested ``0.3.0`` against a pin of ``0.3.00``).
+    """
+    pattern = re.compile(r"(==|>=)\s*" + re.escape(str(version)) + r"(?!\d)")
+    return bool(pattern.search(str(requirement)))
+
+
 def expected_runtime_pins(manifest):
     """Return ``{dist_name: tested_version}`` the runtime extra must pin, from the manifest."""
     expected = {}
@@ -107,10 +122,10 @@ def validate(manifest, pyproject):
             )
             continue
         for requirement in matching:
-            if version not in requirement:
+            if not _admits_version(requirement, version):
                 errors.append(
-                    f"runtime pin {requirement!r} must include the tested_version "
-                    f"{version!r} from compatibility.yaml"
+                    f"runtime pin {requirement!r} must admit the tested_version "
+                    f"{version!r} from compatibility.yaml (use '==' or '>=')"
                 )
 
     # No sibling that is NOT test-backed may be pinned — guards against aspirational pins.
@@ -169,10 +184,22 @@ def self_test():
             one_verified,
             pyproject(["contextweaver>=0.3.0"]),
         ),
+        "verified sibling pinned exactly (==)": (
+            one_verified,
+            pyproject(["contextweaver==0.3.0"]),
+        ),
     }
     bad_cases = {
         "verified sibling not pinned": (one_verified, pyproject([])),
         "pin omits the tested_version": (one_verified, pyproject(["contextweaver>=0.1.0"])),
+        "pin excludes the tested_version (<)": (
+            one_verified,
+            pyproject(["contextweaver<0.3.0"]),
+        ),
+        "pin excludes the tested_version (strictly >)": (
+            one_verified,
+            pyproject(["contextweaver>0.3.0"]),
+        ),
         "aspirational pin of unverified sibling": (
             all_unverified,
             pyproject(["chainweaver>=0.1.0"]),
