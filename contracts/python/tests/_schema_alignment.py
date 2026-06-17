@@ -27,6 +27,20 @@ EXTENDED_SCHEMA_DIR = CORE_SCHEMA_DIR / "extended"
 PAYLOADS_DIR = REPO_ROOT / "examples" / "sample_payloads"
 
 
+def _read_json(path: pathlib.Path) -> dict:
+    """Parse a JSON file, annotating parse errors with the path.
+
+    ``build_registry`` runs at import time, so a malformed schema would
+    otherwise surface as a bare ``JSONDecodeError`` during pytest collection
+    with no indication of which file is broken. Stdlib-only.
+    """
+    text = path.read_text(encoding="utf-8")
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{path}: invalid JSON: {exc}") from exc
+
+
 def build_registry() -> Registry:
     """Preload every Core + Extended schema by ``$id`` so cross-schema ``$ref``s
     resolve offline (no network), mirroring ``conformance/run.py:load_schemas``."""
@@ -34,7 +48,7 @@ def build_registry() -> Registry:
     for path in sorted(CORE_SCHEMA_DIR.glob("*.schema.json")) + sorted(
         EXTENDED_SCHEMA_DIR.glob("*.schema.json")
     ):
-        schema = json.loads(path.read_text(encoding="utf-8"))
+        schema = _read_json(path)
         if "$id" in schema:
             registry = registry.with_resource(
                 uri=schema["$id"],
@@ -47,17 +61,15 @@ REGISTRY = build_registry()
 
 
 def load_core_schema(stem: str) -> dict:
-    return json.loads((CORE_SCHEMA_DIR / f"{stem}.schema.json").read_text(encoding="utf-8"))
+    return _read_json(CORE_SCHEMA_DIR / f"{stem}.schema.json")
 
 
 def load_extended_schema(stem: str) -> dict:
-    return json.loads(
-        (EXTENDED_SCHEMA_DIR / f"{stem}.schema.json").read_text(encoding="utf-8")
-    )
+    return _read_json(EXTENDED_SCHEMA_DIR / f"{stem}.schema.json")
 
 
 def load_payload(stem: str) -> dict:
-    return json.loads((PAYLOADS_DIR / f"{stem}.json").read_text(encoding="utf-8"))
+    return _read_json(PAYLOADS_DIR / f"{stem}.json")
 
 
 def validate(payload: dict, schema: dict) -> None:

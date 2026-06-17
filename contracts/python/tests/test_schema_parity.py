@@ -25,9 +25,14 @@ from datetime import datetime
 
 import pytest
 
-import weaver_contracts.core as core
-import weaver_contracts.extended as extended
-from tests._schema_alignment import load_core_schema, load_extended_schema
+# The shared helper imports jsonschema + referencing at module load, so skip
+# gracefully (as the other alignment modules do) when the dev extras are absent.
+pytest.importorskip("jsonschema")
+pytest.importorskip("referencing")
+
+import weaver_contracts.core as core  # noqa: E402
+import weaver_contracts.extended as extended  # noqa: E402
+from tests._schema_alignment import load_core_schema, load_extended_schema  # noqa: E402
 
 # Fields that back a schema's `additionalProperties: true` extension bag rather
 # than a declared property. Allowed to be absent from `properties` either way.
