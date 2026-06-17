@@ -70,6 +70,17 @@ repos:
         pass_filenames: false
         files: '^(contracts/json/.*\.schema\.json|well-known/contracts\.json|scripts/generate_contracts_index\.py|contracts/python/src/weaver_contracts/version\.py)$'
 
+      - id: version-consistency
+        name: contract version string is consistent everywhere
+        description: |
+          Mirrors the validate-version-consistency CI job. Fails when any
+          tracked file's version string drifts from CONTRACT_VERSION in
+          version.py (the single source of truth).
+        entry: python scripts/check_version_consistency.py
+        language: system
+        pass_filenames: false
+        files: '^(contracts/python/src/weaver_contracts/version\.py|contracts/python/pyproject\.toml|well-known/contracts\.json|CHANGELOG\.md|README\.md|docs/VERSIONING\.md|compatibility\.yaml|scripts/check_version_consistency\.py)$'
+
       - id: weaver-contracts-tests
         name: weaver_contracts pytest (changed Python files only)
         description: |

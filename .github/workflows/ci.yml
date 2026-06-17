@@ -158,6 +158,22 @@ jobs:
       - name: Check well-known/contracts.json is up to date
         run: python scripts/generate_contracts_index.py --check
 
+  validate-version-consistency:
+    name: Validate Version Consistency
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check the contract version string is consistent everywhere
+        run: python scripts/check_version_consistency.py
+
   validate-walkthroughs:
     name: Validate Walkthrough Payloads
     runs-on: ubuntu-latest

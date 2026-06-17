@@ -47,6 +47,7 @@ This repository is **documentation + contracts only**.
 | `docs/SELF_CERTIFICATION.md` | "Weaver-compatible" badge + self-certification flow (#77), derived from a verifiable conformance result | When changing the badge/result contract or self-cert flow |
 | `examples/reference_impl/` | Runnable reference implementation (#76): constructs every Core artifact, mints+verifies an ephemeral ed25519 signature over a `TraceBundle`, validates against the schemas, asserts I-01/I-02. **Example tier**, not the package — it reuses the conformance dev deps (`jcs`/`cryptography`/`jsonschema`), is never imported by `weaver_contracts`, is never published, and is CI-checked by the `reference-impl` job. The one runnable demonstration in this repo, kept isolated under `examples/`. | When illustrating end-to-end Core-contract usage, or after any Core schema change (the example must still validate) |
 | `scripts/generate_coverage_table.py` | Build-time tooling (stdlib only) that regenerates `contracts/COVERAGE.md` from the filesystem | When adding a new contract type, sample payload, or test class |
+| `scripts/check_version_consistency.py` | Build-time tooling (stdlib only — no YAML/TOML/JSON parser) that asserts every tracked file's version string matches `CONTRACT_VERSION` in `version.py`; run by the `validate-version-consistency` CI job and the `version-consistency` pre-commit hook | When the contract version is bumped, or when adding a file that states the version |
 | `scripts/validate_compatibility.py` | Build-time tooling (stdlib only — no YAML parser) holding the `compatibility.yaml` validation logic + self-test; callers (the `validate-compatibility` CI job and the `compatibility-manifest` pre-commit hook) parse the YAML and call `validate()` | When changing the compatibility manifest's required fields or validation rules |
 | `scripts/validate_meta_package.py` | Build-time tooling (stdlib only — no YAML/TOML parser) holding the `weaver-stack` meta-package consistency logic + self-test; callers (the `validate-meta-package` CI job and the `meta-package` pre-commit hook) parse `compatibility.yaml` + the meta-package `pyproject.toml` and call `validate()` | When changing how the meta-package's pins must track `compatibility.yaml` |
 | `packaging/weaver-stack/` | Umbrella meta-package (#80): `pyproject.toml` + `README.md` only, no code. Pins a known-compatible set (base = `weaver_contracts`; `runtime`/`devtools` extras) derived from `compatibility.yaml`. Published to PyPI as `weaver-stack`; never imported by `weaver_contracts`. | When the compatible set, extras, or meta-package version changes |
@@ -79,6 +80,10 @@ For JSON schema conventions specifically, `contracts/json/README.md` is authorit
 JSON Schemas are the language-agnostic source of truth for all **Core** contract definitions. Python Core types must mirror them exactly — same field names, same types, same required/optional status. Zero divergence.
 
 Extended contracts define JSON Schemas under `contracts/json/extended/`. The Python dataclass in `extended.py` must mirror its schema (same as Core).
+
+This mirroring is enforced mechanically — not just by review — by `contracts/python/tests/test_schema_parity.py`, which checks field names, required/optional status, and a coarse type shape for every Core and Extended type against its schema.
+
+The single source of truth for the contract *version* string is `weaver_contracts.version.CONTRACT_VERSION`; `scripts/check_version_consistency.py` (the `validate-version-consistency` CI job) fails if any tracked file drifts from it.
 
 ---
 
@@ -198,6 +203,9 @@ python scripts/check_schema_fields.py
 
 # 4. Contracts index freshness — regenerate first if any contracts/json/ file changed
 python scripts/generate_contracts_index.py --check
+
+# 4b. Contract version string consistency (single source: version.py)
+python scripts/check_version_consistency.py
 
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.

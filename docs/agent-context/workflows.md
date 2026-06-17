@@ -88,6 +88,9 @@ python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('co
 # 4. Contracts index freshness (regenerate first if you changed any schema)
 python scripts/generate_contracts_index.py --check
 
+# 4b. Contract version string consistency (single source: version.py)
+python scripts/check_version_consistency.py
+
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
 

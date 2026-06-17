@@ -8,6 +8,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+### Added
+
+- Mechanical dataclass ⟷ JSON Schema parity test (`contracts/python/tests/test_schema_parity.py`)
+  covering every Core and Extended type — field names, required/optional status, and a coarse
+  type shape — turning the "schemas lead, Python mirrors exactly" rule into an enforced guarantee
+  (#111, #112).
+- `scripts/check_version_consistency.py` plus the `validate-version-consistency` CI job and a
+  `version-consistency` pre-commit hook: `weaver_contracts.version.CONTRACT_VERSION` is now the
+  single source of truth for the contract version, and any drift in `README.md`, `pyproject.toml`,
+  `well-known/contracts.json`, `CHANGELOG.md`, `docs/VERSIONING.md`, or `compatibility.yaml` fails
+  CI (#110).
+
+### Changed
+
+- Consolidated the schema-alignment test boilerplate onto a shared
+  `contracts/python/tests/_schema_alignment.py` helper and migrated both alignment modules off the
+  deprecated `jsonschema.RefResolver` to the modern `referencing.Registry` pattern used by the
+  conformance runner. The suite now runs clean under `-W error::DeprecationWarning` (#113, #114).
+- Documented Extended contracts as **schema-led** (same authority as Core; the MINOR-breaking
+  exception is a stability promise, not a different source of truth) across `CONTRACT_REFERENCE.md`
+  and `VERSIONING.md` (#112).
+
+### Fixed
+
+- Corrected the contract version stated in `README.md`, `docs/VERSIONING.md`, and
+  `compatibility.yaml` from a stale `0.5.0` to the current `0.7.0` (#110).
+
 ---
 
 ## [0.7.0] - 2026-06-06

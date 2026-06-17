@@ -40,7 +40,9 @@ Core contracts are the minimal, stable interface required by all adopters:
 
 ### Extended Contracts
 
-Extended contracts provide optional metadata (telemetry, UI hints, risk levels, schema fingerprints, redaction notes). They are declared in `extended.py` and are not required by any Core contract.
+Extended contracts provide optional metadata (telemetry, UI hints, risk levels, schema fingerprints, redaction notes) plus the cross-project artifact and execution-boundary types. Each has a JSON Schema in `contracts/json/extended/` mirrored by a dataclass in `extended.py`, and none is required by any Core contract.
+
+**Authority:** Extended contracts are **schema-led, the same as Core** — the JSON Schema is the source of truth and the dataclass mirrors it (enforced by `test_schema_parity.py`). The difference is the stability promise below, not where the contract is defined.
 
 **Stability promise:** Extended contracts may have breaking changes in a MINOR version, provided the change is backward-compatible from a Core perspective. Extended contracts are explicitly versioned separately when they change independently.
 
@@ -102,13 +104,15 @@ This table tracks which versions of the sibling repositories are known-compatibl
 > [!IMPORTANT]
 > A cell may be `verified` or `provisional` only when backed by a real declaration recorded in `compatibility.yaml` (the `declaration` field). Unknown compatibility MUST be recorded as `unverified` — never assume or invent a version claim.
 
-### Current matrix (contract version 0.5.0)
+### Current matrix (contract version 0.7.0)
 
 | Contract Version | contextweaver | agent-kernel | ChainWeaver |
 | ----------------- | -------------- | ------------- | ------------- |
-| 0.5.0 (current) | `unverified` | `unverified` | `unverified` |
+| 0.7.0 (current) | `unverified` | `unverified` | `unverified` |
 
 All `0.x` contract versions share MAJOR version `0` and are mutually compatible (see [Semantic Versioning](#semantic-versioning) and `weaver_contracts.version.is_compatible`). No sibling repository has published a compatibility declaration yet, so every cell is `unverified`.
+
+The single source of truth for the contract version string is `weaver_contracts.version.CONTRACT_VERSION`. Every other file that states the version (this document, `README.md`, `pyproject.toml`, `well-known/contracts.json`, `CHANGELOG.md`, `compatibility.yaml`) must match it; `scripts/check_version_consistency.py` (the `validate-version-consistency` CI job) enforces this and fails on drift.
 
 ### How a sibling repository declares compatibility
 
