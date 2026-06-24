@@ -131,7 +131,7 @@ examples/
 
 The spec and contracts follow semantic versioning. See [docs/VERSIONING.md](docs/VERSIONING.md) for the full compatibility promise.
 
-Current contract version: **0.5.0**
+Current contract version: **0.7.0**
 
 ---
 

@@ -22,21 +22,21 @@ CI runs the same script with `--check` and fails if this file is stale.
 - Python classes: **32 / 32**
 - Sample payloads: **32 / 32**
 - Roundtrip tests: **32 / 32**
-- Schema validation tests: **26 / 32**
+- Schema validation tests: **32 / 32**
 
 ## Coverage table
 
 | Tier | Type | JSON Schema | Python Class | Sample Payload | Roundtrip Test | Schema Test |
 | ---- | ---- | :---------: | :----------: | :------------: | :------------: | :---------: |
-| Core | `SelectableItem` | OK | OK | OK | OK | -- |
+| Core | `SelectableItem` | OK | OK | OK | OK | OK |
 | Core | `ChoiceCard` | OK | OK | OK | OK | OK |
-| Core | `RoutingDecision` | OK | OK | OK | OK | -- |
-| Core | `Capability` | OK | OK | OK | OK | -- |
+| Core | `RoutingDecision` | OK | OK | OK | OK | OK |
+| Core | `Capability` | OK | OK | OK | OK | OK |
 | Core | `CapabilityToken` | OK | OK | OK | OK | OK |
-| Core | `PolicyDecision` | OK | OK | OK | OK | -- |
+| Core | `PolicyDecision` | OK | OK | OK | OK | OK |
 | Core | `Frame` | OK | OK | OK | OK | OK |
-| Core | `Handle` | OK | OK | OK | OK | -- |
-| Core | `TraceEvent` | OK | OK | OK | OK | -- |
+| Core | `Handle` | OK | OK | OK | OK | OK |
+| Core | `TraceEvent` | OK | OK | OK | OK | OK |
 | Extended | `TelemetryHint` | OK | OK | OK | OK | OK |
 | Extended | `SchemaFingerprint` | OK | OK | OK | OK | OK |
 | Extended | `RedactionPolicy` | OK | OK | OK | OK | OK |

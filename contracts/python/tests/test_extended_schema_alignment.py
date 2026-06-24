@@ -9,16 +9,18 @@ schema-test artifact for that type.
 """
 
 import json
-import pathlib
 
 import pytest
 
-jsonschema = pytest.importorskip("jsonschema")
+pytest.importorskip("jsonschema")
 
-REPO_ROOT = pathlib.Path(__file__).parent.parent.parent.parent
-CORE_SCHEMA_DIR = REPO_ROOT / "contracts" / "json"
-EXTENDED_SCHEMA_DIR = CORE_SCHEMA_DIR / "extended"
-PAYLOADS_DIR = REPO_ROOT / "examples" / "sample_payloads"
+from tests._schema_alignment import (  # noqa: E402
+    CORE_SCHEMA_DIR,
+    EXTENDED_SCHEMA_DIR,
+    load_extended_schema,
+    load_payload,
+    validate,
+)
 
 # (dataclass name, snake_case schema/payload stem). The dataclass names appear
 # here as whole tokens so the coverage generator marks the schema test present:
@@ -54,51 +56,6 @@ EXTENDED_TYPES = [
     ("TraceBundle", "trace_bundle"),
     ("FailureCaseArtifact", "failure_case_artifact"),
 ]
-
-
-def load_extended_schema(stem: str) -> dict:
-    with open(EXTENDED_SCHEMA_DIR / f"{stem}.schema.json") as f:
-        return json.load(f)
-
-
-def load_payload(stem: str) -> dict:
-    with open(PAYLOADS_DIR / f"{stem}.json") as f:
-        return json.load(f)
-
-
-def build_store() -> dict:
-    """URI -> schema for all local schemas (Core + Extended), so $ref
-    resolution works without network access."""
-    store = {}
-    for schema_file in list(CORE_SCHEMA_DIR.glob("*.schema.json")) + list(
-        EXTENDED_SCHEMA_DIR.glob("*.schema.json")
-    ):
-        with open(schema_file) as f:
-            schema = json.load(f)
-        if "$id" in schema:
-            store[schema["$id"]] = schema
-    return store
-
-
-_SCHEMA_STORE = build_store()
-
-
-def validate(payload: dict, schema: dict) -> None:
-    resolver = jsonschema.RefResolver(
-        base_uri=schema.get("$id", ""),
-        referrer=schema,
-        store=_SCHEMA_STORE,
-    )
-    validator_cls = jsonschema.validators.validator_for(schema)
-    validator = validator_cls(
-        schema,
-        resolver=resolver,
-        format_checker=jsonschema.FormatChecker(),
-    )
-    errors = list(validator.iter_errors(payload))
-    if errors:
-        msgs = "\n".join(str(e) for e in errors)
-        raise AssertionError(f"Schema validation failed:\n{msgs}")
 
 
 class TestExtendedSchemaStructure:

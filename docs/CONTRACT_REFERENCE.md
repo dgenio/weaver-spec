@@ -1,6 +1,6 @@
 # Contract Field Reference
 
-A single-page field reference for every Weaver contract type — both Core (9) and Extended (7).
+A single-page field reference for every Weaver contract type — both Core (9) and Extended (23).
 
 For narrative and adoption guidance, read [ARCHITECTURE.md](ARCHITECTURE.md), [BOUNDARIES.md](BOUNDARIES.md), and [GLOSSARY.md](GLOSSARY.md). For a runnable code path, use [QUICKSTART.md](QUICKSTART.md).
 
@@ -9,7 +9,7 @@ For narrative and adoption guidance, read [ARCHITECTURE.md](ARCHITECTURE.md), [B
 ## Source of truth and authority
 
 - **Core types** — the JSON Schemas in [`contracts/json/`](../contracts/json/) are the language-agnostic source of truth. The Python dataclasses in [`contracts/python/src/weaver_contracts/core.py`](../contracts/python/src/weaver_contracts/core.py) mirror them exactly.
-- **Extended types** — the Python dataclasses in [`contracts/python/src/weaver_contracts/extended.py`](../contracts/python/src/weaver_contracts/extended.py) are the source of truth. Extended contracts have no JSON Schemas yet and may have breaking changes in MINOR versions (see [VERSIONING.md](VERSIONING.md)).
+- **Extended types** — schema-led, the same as Core: the JSON Schemas in [`contracts/json/extended/`](../contracts/json/extended/) are the source of truth and the Python dataclasses in [`contracts/python/src/weaver_contracts/extended.py`](../contracts/python/src/weaver_contracts/extended.py) mirror them exactly. Unlike Core, Extended contracts may have breaking changes in MINOR versions (see [VERSIONING.md](VERSIONING.md)). Dataclass ⟷ schema parity is enforced mechanically by `test_schema_parity.py`.
 
 If this document ever disagrees with a schema or dataclass, the schema or dataclass wins. Open an issue.
 
@@ -180,9 +180,9 @@ The token must either be single-use **or** carry an expiry. This is invariant I-
 
 ---
 
-## Extended types (7)
+## Extended types (23)
 
-Extended types are optional. None is required for spec compliance. They live in [`contracts/python/src/weaver_contracts/extended.py`](../contracts/python/src/weaver_contracts/extended.py) only — there are no JSON Schemas for Extended types yet. Per [VERSIONING.md](VERSIONING.md), Extended contracts may have breaking changes in MINOR versions.
+Extended types are optional. None is required for spec compliance. Each has a JSON Schema in [`contracts/json/extended/`](../contracts/json/extended/) (the source of truth) mirrored by a dataclass in [`contracts/python/src/weaver_contracts/extended.py`](../contracts/python/src/weaver_contracts/extended.py). Per [VERSIONING.md](VERSIONING.md), Extended contracts may have breaking changes in MINOR versions.
 
 Adopters typically attach Extended objects to their own payloads via the `metadata` field of a Core contract (Core schemas set `additionalProperties: true`), or by composing them into Extended wrappers like `ExtendedFrameMetadata`.
 

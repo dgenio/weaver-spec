@@ -1,72 +1,51 @@
 """
-Tests that verify sample payloads in examples/sample_payloads/ validate
-against the corresponding JSON Schemas in contracts/json/.
+Core schema-alignment tests: every Core sample payload in
+examples/sample_payloads/ validates against its JSON Schema in contracts/json/,
+plus targeted invariant assertions that document specific Core constraints.
 
 These tests act as living documentation: if a schema changes in a breaking way,
-the sample payloads will fail to validate, catching the regression.
+the sample payloads fail to validate, catching the regression.
+
+The registry/validation boilerplate is shared with the Extended tier in
+tests/_schema_alignment.py (the modern referencing.Registry pattern, mirroring
+conformance/run.py) — issues #113 and #114.
 """
 
 import json
-import pathlib
+
 import pytest
 
-jsonschema = pytest.importorskip("jsonschema")
+pytest.importorskip("jsonschema")
 
-REPO_ROOT = pathlib.Path(__file__).parent.parent.parent.parent
-SCHEMA_DIR = REPO_ROOT / "contracts" / "json"
-PAYLOADS_DIR = REPO_ROOT / "examples" / "sample_payloads"
+from tests._schema_alignment import (  # noqa: E402
+    CORE_SCHEMA_DIR,
+    load_core_schema as load_schema,
+    load_payload,
+    validate,
+)
 
-
-def load_schema(name: str) -> dict:
-    path = SCHEMA_DIR / f"{name}.schema.json"
-    with open(path) as f:
-        return json.load(f)
-
-
-def load_payload(name: str) -> dict:
-    path = PAYLOADS_DIR / f"{name}.json"
-    with open(path) as f:
-        return json.load(f)
-
-
-def build_store() -> dict:
-    """Build a URI → schema dict for all local schemas, so $ref resolution
-    works without network access."""
-    store = {}
-    for schema_file in SCHEMA_DIR.glob("*.schema.json"):
-        with open(schema_file) as f:
-            schema = json.load(f)
-        if "$id" in schema:
-            store[schema["$id"]] = schema
-    return store
-
-
-_SCHEMA_STORE = build_store()
-
-
-def validate(payload: dict, schema: dict) -> None:
-    """Validate payload against schema using a local-only resolver."""
-    resolver = jsonschema.RefResolver(
-        base_uri=schema.get("$id", ""),
-        referrer=schema,
-        store=_SCHEMA_STORE,
-    )
-    validator_cls = jsonschema.validators.validator_for(schema)
-    validator = validator_cls(
-        schema,
-        resolver=resolver,
-        format_checker=jsonschema.FormatChecker(),
-    )
-    errors = [e for e in validator.iter_errors(payload)]
-    if errors:
-        msgs = "\n".join(str(e) for e in errors)
-        raise AssertionError(f"Schema validation failed:\n{msgs}")
+# (dataclass name, schema stem, payload stem). The CamelCase dataclass names
+# appear here as whole tokens so scripts/generate_coverage_table.py detects the
+# schema-test artifact for every Core type (it scans this file for the token):
+# SelectableItem, ChoiceCard, RoutingDecision, Capability, CapabilityToken,
+# PolicyDecision, Frame, Handle, TraceEvent.
+CORE_TYPES = [
+    ("SelectableItem", "selectable_item", "selectable_item"),
+    ("ChoiceCard", "choice_card", "choice_card"),
+    ("RoutingDecision", "routing_decision", "routing_decision"),
+    ("Capability", "capability", "capability"),
+    ("CapabilityToken", "capability_token", "capability_token"),
+    ("PolicyDecision", "policy_decision", "policy_decision"),
+    ("Frame", "frame", "frame_with_handles"),
+    ("Handle", "handle", "handle"),
+    ("TraceEvent", "trace_event", "trace_event"),
+]
 
 
 class TestSchemaValidJSON:
-    """All schema files must be valid JSON."""
+    """All Core schema files must be valid JSON with the required metadata."""
 
-    @pytest.mark.parametrize("schema_file", sorted(SCHEMA_DIR.glob("*.schema.json")))
+    @pytest.mark.parametrize("schema_file", sorted(CORE_SCHEMA_DIR.glob("*.schema.json")))
     def test_schema_is_valid_json(self, schema_file):
         with open(schema_file) as f:
             data = json.load(f)
@@ -75,68 +54,43 @@ class TestSchemaValidJSON:
         assert "description" in data, f"{schema_file.name} must have description"
 
 
-class TestRoutingDecisionPayload:
-    """routing_decision.json validates against routing_decision schema."""
+class TestCorePayloadValidation:
+    """Each Core sample payload validates against its schema and carries the
+    schema's required fields as non-empty values."""
 
-    def test_payload_validates(self):
-        schema = load_schema("routing_decision")
-        payload = load_payload("routing_decision")
-        validate(payload, schema)
+    @pytest.mark.parametrize("class_name,schema_stem,payload_stem", CORE_TYPES)
+    def test_payload_validates(self, class_name, schema_stem, payload_stem):
+        validate(load_payload(payload_stem), load_schema(schema_stem))
 
-    def test_required_fields_present(self):
-        payload = load_payload("routing_decision")
-        assert payload.get("id"), "routing_decision payload must have non-empty id"
-        assert payload.get("choice_cards"), "routing_decision payload must have choice_cards"
-        assert payload.get("timestamp"), "routing_decision payload must have timestamp"
+    @pytest.mark.parametrize("class_name,schema_stem,payload_stem", CORE_TYPES)
+    def test_required_fields_present(self, class_name, schema_stem, payload_stem):
+        schema = load_schema(schema_stem)
+        payload = load_payload(payload_stem)
+        for field_name in schema.get("required", []):
+            assert payload.get(field_name) not in (None, "", [], {}), (
+                f"{payload_stem} payload must carry non-empty required field "
+                f"{field_name!r}"
+            )
 
 
-class TestFrameWithHandlesPayload:
-    """frame_with_handles.json validates against frame schema."""
+class TestCoreInvariants:
+    """Targeted assertions documenting specific Core constraints (preserved from
+    the per-type tests this module replaced)."""
 
-    def test_payload_validates(self):
-        schema = load_schema("frame")
-        payload = load_payload("frame_with_handles")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("frame_with_handles")
-        assert payload.get("frame_id"), "frame payload must have non-empty frame_id"
-        assert payload.get("capability_id"), "frame payload must have capability_id"
-        assert payload.get("summary"), "frame payload must have summary"
-        assert payload.get("created_at"), "frame payload must have created_at"
-
-    def test_no_raw_output_field(self):
+    def test_frame_has_no_raw_output_field(self):
         """Frames must not contain a 'raw_output' field (invariant I-01 / I-05)."""
         payload = load_payload("frame_with_handles")
         assert "raw_output" not in payload, (
             "Frame must not contain raw_output (invariant: LLM never sees raw tool output)"
         )
 
-
-class TestCapabilityTokenPayload:
-    """capability_token.json validates against capability_token schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("capability_token")
-        payload = load_payload("capability_token")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("capability_token")
-        assert payload.get("token_id"), "capability_token payload must have non-empty token_id"
-        assert payload.get("principal"), "capability_token payload must have principal"
-        assert payload.get("scope"), "capability_token payload must have non-empty scope"
-        assert payload.get("issued_at"), "capability_token payload must have issued_at"
-
-    def test_scope_is_not_empty(self):
+    def test_capability_token_scope_is_not_empty(self):
         """Invariant I-06: CapabilityTokens must be scoped."""
-        payload = load_payload("capability_token")
-        scope = payload.get("scope", [])
+        scope = load_payload("capability_token").get("scope", [])
         assert len(scope) > 0, "CapabilityToken.scope must not be empty (invariant I-06)"
 
-    def test_invariant_i06_no_expiry_no_single_use_fails(self):
+    def test_capability_token_no_expiry_no_single_use_fails(self):
         """Invariant I-06: token without expires_at and without single_use must fail."""
-        schema = load_schema("capability_token")
         invalid_payload = {
             "token_id": "tok-invalid",
             "principal": "agent-1",
@@ -144,115 +98,27 @@ class TestCapabilityTokenPayload:
             "issued_at": "2026-03-08T06:00:00Z",
         }
         with pytest.raises(AssertionError, match="Schema validation failed"):
-            validate(invalid_payload, schema)
+            validate(invalid_payload, load_schema("capability_token"))
 
-
-class TestSelectableItemPayload:
-    """selectable_item.json validates against selectable_item schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("selectable_item")
-        payload = load_payload("selectable_item")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("selectable_item")
-        assert payload.get("id"), "selectable_item payload must have non-empty id"
-        assert payload.get("label"), "selectable_item payload must have label"
-        assert payload.get("description"), "selectable_item payload must have description"
-
-
-class TestChoiceCardPayload:
-    """choice_card.json validates against choice_card schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("choice_card")
-        payload = load_payload("choice_card")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("choice_card")
-        assert payload.get("id"), "choice_card payload must have non-empty id"
-        assert payload.get("items"), "choice_card payload must have non-empty items"
-
-    def test_items_within_bounds(self):
+    def test_choice_card_items_within_bounds(self):
         """ChoiceCard schema requires 1..20 items."""
-        payload = load_payload("choice_card")
-        items = payload.get("items", [])
+        items = load_payload("choice_card").get("items", [])
         assert 1 <= len(items) <= 20, "choice_card.items must be 1..20"
 
+    def test_policy_decision_is_allow_or_deny(self):
+        assert load_payload("policy_decision")["decision"] in ("allow", "deny")
 
-class TestCapabilityPayload:
-    """capability.json validates against capability schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("capability")
-        payload = load_payload("capability")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("capability")
-        for f in ("id", "name", "version", "description"):
-            assert payload.get(f), f"capability payload must have non-empty {f}"
-
-
-class TestPolicyDecisionPayload:
-    """policy_decision.json validates against policy_decision schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("policy_decision")
-        payload = load_payload("policy_decision")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("policy_decision")
-        for f in ("decision_id", "decision", "capability_id", "principal", "timestamp"):
-            assert payload.get(f), f"policy_decision payload must have non-empty {f}"
-
-    def test_decision_is_allow_or_deny(self):
-        payload = load_payload("policy_decision")
-        assert payload["decision"] in ("allow", "deny")
-
-
-class TestHandlePayload:
-    """handle.json validates against handle schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("handle")
+    def test_handle_byte_size_non_negative(self):
         payload = load_payload("handle")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("handle")
-        for f in ("handle_id", "capability_id", "artifact_type", "created_at"):
-            assert payload.get(f), f"handle payload must have non-empty {f}"
-
-    def test_byte_size_non_negative(self):
-        payload = load_payload("handle")
-        if "byte_size" in payload and payload["byte_size"] is not None:
+        if payload.get("byte_size") is not None:
             assert payload["byte_size"] >= 0
 
-
-class TestTraceEventPayload:
-    """trace_event.json validates against trace_event schema."""
-
-    def test_payload_validates(self):
-        schema = load_schema("trace_event")
-        payload = load_payload("trace_event")
-        validate(payload, schema)
-
-    def test_required_fields_present(self):
-        payload = load_payload("trace_event")
-        for f in ("event_id", "event_type", "timestamp"):
-            assert payload.get(f), f"trace_event payload must have non-empty {f}"
-
-    def test_event_type_in_schema_enum(self):
+    def test_trace_event_type_in_schema_enum(self):
         """Sample event_type must be one of the values declared in the schema.
 
-        Sourced from the loaded schema so the schema's enum remains the
-        single source of truth (no drift between test and schema).
+        Sourced from the loaded schema so the schema's enum remains the single
+        source of truth (no drift between test and schema).
         """
         schema = load_schema("trace_event")
         payload = load_payload("trace_event")
-        enum_values = schema["properties"]["event_type"]["enum"]
-        assert payload["event_type"] in enum_values
+        assert payload["event_type"] in schema["properties"]["event_type"]["enum"]
