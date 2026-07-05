@@ -373,13 +373,20 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # Mirror the package `python-tests` matrix (#152): the reference impl
+        # exercises the same crypto/JCS/jsonschema path as the conformance
+        # runner, so run it on every supported interpreter.
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install package with dev dependencies
         working-directory: contracts/python
@@ -388,11 +395,16 @@ jobs:
       - name: "Run the reference implementation (issue #76)"
         run: python examples/reference_impl/reference_impl.py
 
+      # The badge is a committed, deterministic artifact; regenerate and
+      # staleness-check it once (on the baseline interpreter) rather than on
+      # every matrix leg.
       - name: "Regenerate scoreboard badge from a real conformance result (#77)"
+        if: matrix.python-version == '3.11'
         run: |
           python conformance/run.py \
             --emit-result /tmp/conformance-result.json \
             --emit-badge docs/badges/weaver-spec.json
 
       - name: Fail if the committed self-cert badge is stale
+        if: matrix.python-version == '3.11'
         run: git diff --exit-code docs/badges/weaver-spec.json

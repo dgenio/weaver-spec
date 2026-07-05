@@ -18,13 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # Mirror the package `python-tests` matrix (#152). The runner leans on
+        # jsonschema / referencing / jcs / cryptography, whose behaviour can vary
+        # by interpreter, so the security-relevant path is exercised on every
+        # supported version rather than a single one.
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install conformance dependencies
         run: pip install jsonschema referencing PyYAML jcs cryptography
