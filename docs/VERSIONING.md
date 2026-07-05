@@ -104,11 +104,11 @@ This table tracks which versions of the sibling repositories are known-compatibl
 > [!IMPORTANT]
 > A cell may be `verified` or `provisional` only when backed by a real declaration recorded in `compatibility.yaml` (the `declaration` field). Unknown compatibility MUST be recorded as `unverified` — never assume or invent a version claim.
 
-### Current matrix (contract version 0.7.0)
+### Current matrix (contract version 0.8.0)
 
 | Contract Version | contextweaver | agent-kernel | ChainWeaver |
 | ----------------- | -------------- | ------------- | ------------- |
-| 0.7.0 (current) | `unverified` | `unverified` | `unverified` |
+| 0.8.0 (current) | `unverified` | `unverified` | `unverified` |
 
 All `0.x` contract versions share MAJOR version `0` and are mutually compatible (see [Semantic Versioning](#semantic-versioning) and `weaver_contracts.version.is_compatible`). No sibling repository has published a compatibility declaration yet, so every cell is `unverified`.
 

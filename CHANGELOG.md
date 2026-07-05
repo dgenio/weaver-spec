@@ -8,8 +8,69 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ## [Unreleased]
 
+---
+
+## [0.8.0] - 2026-07-05
+
 ### Added
 
+- **Conformance-suite hardening sweep.** A single cycle of build-time/CI
+  conformance improvements. Only one new **Extended** contract is added, which
+  bumps `CONTRACT_VERSION` 0.7.0 → 0.8.0 (MINOR, per the Extended-contract
+  workflow); the rest is CI tooling, tests, fixtures, and docs — never imported
+  by `weaver_contracts` and never published.
+  - **`ConformanceResult` Extended contract (#116).** The machine-readable
+    result emitted by `conformance/run.py` is now a schematized interchange
+    shape (`contracts/json/extended/conformance_result.schema.json` + a
+    `ConformanceResult` dataclass in `extended.py` + a sample payload +
+    roundtrip/alignment tests), so the self-certification badge, the scoreboard,
+    and siblings that read it share one validated contract. It is CI tooling
+    output, not a Weaver runtime contract; the runner still does not import the
+    package (the schema-parity test keeps the two in lockstep). The runner now
+    validates its own emitted result against the schema in tests.
+  - **Structured failure records (#145).** The emitted result gains a
+    `failure_records` array alongside the flat `failure_detail` strings — each
+    record carries a `kind` plus, where known, `payload` / `schema` / `keyword`
+    / `path` / `invariant_id`, so an agent can map a failure to the offending
+    fixture/field. The human stderr output and exit codes are unchanged.
+  - **Result freshness/expiry policy (#150).** `conformance/run.py:is_result_fresh()`
+    flags a published result whose `generated_at` is older than 90 days or whose
+    `contract_version` is not the current MAJOR, using only existing result
+    fields. Documented in `docs/SELF_CERTIFICATION.md`; the scoreboard is
+    unaffected because it re-verifies each sibling's live bundle every run.
+  - **Adversarial TraceBundle fixtures (#133).** Negative corpus fixtures for a
+    signature envelope missing `kid` and one declaring a non-registry
+    `canonicalization` (caught at the schema gate via the bundle's `$ref` to
+    `capability_token_signature`, so no runner code path was needed), plus a
+    unit test that tampering a nested `Frame` after signing breaks verification.
+  - **Validator caching + validation-at-scale guidance (#130).** The runner
+    compiles one `Draft202012Validator` per schema `$id` and reuses it, with a
+    regression guard asserting compilations scale with schemas, not payload
+    count; documented as the compile-once/reuse pattern in `docs/CONFORMANCE.md`.
+  - **External-bundle input hardening (#158).** `--bundle` mode now rejects an
+    oversized (> 5 MiB) or non-object input with a clear `input:` failure instead
+    of a traceback; the 5 MiB cap is shared with the scoreboard's network fetch.
+  - **Extend-via-data guard (#137).** The runner now raises on an
+    `invariants.yaml` `applies_to` that matches no handling branch (was a silent
+    no-op), a consistency test asserts every corpus schema name and every
+    trace_bundle-scoped invariant assertion resolves, and `docs/CONFORMANCE.md`
+    documents the "extend via data, not new code paths" constraint.
+  - **Trust-model documentation (#156).** A new "Trust model" section in
+    `docs/SIGNING.md` states what a verified signature does and does not attest
+    (integrity + origin only; not correctness, freshness/replay, or
+    confidentiality), roots trust in keyring distribution, and reconciles the
+    strict verifier's "unknown key → reject" with the runner's "unknown `kid` →
+    skipped, not failed". Cross-linked from `SECURITY.md` and
+    `docs/SELF_CERTIFICATION.md`.
+
+### Changed
+
+- **Conformance runner runs across the full Python matrix (#152).** The reusable
+  `.github/workflows/conformance.yml` and the `reference-impl` job in `ci.yml`
+  now run on Python 3.10–3.14 (matching the package `python-tests` matrix)
+  instead of only 3.11, so the crypto/JCS/jsonschema path is exercised on every
+  supported interpreter. `run()` and `verify_external_bundle()` now also return
+  the structured failure records described above (internal API, never published).
 - Mechanical dataclass ⟷ JSON Schema parity test (`contracts/python/tests/test_schema_parity.py`)
   covering every Core and Extended type — field names, required/optional status, and a coarse
   type shape — turning the "schemas lead, Python mirrors exactly" rule into an enforced guarantee
@@ -19,9 +80,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
   single source of truth for the contract version, and any drift in `README.md`, `pyproject.toml`,
   `well-known/contracts.json`, `CHANGELOG.md`, `docs/VERSIONING.md`, or `compatibility.yaml` fails
   CI (#110).
-
-### Changed
-
 - Consolidated the schema-alignment test boilerplate onto a shared
   `contracts/python/tests/_schema_alignment.py` helper and migrated both alignment modules off the
   deprecated `jsonschema.RefResolver` to the modern `referencing.Registry` pattern used by the

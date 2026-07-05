@@ -20,7 +20,7 @@ schema_version: 1
 # weaver-spec contract versions this manifest reasons about. All 0.x versions
 # share MAJOR 0 and are mutually compatible (see docs/VERSIONING.md).
 contract_versions:
-  - "0.7.0"
+  - "0.8.0"
 
 repositories:
   - name: contextweaver

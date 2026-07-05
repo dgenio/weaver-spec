@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://weaver-spec.dev/contracts/v0/extended/conformance_result.schema.json",
+  "title": "ConformanceResult",
+  "description": "Extended. The machine-readable result emitted by the conformance runner (conformance/run.py). It is build-time CI tooling output, not a Weaver runtime contract, but it is a stable inter-repo interchange shape: the self-certification badge (docs/SELF_CERTIFICATION.md) and the public scoreboard (docs/SCOREBOARD.md) consume it, so schematizing it keeps producers and consumers from drifting. See docs/CONFORMANCE.md.",
+  "type": "object",
+  "required": [
+    "result_version",
+    "contract_version",
+    "mode",
+    "target",
+    "status",
+    "checks_run",
+    "failures",
+    "generated_at",
+    "runner"
+  ],
+  "properties": {
+    "result_version": {
+      "type": "string",
+      "const": "1",
+      "description": "Version of this result format. Bumped only on an intentional shape change."
+    },
+    "contract_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The weaver-spec CONTRACT_VERSION the run was performed against."
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["corpus", "bundle"],
+      "description": "`corpus` when the built-in corpus was run; `bundle` when a single external TraceBundle was checked."
+    },
+    "target": {
+      "type": ["string", "null"],
+      "description": "The bundle path/URL in `bundle` mode; null in `corpus` mode."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail"],
+      "description": "Overall verdict: `pass` iff no checks failed."
+    },
+    "checks_run": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of conformance checks executed."
+    },
+    "failures": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Count of failed checks (0 iff status is `pass`)."
+    },
+    "failure_detail": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Human-readable failure messages (empty when status is `pass`)."
+    },
+    "failure_records": {
+      "type": "array",
+      "description": "Structured, machine-mappable view of each failure (#145): an agent can map a failure to the offending fixture/field without parsing the human strings. Empty when status is `pass`.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "message"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["positive", "negative", "invariant", "schema", "tracebundle", "input"],
+            "description": "Category of the failing check."
+          },
+          "message": {
+            "type": "string",
+            "description": "The same human-readable message as the matching `failure_detail` entry."
+          },
+          "payload": {
+            "type": "string",
+            "description": "Repo-relative fixture path or bundle id the failure concerns, when applicable."
+          },
+          "schema": {
+            "type": "string",
+            "description": "Schema stem the check validated against, when applicable."
+          },
+          "keyword": {
+            "type": "string",
+            "description": "Declared/observed JSON Schema keyword for a schema-level failure, when applicable."
+          },
+          "path": {
+            "type": "string",
+            "description": "Location within the payload the failure concerns, when applicable."
+          },
+          "invariant_id": {
+            "type": "string",
+            "description": "Invariant id or named check for an invariant-level failure, when applicable."
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the result was produced. Used by the freshness policy (docs/SELF_CERTIFICATION.md)."
+    },
+    "runner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the tool that produced the result."
+    }
+  },
+  "additionalProperties": true
+}

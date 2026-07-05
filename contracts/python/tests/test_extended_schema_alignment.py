@@ -55,6 +55,7 @@ EXTENDED_TYPES = [
     ("ExecutionFeedback", "execution_feedback"),
     ("TraceBundle", "trace_bundle"),
     ("FailureCaseArtifact", "failure_case_artifact"),
+    ("ConformanceResult", "conformance_result"),
 ]
 
 
@@ -394,6 +395,41 @@ class TestExtendedNegativeCases:
             "property_name": "p",
             "status": "candidate",
             "severity": "extreme",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_conformance_result_bad_status_fails(self):
+        # #116: status is constrained to pass|fail.
+        schema = load_extended_schema("conformance_result")
+        bad = {
+            "result_version": "1",
+            "contract_version": "0.8.0",
+            "mode": "corpus",
+            "target": None,
+            "status": "maybe",
+            "checks_run": 1,
+            "failures": 0,
+            "generated_at": "2026-07-05T12:00:00Z",
+            "runner": "weaver-spec conformance/run.py",
+        }
+        with pytest.raises(AssertionError, match="Schema validation failed"):
+            validate(bad, schema)
+
+    def test_conformance_result_bad_failure_record_fails(self):
+        # #145: each failure_record needs a kind from the enum and a message.
+        schema = load_extended_schema("conformance_result")
+        bad = {
+            "result_version": "1",
+            "contract_version": "0.8.0",
+            "mode": "corpus",
+            "target": None,
+            "status": "fail",
+            "checks_run": 1,
+            "failures": 1,
+            "failure_records": [{"kind": "not-a-kind", "message": "x"}],
+            "generated_at": "2026-07-05T12:00:00Z",
+            "runner": "weaver-spec conformance/run.py",
         }
         with pytest.raises(AssertionError, match="Schema validation failed"):
             validate(bad, schema)
