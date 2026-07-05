@@ -53,8 +53,9 @@ STATUS_ICON = {"pass": "✅ pass", "fail": "❌ fail", "not-submitted": "⚪ not
 
 # Cap on a fetched sibling bundle. The scoreboard fetches whatever a registered
 # sibling publishes, on a schedule in CI; an oversized response must not be able
-# to exhaust memory before we even attempt to parse it.
-MAX_BUNDLE_BYTES = 5 * 1024 * 1024  # 5 MiB
+# to exhaust memory before we even attempt to parse it. Shared with the runner's
+# file-based --bundle path (#158) so both ingestion paths enforce one limit.
+MAX_BUNDLE_BYTES = run.MAX_BUNDLE_BYTES
 
 
 class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
@@ -110,7 +111,7 @@ def fetch_json(url: str, timeout: float) -> tuple[Optional[dict], str]:
 
 def self_row() -> Row:
     """Conformance-check this repo against its own corpus."""
-    checks, failures = run.run(run.DEFAULT_KEYRING)
+    checks, failures, _records = run.run(run.DEFAULT_KEYRING)
     status = "pass" if not failures else "fail"
     detail = "reference corpus" if not failures else f"{len(failures)} failure(s)"
     return Row(repo=SELF_REPO, status=status, checks=checks, detail=detail,
@@ -137,7 +138,7 @@ def sibling_row(entry: dict, schemas, registry, keyring, timeout: float) -> Row:
     payload, note = fetch_json(url, timeout)
     if payload is None:
         return Row(repo=repo, status="not-submitted", checks=0, detail=note, url=url)
-    checks, failures, notes = run.verify_external_bundle(payload, schemas, registry, keyring)
+    checks, failures, _records, notes = run.verify_external_bundle(payload, schemas, registry, keyring)
     status = "pass" if not failures else "fail"
     if failures:
         detail = f"{len(failures)} failure(s): {failures[0]}"

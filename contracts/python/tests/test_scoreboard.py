@@ -132,7 +132,7 @@ def test_sibling_row_pass_surfaces_signature_status(monkeypatch):
     monkeypatch.setattr(
         sb.run,
         "verify_external_bundle",
-        lambda *a: (3, [], ["signature cryptographically verified (kid 'k')"]),
+        lambda *a: (3, [], [], ["signature cryptographically verified (kid 'k')"]),
     )
     row = sb.sibling_row({"repo": "x", "url": "https://x.dev/b.json"}, {}, None, {}, 1.0)
     assert row.status == "pass"
@@ -142,7 +142,7 @@ def test_sibling_row_pass_surfaces_signature_status(monkeypatch):
 
 def test_sibling_row_fail_reports_first_failure(monkeypatch):
     monkeypatch.setattr(sb, "fetch_json", lambda url, timeout: ({"bundle_id": "b"}, "fetched"))
-    monkeypatch.setattr(sb.run, "verify_external_bundle", lambda *a: (2, ["boom", "second"], []))
+    monkeypatch.setattr(sb.run, "verify_external_bundle", lambda *a: (2, ["boom", "second"], [], []))
     row = sb.sibling_row({"repo": "x", "url": "https://x.dev/b.json"}, {}, None, {}, 1.0)
     assert row.status == "fail"
     assert row.detail == "2 failure(s): boom"
