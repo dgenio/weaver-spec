@@ -116,6 +116,52 @@ adoption.
 
 ---
 
+## Trust model
+
+> [!IMPORTANT]
+> This section states what a verified signature does and does not guarantee. It
+> is normative for adopters reasoning about the signing/conformance path (#156).
+
+**What a valid signature attests.** A signature that verifies proves exactly
+two things: (1) **integrity** — the JCS-canonical form of the payload (with
+`x_weaver_signature` / `signature` removed) has not changed since signing; and
+(2) **origin** — it was produced by the private key whose public key the
+verifier holds under `kid`. Nothing more.
+
+**What it does NOT attest.**
+
+- **Correctness or safety.** A signed `TraceBundle` or `CapabilityToken` is
+  authentic, not *correct*. Signing says who produced the bytes, not that the
+  decision they encode was sound.
+- **Freshness / replay.** A detached signature carries no nonce or expiry of its
+  own. `signed_at` is informational and unverified. A captured signed payload
+  stays verifiable forever; bound freshness at the payload layer (a
+  `CapabilityToken`'s `expires_at` / `single_use`, invariant I-06) or with a
+  transport nonce, not via the signature.
+- **Confidentiality.** Signing is integrity + authentication, never encryption
+  (see below).
+
+**Trust is rooted in keyring distribution.** Verification is only as trustworthy
+as the mapping from `kid` to public key. Distributing and rotating that keyring
+is the adopter's responsibility (see *What is out of scope*); a signature
+verified against an attacker-controlled keyring proves nothing.
+
+**Unknown key means "not verified", not "trusted".** The strict verifier in
+[Verifying a signature](#verifying-a-signature) returns `False` for a `kid` that
+is absent from the keyring — an unknown key is a verification *failure* for a
+verifier that must decide accept/reject. The conformance runner
+(`conformance/run.py:check_trace_bundle`) instead reports an unknown `kid` as
+**skipped** — it validates the signature *envelope* (shape, algorithm registry,
+canonicalization) but records that cryptographic verification did not run,
+because the runner is a **conformance report**, not an authorization gate: it
+must not claim provenance it did not check, and it must not fail a bundle merely
+because the report host lacks the signer's key. Both behaviours share the same
+rule — **an unknown key is never treated as verified** — they differ only in
+what an unverifiable signature means for the caller: reject (a gate) versus
+report-as-unchecked (a scoreboard). See
+[CONFORMANCE.md](CONFORMANCE.md#signature-verification-74) and
+[SELF_CERTIFICATION.md](SELF_CERTIFICATION.md).
+
 ## What is out of scope
 
 - **Key management.** Issuing `kid` values, rotating keys, distributing
