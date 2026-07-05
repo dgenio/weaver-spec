@@ -105,9 +105,11 @@ from datetime import datetime, timedelta, timezone  # noqa: E402
 
 
 def test_result_freshness_accepts_recent_current_major():
-    now = datetime(2026, 7, 5, tzinfo=timezone.utc)
-    result = conf.build_result("pass", 47, [])  # generated_at ~= now, current version
-    fresh, reasons = conf.is_result_fresh(result, now=now)
+    # Just-produced result: generated_at ~= real now and version == current, so
+    # it is fresh. Uses the default `now` (real clock) rather than a pinned one
+    # so the freshly-stamped generated_at is never treated as future.
+    result = conf.build_result("pass", 47, [])
+    fresh, reasons = conf.is_result_fresh(result)
     assert fresh, reasons
 
 
@@ -135,6 +137,17 @@ def test_result_freshness_flags_missing_generated_at():
     fresh, reasons = conf.is_result_fresh(result)
     assert not fresh
     assert any("generated_at" in r for r in reasons)
+
+
+def test_result_freshness_flags_future_timestamp():
+    # A future-dated result is clock-skewed/malformed, not fresh: a negative age
+    # must not slip past the age ceiling.
+    now = datetime(2026, 7, 5, tzinfo=timezone.utc)
+    result = conf.build_result("pass", 47, [])
+    result["generated_at"] = "2026-08-01T00:00:00Z"  # after `now`
+    fresh, reasons = conf.is_result_fresh(result, now=now)
+    assert not fresh
+    assert any("future" in r for r in reasons)
 
 
 def test_main_emits_result_and_badge(tmp_path):
@@ -225,6 +238,18 @@ def test_main_bundle_mode_oversized_input_is_reported(tmp_path, capsys):
     assert conf.main(["--bundle", str(path)]) == 1
     err = capsys.readouterr().err
     assert "input:" in err and "limit" in err
+
+
+def test_input_failure_message_is_1to1_in_result(tmp_path):
+    # The structured record's message must equal the failure_detail entry (the
+    # _Failures 1:1 invariant), including the "input:" prefix.
+    path = tmp_path / "bad.json"
+    path.write_text("[1, 2, 3]")  # valid JSON, not an object
+    result_path = tmp_path / "result.json"
+    assert conf.main(["--bundle", str(path), "--emit-result", str(result_path)]) == 1
+    result = json.loads(result_path.read_text())
+    assert result["failure_detail"] == [r["message"] for r in result["failure_records"]]
+    assert result["failure_detail"][0].startswith("input:")
 
 
 # ---------------------------------------------------------------------------

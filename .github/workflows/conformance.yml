@@ -33,6 +33,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          # Matches the package `python-tests` job: 3.14 may still resolve as a
+          # prerelease on the runner, so allow it rather than fail to set up.
+          allow-prereleases: true
 
       - name: Install conformance dependencies
         run: pip install jsonschema referencing PyYAML jcs cryptography

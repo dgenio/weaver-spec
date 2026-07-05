@@ -39,7 +39,7 @@ import base64
 import json
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -632,9 +632,13 @@ def is_result_fresh(
     else:
         if generated_at.tzinfo is None:  # treat a naive timestamp as UTC
             generated_at = generated_at.replace(tzinfo=timezone.utc)
-        age_days = (now - generated_at).days
-        if age_days > max_age_days:
-            reasons.append(f"result is {age_days} days old (limit {max_age_days})")
+        age = now - generated_at
+        if age < timedelta(0):
+            # A result dated in the future is clock-skewed or malformed, not
+            # fresh — don't let a negative age slip past the age ceiling.
+            reasons.append(f"generated_at is in the future ({raw})")
+        elif age.days > max_age_days:
+            reasons.append(f"result is {age.days} days old (limit {max_age_days})")
 
     return (not reasons, reasons)
 
@@ -743,9 +747,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         bundle, load_error = load_external_bundle(args.bundle)
         if load_error is not None:
             # Oversized / malformed / non-object input: fail cleanly (#158), not
-            # with a traceback, and never reach schema validation.
+            # with a traceback, and never reach schema validation. Keep the
+            # structured record's message identical to the failure_detail entry
+            # (the 1:1 invariant documented on _Failures).
+            input_message = f"input: {load_error}"
             checks, failures, records, notes = (
-                0, [f"input: {load_error}"], [{"kind": "input", "message": load_error}], [],
+                0, [input_message], [{"kind": "input", "message": input_message}], [],
             )
         else:
             assert bundle is not None  # load_error is None => bundle is set
