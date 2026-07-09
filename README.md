@@ -3,6 +3,7 @@
 **Canonical specs and shared contracts for the Weaver Stack.**
 
 [![Weaver-compatible](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dgenio/weaver-spec/main/docs/badges/weaver-spec.json)](docs/SELF_CERTIFICATION.md)
+[![Read the Weaver Stack overview on Towards AI](https://img.shields.io/badge/Read_the_overview-Towards_AI-black?logo=medium&logoColor=white)](https://pub.towardsai.net/the-weaver-stack-one-contract-layer-for-safe-llm-agents-7f733cad5eac)
 
 > **Part of the [Weaver Stack](docs/WEAVER_STACK.md)**
 >
