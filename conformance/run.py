@@ -637,7 +637,10 @@ def is_result_fresh(
             # A result dated in the future is clock-skewed or malformed, not
             # fresh — don't let a negative age slip past the age ceiling.
             reasons.append(f"generated_at is in the future ({raw})")
-        elif age.days > max_age_days:
+        elif age > timedelta(days=max_age_days):
+            # Compare the full timedelta, not the truncated ``age.days``: a result
+            # 90 days and a few hours old is past the "within 90 days" window
+            # (docs/SELF_CERTIFICATION.md) and must not read as fresh.
             reasons.append(f"result is {age.days} days old (limit {max_age_days})")
 
     return (not reasons, reasons)

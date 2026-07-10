@@ -150,6 +150,20 @@ def test_result_freshness_flags_future_timestamp():
     assert any("future" in r for r in reasons)
 
 
+def test_result_freshness_flags_just_past_window_by_hours():
+    # A result 90 days *and a few hours* old is past the "within 90 days" window
+    # and must not read as fresh. Guards the full-timedelta comparison against a
+    # regression to the truncating ``age.days`` check, which would round 90d6h
+    # down to 90 and wrongly accept it.
+    now = datetime(2026, 7, 5, tzinfo=timezone.utc)
+    result = conf.build_result("pass", 47, [])
+    generated = now - timedelta(days=90, hours=6)
+    result["generated_at"] = generated.strftime("%Y-%m-%dT%H:%M:%SZ")
+    fresh, reasons = conf.is_result_fresh(result, now=now)
+    assert not fresh
+    assert any("days old" in r for r in reasons)
+
+
 def test_main_emits_result_and_badge(tmp_path):
     result_path = tmp_path / "result.json"
     badge_path = tmp_path / "badge.json"
