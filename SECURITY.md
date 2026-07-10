@@ -37,6 +37,7 @@ It does **not** cover the sibling runtime repositories (`contextweaver`, `agent-
 - The `weaver_contracts` package has **no runtime dependencies** beyond the Python standard library. This minimises supply chain risk.
 - JSON Schemas should be loaded from trusted sources; do not load schemas from untrusted user input without validation.
 - Contract tokens (`CapabilityToken`) contain authorization scope. Treat them with the same care as bearer tokens.
+- Before relying on a signed `CapabilityToken` or `TraceBundle`, read the trust model in [`docs/SIGNING.md`](docs/SIGNING.md#trust-model): a verified signature attests integrity and origin only — not correctness, freshness/replay protection, or confidentiality — and its trust is rooted in how you distribute the verifier keyring.
 
 ### Framework alignment
 

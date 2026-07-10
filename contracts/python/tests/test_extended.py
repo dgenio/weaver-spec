@@ -22,6 +22,7 @@ from weaver_contracts.extended import (
     ArtifactSafetyReport,
     CapabilityTokenSignature,
     CompiledFlow,
+    ConformanceResult,
     EvaluationArtifact,
     ExecutionCandidate,
     ExecutionFeedback,
@@ -1480,3 +1481,73 @@ class TestFailureCaseArtifact:
         data = json.loads(json.dumps(asdict(fc)))
         for key, value in p.items():
             assert data[key] == value, f"{name}: {key!r} not preserved on round-trip"
+
+
+class TestConformanceResult:
+    def _kwargs(self, **overrides):
+        base = dict(
+            result_version="1",
+            contract_version="0.8.0",
+            mode="corpus",
+            target=None,
+            status="pass",
+            checks_run=47,
+            failures=0,
+            generated_at="2026-07-05T12:00:00Z",
+            runner="weaver-spec conformance/run.py",
+        )
+        base.update(overrides)
+        return base
+
+    def test_valid_from_payload(self):
+        p = load_payload("conformance_result")
+        r = ConformanceResult(
+            result_version=p["result_version"],
+            contract_version=p["contract_version"],
+            mode=p["mode"],
+            target=p["target"],
+            status=p["status"],
+            checks_run=p["checks_run"],
+            failures=p["failures"],
+            generated_at=p["generated_at"],
+            runner=p["runner"],
+            failure_detail=p.get("failure_detail", []),
+            failure_records=p.get("failure_records", []),
+        )
+        assert r.status == "pass"
+        assert r.mode == "corpus"
+        assert r.target is None
+        assert r.failure_records == []
+
+    def test_bad_result_version_raises(self):
+        with pytest.raises(ValueError, match="result_version must be '1'"):
+            ConformanceResult(**self._kwargs(result_version="2"))
+
+    def test_bad_mode_raises(self):
+        with pytest.raises(ValueError, match="mode must be one of"):
+            ConformanceResult(**self._kwargs(mode="offline"))
+
+    def test_bad_status_raises(self):
+        with pytest.raises(ValueError, match="status must be one of"):
+            ConformanceResult(**self._kwargs(status="maybe"))
+
+    def test_negative_counts_raise(self):
+        with pytest.raises(ValueError, match="checks_run must be >= 0"):
+            ConformanceResult(**self._kwargs(checks_run=-1))
+        with pytest.raises(ValueError, match="failures must be >= 0"):
+            ConformanceResult(**self._kwargs(failures=-1))
+
+    def test_serialization_roundtrips(self):
+        r = ConformanceResult(
+            **self._kwargs(
+                mode="bundle",
+                target="path/to/bundle.json",
+                status="fail",
+                failures=1,
+                failure_detail=["schema: <root>: boom"],
+                failure_records=[{"kind": "schema", "message": "schema: <root>: boom"}],
+            )
+        )
+        data = json.loads(json.dumps(asdict(r)))
+        assert data["mode"] == "bundle"
+        assert data["failure_records"][0]["kind"] == "schema"

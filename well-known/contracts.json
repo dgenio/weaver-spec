@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "contract_version": "0.7.0",
+  "contract_version": "0.8.0",
   "core": [
     {
       "name": "capability",
@@ -94,6 +94,13 @@
       "$id": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json",
       "path": "contracts/json/extended/compiled_flow.schema.json",
       "sha256": "0dc2a8ddfc9b3b8d33f85d442661fe696639e56184c2d89d812ab9cbf0082829"
+    },
+    {
+      "name": "conformance_result",
+      "version": "v0",
+      "$id": "https://weaver-spec.dev/contracts/v0/extended/conformance_result.schema.json",
+      "path": "contracts/json/extended/conformance_result.schema.json",
+      "sha256": "ec5a1a97e240327026c0dc97371002ad540aba2ca80ad453911925e6df7c30ba"
     },
     {
       "name": "evaluation_artifact",

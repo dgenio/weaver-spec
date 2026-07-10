@@ -1,0 +1,13 @@
+{
+  "result_version": "1",
+  "contract_version": "0.8.0",
+  "mode": "corpus",
+  "target": null,
+  "status": "pass",
+  "checks_run": 47,
+  "failures": 0,
+  "failure_detail": [],
+  "failure_records": [],
+  "generated_at": "2026-07-05T12:00:00Z",
+  "runner": "weaver-spec conformance/run.py"
+}

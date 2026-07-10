@@ -18,7 +18,7 @@ Schema cannot express.
 | Positive corpus | [`conformance/corpus.yaml`](../conformance/corpus.yaml) `positive` | Each payload **must** validate against its schema. |
 | Negative corpus | `conformance/corpus.yaml` `negative` | Each payload **must** be rejected — by JSON Schema (`by: schema`) or, for schema-valid payloads, by an invariant (`by: invariant`). |
 | Invariants | [`conformance/invariants.yaml`](../conformance/invariants.yaml) | Executable assertions for **I-01, I-02, I-04, I-06** (see [INVARIANTS.md](INVARIANTS.md)). |
-| TraceBundle integrity | runner (`#74`) | Recomputes the RFC 8785 (JCS) canonical form excluding `signature`; validates the detached-signature envelope; cryptographically verifies the signature when the signing key is in the supplied keyring. |
+| TraceBundle integrity | runner (`#74`) | Recomputes the RFC 8785 (JCS) canonical form excluding `signature`; validates the detached-signature envelope; cryptographically verifies the signature when the signing key is in the supplied keyring. Adversarial envelopes — a missing `kid`, a non-registry `canonicalization`, or a nested artifact tampered after signing — are rejected (`#133`). |
 
 `invariants.yaml` is intentionally a **named-check registry**, not an embedded
 expression language: each block binds an invariant `id` to a real Python check
@@ -92,7 +92,11 @@ python conformance/run.py --bundle path/to/bundle.json
 ```
 
 This is the engine the [scoreboard](SCOREBOARD.md) runs against each sibling's
-published bundle.
+published bundle. Because that input is semi-trusted (it comes from another
+repo), the external path is hardened (#158): a bundle larger than **5 MiB** or
+that is not a JSON object is rejected with a clear `input:` failure rather than
+a traceback, and at most that many bytes are read before parsing. The scoreboard
+enforces the same limit on the bundles it fetches over the network.
 
 ## Machine-readable result and badge
 
@@ -106,9 +110,47 @@ python conformance/run.py \
   --emit-badge weaver-compatible.json
 ```
 
-The result is CI tooling output, not a Weaver contract. See
+The result is CI tooling output, not a Weaver runtime contract, but it is a
+stable interchange shape: it validates against
+[`contracts/json/extended/conformance_result.schema.json`](../contracts/json/extended/conformance_result.schema.json)
+(`#116`), so the badge, the scoreboard, and any sibling reading it share one
+schema and cannot drift. Alongside the flat `failure_detail` strings the result
+carries `failure_records` — a structured per-failure view (`kind`, `message`,
+and, where known, `payload` / `schema` / `keyword` / `path` / `invariant_id`)
+that an agent can map straight to the offending fixture or field (`#145`). See
 [SELF_CERTIFICATION.md](SELF_CERTIFICATION.md) for the badge flow and
 [SCOREBOARD.md](SCOREBOARD.md) for the public per-repo scoreboard.
+
+## Validating at scale
+
+Compiling a JSON Schema validator is far more expensive than running one.
+Adopters that validate many payloads — a kernel firewalling every tool call, a
+batch validating a corpus — should **compile once and reuse**, not build a
+validator per payload. The runner does this internally: `load_schemas()` builds
+the schema registry once, and `_validator_for()` caches one compiled
+`Draft202012Validator` per schema `$id`, so validating N payloads against the
+same schema compiles it once, not N times. Mirror that pattern in your own
+integration rather than constructing a validator inside a per-payload loop.
+
+## Extending the conformance suite
+
+The runner is deliberately a single, data-driven file. Extend it through
+**data, not new code paths**:
+
+- **A new positive or negative payload** is a new entry in
+  [`corpus.yaml`](../conformance/corpus.yaml) plus a fixture file — no runner
+  change. A schema-level negative declares `by: schema` and the `violates`
+  keyword/target; an invariant-level negative declares `by: invariant` and the
+  invariant `id`.
+- **A new invariant** registers a named check in `BUNDLE_INVARIANTS` (or the
+  relevant dispatch in `run()`) and adds a block to
+  [`invariants.yaml`](../conformance/invariants.yaml) binding the `id` to that
+  named check. Avoid bespoke per-fixture branches.
+
+A consistency test (`test_conformance.py`) enforces this: every `corpus.yaml`
+schema name must resolve to a loaded schema, and every `trace_bundle`-scoped
+invariant assertion must resolve to a registered check — so a typo or an
+orphaned entry fails CI rather than silently skipping a check.
 
 ## Related
 

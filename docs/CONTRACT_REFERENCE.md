@@ -1,6 +1,6 @@
 # Contract Field Reference
 
-A single-page field reference for every Weaver contract type — both Core (9) and Extended (23).
+A single-page field reference for every Weaver contract type — both Core (9) and Extended (24).
 
 For narrative and adoption guidance, read [ARCHITECTURE.md](ARCHITECTURE.md), [BOUNDARIES.md](BOUNDARIES.md), and [GLOSSARY.md](GLOSSARY.md). For a runnable code path, use [QUICKSTART.md](QUICKSTART.md).
 

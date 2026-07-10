@@ -20,6 +20,12 @@ The LLM context window must never receive raw tool output unless an explicit, au
 
 **What "default" means:** Without explicit opt-in configuration, the firewall is always active. An implementation may expose a `raw_passthrough` mode for trusted internal pipelines, but this must be explicitly declared in the `CapabilityToken` and recorded in the audit log.
 
+> [!NOTE]
+> A structural wire representation for this override — and a corresponding
+> conformance check that exempts a correctly declared-and-audited passthrough
+> without weakening the default check — is **proposed, not yet accepted**, in
+> [ADR 003](adr/003-raw-passthrough-override.md) ([#117](https://github.com/dgenio/weaver-spec/issues/117)). Until it is accepted, any `Frame` carrying raw output is treated as an I-01 violation by the conformance suite.
+
 ---
 
 ### I-02: Every Execution Is Authorized and Auditable

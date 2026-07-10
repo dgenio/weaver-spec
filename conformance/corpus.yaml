@@ -51,6 +51,11 @@ negative:
   - {payload: conformance/negative/trace_event/bad_event_type.json, schema: trace_event, by: schema, violates: "enum:event_type"}
   - {payload: conformance/negative/trace_event/missing_timestamp.json, schema: trace_event, by: schema, violates: "required:timestamp"}
   - {payload: conformance/negative/trace_event/empty_event_id.json, schema: trace_event, by: schema, violates: "minLength:event_id"}
+  # TraceBundle — adversarial signature envelopes (#133). Caught at the schema
+  # gate via the bundle's $ref to capability_token_signature, so no runner code
+  # path is needed — the envelope is rejected before crypto verification.
+  - {payload: conformance/negative/trace_bundle/sig_missing_kid.json, schema: trace_bundle, by: schema, violates: "required:kid"}
+  - {payload: conformance/negative/trace_bundle/sig_wrong_canonicalization.json, schema: trace_bundle, by: schema, violates: "enum:canonicalization"}
   # TraceBundle — schema-valid but invariant-violating (exercises #74 checks)
   - {payload: conformance/negative/trace_bundle/i01_frame_carries_raw_output.json, schema: trace_bundle, by: invariant, violates: I-01}
   - {payload: conformance/negative/trace_bundle/i02_policy_decision_without_trace_event.json, schema: trace_bundle, by: invariant, violates: I-02}

@@ -968,3 +968,57 @@ class FailureCaseArtifact:
             raise ValueError(
                 f"FailureCaseArtifact.sensitivity must be one of {_SENSITIVITY_LEVELS}"
             )
+
+
+# ---------------------------------------------------------------------------
+# ConformanceResult — the conformance runner's machine-readable output (#116)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class ConformanceResult:
+    """The machine-readable result emitted by the conformance runner.
+
+    Build-time CI tooling output — not a Weaver runtime contract — but a stable
+    inter-repo interchange shape consumed by the self-certification badge and the
+    public scoreboard, so it is schematized like any Extended type. ``failure_detail``
+    is the flat human-readable list; ``failure_records`` is the structured
+    per-failure view (#145). See docs/CONFORMANCE.md and docs/SELF_CERTIFICATION.md.
+
+    This dataclass mirrors ``conformance/run.py:build_result()``; the runner does
+    not import ``weaver_contracts`` (it must run with only its own deps), so the
+    two are kept in lockstep by the schema-parity test rather than by a shared
+    import.
+    """
+
+    result_version: str
+    contract_version: str
+    mode: str
+    target: Optional[str]
+    status: str
+    checks_run: int
+    failures: int
+    generated_at: str
+    runner: str
+    failure_detail: List[str] = field(default_factory=list)
+    failure_records: List[Dict[str, Any]] = field(default_factory=list)
+
+    _MODES = frozenset({"corpus", "bundle"})
+    _STATUSES = frozenset({"pass", "fail"})
+
+    def __post_init__(self) -> None:
+        if self.result_version != "1":
+            raise ValueError("ConformanceResult.result_version must be '1'")
+        if not self.contract_version:
+            raise ValueError("ConformanceResult.contract_version must be non-empty")
+        if self.mode not in self._MODES:
+            raise ValueError(f"ConformanceResult.mode must be one of {self._MODES}")
+        if self.status not in self._STATUSES:
+            raise ValueError(f"ConformanceResult.status must be one of {self._STATUSES}")
+        if self.checks_run < 0:
+            raise ValueError("ConformanceResult.checks_run must be >= 0")
+        if self.failures < 0:
+            raise ValueError("ConformanceResult.failures must be >= 0")
+        if not self.generated_at:
+            raise ValueError("ConformanceResult.generated_at must be non-empty")
+        if not self.runner:
+            raise ValueError("ConformanceResult.runner must be non-empty")
