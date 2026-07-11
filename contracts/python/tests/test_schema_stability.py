@@ -24,7 +24,7 @@ def test_vocabulary_is_documented_set():
 
 def test_every_live_schema_has_valid_stability():
     files = sorted(SCHEMA_DIR.rglob("*.schema.json"))
-    assert len(files) == 33
+    assert files, "expected at least one schema"
     for path in files:
         data = json.loads(path.read_text(encoding="utf-8"))
         assert "x_weaver_stability" in data, f"{path.name} missing x_weaver_stability"

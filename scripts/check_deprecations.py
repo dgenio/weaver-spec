@@ -104,9 +104,10 @@ def check(rows: list[dict[str, str]], deprecated_fields: list[str]) -> list[str]
             )
 
     for field in deprecated_fields:
-        # field is "schema.json:property"; the property name should be named in a row.
-        prop = field.split(":", 1)[-1]
-        if prop.lower() not in registered_text:
+        # field is "schema.json:dotted.path"; the leaf property name should be
+        # named in a register row.
+        leaf = field.split(":", 1)[-1].split(".")[-1]
+        if leaf.lower() not in registered_text:
             errors.append(
                 f"schema field {field!r} is marked \"deprecated\": true but is not "
                 "listed in the Active deprecations register"
@@ -124,12 +125,13 @@ def _collect_deprecated_fields() -> list[str]:
             for name, field in (props or {}).items():
                 if not isinstance(field, dict):
                     continue
+                path = f"{prefix}.{name}" if prefix else name
                 if field.get("deprecated") is True:
-                    found.append(f"{rel}:{name}")
+                    found.append(f"{rel}:{path}")
                 if field.get("type") == "object" and isinstance(field.get("properties"), dict):
-                    walk(field["properties"], f"{prefix}.{name}")
+                    walk(field["properties"], path)
 
-        walk(data.get("properties", {}), "properties")
+        walk(data.get("properties", {}), "")
     return found
 
 

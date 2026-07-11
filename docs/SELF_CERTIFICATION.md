@@ -32,7 +32,7 @@ conformance result, so it cannot disagree with what the suite actually checks.
    ```json
    {
      "result_version": "1",
-     "contract_version": "0.8.0",
+     "contract_version": "0.9.0",
      "mode": "corpus",
      "target": null,
      "status": "pass",

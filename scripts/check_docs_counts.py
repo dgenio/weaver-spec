@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Stdlib-only lint that documentation type-counts and version strings are current.
+"""Stdlib-only lint that documentation type-counts are current (issue #118).
 
-Prose docs repeatedly state derived facts — how many Core and Extended contract
-types exist, and the current contract version — that silently drift when a type
-or a release is added (issue #118). This checker treats the filesystem and
-``weaver_contracts.version.CONTRACT_VERSION`` as the source of truth and fails
-CI / pre-commit when a doc states a stale number.
+Prose docs repeatedly state a derived fact — how many Core and Extended contract
+types exist — that silently drifts when a type is added or removed. This checker
+treats the schema filesystem as the source of truth and fails CI / pre-commit
+when a doc states a stale count. (Contract-version string consistency is a
+separate concern, enforced across the canonical files by
+``scripts/check_version_consistency.py``; this checker does not duplicate it.)
 
 It matches a small set of targeted phrasings rather than trying to parse English:
 
@@ -33,9 +34,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_DIR = REPO_ROOT / "contracts" / "json"
-VERSION_PY = (
-    REPO_ROOT / "contracts" / "python" / "src" / "weaver_contracts" / "version.py"
-)
 
 # Docs scanned for count claims. Relative to REPO_ROOT.
 DOC_GLOBS = ("docs/*.md", "README.md", "contracts/*.md")
@@ -43,7 +41,6 @@ DOC_GLOBS = ("docs/*.md", "README.md", "contracts/*.md")
 _CORE_RE = re.compile(r"Core \((\d+)\)")
 _EXTENDED_RE = re.compile(r"Extended \((\d+)\)")
 _COMBINED_RE = re.compile(r"all (\d+) Core and Extended types")
-_CONTRACT_VERSION_RE = re.compile(r'CONTRACT_VERSION\s*=\s*"([^"]+)"')
 
 
 def count_schemas() -> tuple[int, int]:
@@ -54,13 +51,6 @@ def count_schemas() -> tuple[int, int]:
         len(list(extended_dir.glob("*.schema.json"))) if extended_dir.is_dir() else 0
     )
     return core, extended
-
-
-def read_contract_version(version_py_text: str) -> str:
-    match = _CONTRACT_VERSION_RE.search(version_py_text)
-    if not match:
-        raise ValueError("CONTRACT_VERSION not found in version.py")
-    return match.group(1)
 
 
 def check(core: int, extended: int, files: dict[str, str]) -> list[str]:

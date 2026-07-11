@@ -30,21 +30,24 @@ published.
   the `schema-fields-present` pre-commit hook), documented in
   `docs/CONTRACT_REFERENCE.md`. Draft 2020-12 ignores the `x_`-prefixed keyword,
   so payload validation and dataclass parity are unaffected.
-- **Docs count/version consistency lint (#118).** New
-  `scripts/check_docs_counts.py` (stdlib-only) asserts the Core/Extended type
-  counts and contract-version strings stated in prose docs match the real
-  filesystem and `CONTRACT_VERSION`. Fixed the stale counts/version in
-  `docs/QUICKSTART.md` and `docs/CONTRACT_REFERENCE.md` and the stale
-  "extended array is empty" note in `docs/SCHEMA_HOSTING.md`.
+- **Docs type-count lint (#118).** New `scripts/check_docs_counts.py`
+  (stdlib-only) asserts the Core/Extended type counts stated in prose docs match
+  the real schema filesystem. (Contract-version string consistency is enforced
+  separately by `scripts/check_version_consistency.py`.) Fixed the stale counts
+  in `docs/QUICKSTART.md` and `docs/CONTRACT_REFERENCE.md`, the stale version
+  print example in `docs/QUICKSTART.md`, and the stale "extended array is empty"
+  note in `docs/SCHEMA_HOSTING.md`.
 - **Anchor + `$id` link checking (#119).** `scripts/check_doc_links.py`
   extends internal link validation to resolve intra-document `#anchor`
   fragments against real headings and to check each schema `$id` is internally
   consistent with `SCHEMA_BASE_URI` and present in `well-known/contracts.json`.
   `links.yml` now calls the script instead of an inline blob.
 - **Schema description/constraint coherence lint (#128).**
-  `scripts/check_schema_coherence.py` flags conservative contradictions between
-  a field's `description` and its declared constraints (e.g., a described enum
-  with no `enum`, a described pattern/UUID with no `pattern`).
+  `scripts/check_schema_coherence.py` flags a small set of conservative
+  contradictions: a declared property with no `description`, a description that
+  spells out an inline `one of: …` option list without an `enum`/`const`/`$ref`,
+  and a description that says "deprecated" without `"deprecated": true` (or vice
+  versa).
 - **ADR template linter (#129).** `scripts/check_adr_template.py` asserts every
   `docs/adr/NNN-*.md` carries the required template sections and is listed in
   `docs/adr/README.md`.

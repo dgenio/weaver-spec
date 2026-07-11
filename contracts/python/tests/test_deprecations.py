@@ -36,6 +36,14 @@ def test_registered_deprecated_field_ok():
     assert cd.check(rows, ["frame.schema.json:legacy"]) == []
 
 
+def test_nested_field_matched_by_leaf_name():
+    # A nested deprecated field is recorded with its full dotted path; coverage
+    # matches on the leaf name, so a register row naming the leaf satisfies it.
+    rows = [{"item": "`child`", "deprecated in": "0.9.0", "eligible to remove": "1.0.0"}]
+    assert cd.check(rows, ["s.schema.json:parent.child"]) == []
+    assert cd.check([], ["s.schema.json:parent.child"])  # unregistered still flagged
+
+
 def test_active_table_parser_skips_placeholder():
     md = cd.DEPRECATIONS.read_text(encoding="utf-8")
     assert cd.parse_active_rows(md) == []
