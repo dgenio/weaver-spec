@@ -30,7 +30,7 @@ Three overlaps are explicitly prohibited by the boundary decisions in [BOUNDARIE
 
 **Core contracts are strict.** Every required field is required; types are precise; IDs must be non-empty strings (`minLength: 1`).
 
-**Extended contracts are lenient.** Optional fields may be absent. New fields may be added in a minor version. Extended contracts are not required for spec compliance.
+**Extended contracts are lenient.** Optional fields may be absent. New fields may be added in a minor version, and — unlike Core — Extended contracts may have **breaking changes in a MINOR version** (see the [Extended stability exception](VERSIONING.md#extended-stability-exception-minor-breaking)). Extended contracts are not required for spec compliance.
 
 **The Python package enforces Core contracts at construction time** (dataclass field types and post-init validation). The JSON Schemas enforce them at validation time.
 

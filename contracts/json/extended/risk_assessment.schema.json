@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/risk_assessment.schema.json",
   "title": "RiskAssessment",
   "description": "Extended. Optional risk metadata for a capability invocation. Encodes the assessed risk level, reasons, whether human approval is required, and any mitigations in place.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": [],
   "properties": {

@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/artifact_safety_gate_request.schema.json",
   "title": "ArtifactSafetyGateRequest",
   "description": "Extended. Inputs to an optional artifact safety gate run that validates agent-produced code/files before a high-impact action. Implementation-neutral: it does not name a specific scanner or rule set.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["request_id", "repository_root"],
   "properties": {

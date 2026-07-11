@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/redaction_policy.schema.json",
   "title": "RedactionPolicy",
   "description": "Extended. Describes the redaction rules applied by the firewall when producing a Frame. Identifies which fields were redacted or truncated and whether PII was detected.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["policy_id"],
   "properties": {

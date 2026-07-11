@@ -51,14 +51,64 @@ repos:
   - repo: local
     hooks:
       - id: schema-fields-present
-        name: contracts/json schemas have $id, title, description
+        name: contracts/json schemas have $id, title, description, x_weaver_stability
         description: |
           Mirrors the validate-schemas CI job. Every JSON Schema in
-          contracts/json/ must declare $id, title, and description.
+          contracts/json/ must declare $id, title, description, required, and a
+          valid x_weaver_stability annotation (#163).
         entry: python scripts/check_schema_fields.py
         language: system
         pass_filenames: false
         files: '^contracts/json/.*\.schema\.json$'
+
+      - id: schema-coherence
+        name: schema description/constraint coherence
+        description: |
+          Mirrors the validate-schemas coherence check (#128): flags
+          descriptions that contradict declared constraints.
+        entry: python scripts/check_schema_coherence.py
+        language: system
+        pass_filenames: false
+        files: '^contracts/json/.*\.schema\.json$'
+
+      - id: docs-counts
+        name: documentation type-counts and version references are current
+        description: |
+          Mirrors the validate-docs-counts CI job (#118). Fails when a doc
+          states a Core/Extended type count that no longer matches the schemas.
+        entry: python scripts/check_docs_counts.py
+        language: system
+        pass_filenames: false
+        files: '^(docs/.*\.md|README\.md|contracts/.*\.md|contracts/json/.*\.schema\.json)$'
+
+      - id: doc-links
+        name: internal links, anchors, and schema $ids resolve
+        description: |
+          Mirrors the validate-links CI job (#119). Checks relative links,
+          intra-doc anchors, and schema $id consistency with the index.
+        entry: python scripts/check_doc_links.py
+        language: system
+        pass_filenames: false
+        files: '^(.*\.md|contracts/json/.*\.schema\.json|well-known/contracts\.json)$'
+
+      - id: adr-template
+        name: ADRs conform to the template and are indexed
+        description: |
+          Mirrors the validate-adrs CI job (#129).
+        entry: python scripts/check_adr_template.py
+        language: system
+        pass_filenames: false
+        files: '^docs/adr/.*\.md$'
+
+      - id: deprecation-register
+        name: deprecation register policy
+        description: |
+          Mirrors the validate-deprecations CI job (#153): enforces the
+          one-MAJOR retention rule and schema-field register coverage.
+        entry: python scripts/check_deprecations.py
+        language: system
+        pass_filenames: false
+        files: '^(docs/DEPRECATIONS\.md|contracts/json/.*\.schema\.json)$'
 
       - id: contracts-index-fresh
         name: well-known/contracts.json is up to date
@@ -79,7 +129,7 @@ repos:
         entry: python scripts/check_version_consistency.py
         language: system
         pass_filenames: false
-        files: '^(contracts/python/src/weaver_contracts/version\.py|contracts/python/pyproject\.toml|well-known/contracts\.json|CHANGELOG\.md|README\.md|docs/VERSIONING\.md|compatibility\.yaml|scripts/check_version_consistency\.py)$'
+        files: '^(contracts/python/src/weaver_contracts/version\.py|contracts/python/pyproject\.toml|well-known/contracts\.json|CHANGELOG\.md|README\.md|docs/VERSIONING\.md|compatibility\.yaml|CITATION\.cff|scripts/check_version_consistency\.py)$'
 
       - id: weaver-contracts-tests
         name: weaver_contracts pytest (changed Python files only)

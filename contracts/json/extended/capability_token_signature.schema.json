@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/capability_token_signature.schema.json",
   "title": "CapabilityTokenSignature",
   "description": "Extended. A detached signature over a JCS-canonicalized (RFC 8785) CapabilityToken payload. Attached to the token under the namespaced extension key `x_weaver_signature`. Verifiers MUST reject signatures whose `alg` or `canonicalization` is not in the published registry. See docs/SIGNING.md and docs/adr/001-capability-token-signing.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["alg", "kid", "sig"],
   "properties": {

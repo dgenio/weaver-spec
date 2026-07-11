@@ -10,6 +10,94 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The
 
 ---
 
+## [0.9.0] - 2026-07-10
+
+A spec-hygiene and consistency-hardening sweep: new build-time lint gates,
+generator hardening, documentation conventions, and a machine-readable
+per-type stability annotation. Only one change touches contract artifacts (the
+additive `x_weaver_stability` annotation on every schema, #163), which bumps
+`CONTRACT_VERSION` 0.8.0 → 0.9.0 (MINOR, additive/non-breaking); everything else
+is CI tooling, tests, and docs — never imported by `weaver_contracts` and never
+published.
+
+### Added
+
+- **Per-type stability annotation (#163).** Every Core and Extended JSON Schema
+  now carries a top-level `x_weaver_stability` keyword (`stable` /
+  `experimental` / `deprecated`) so each contract type advertises a
+  machine-readable stability level. All currently-shipped types are `stable`.
+  Enforced by `scripts/check_schema_fields.py` (the `validate-schemas` CI job +
+  the `schema-fields-present` pre-commit hook), documented in
+  `docs/CONTRACT_REFERENCE.md`. Draft 2020-12 ignores the `x_`-prefixed keyword,
+  so payload validation and dataclass parity are unaffected.
+- **Docs count/version consistency lint (#118).** New
+  `scripts/check_docs_counts.py` (stdlib-only) asserts the Core/Extended type
+  counts and contract-version strings stated in prose docs match the real
+  filesystem and `CONTRACT_VERSION`. Fixed the stale counts/version in
+  `docs/QUICKSTART.md` and `docs/CONTRACT_REFERENCE.md` and the stale
+  "extended array is empty" note in `docs/SCHEMA_HOSTING.md`.
+- **Anchor + `$id` link checking (#119).** `scripts/check_doc_links.py`
+  extends internal link validation to resolve intra-document `#anchor`
+  fragments against real headings and to check each schema `$id` is internally
+  consistent with `SCHEMA_BASE_URI` and present in `well-known/contracts.json`.
+  `links.yml` now calls the script instead of an inline blob.
+- **Schema description/constraint coherence lint (#128).**
+  `scripts/check_schema_coherence.py` flags conservative contradictions between
+  a field's `description` and its declared constraints (e.g., a described enum
+  with no `enum`, a described pattern/UUID with no `pattern`).
+- **ADR template linter (#129).** `scripts/check_adr_template.py` asserts every
+  `docs/adr/NNN-*.md` carries the required template sections and is listed in
+  `docs/adr/README.md`.
+- **Six-artifact CI gate (#136).** `scripts/check_six_artifacts.py` inspects the
+  changed-file set and, when a Core schema changes structurally, requires the
+  other five artifacts to change in the same PR. It ignores annotation-only
+  diffs (`x_weaver_stability`, `$comment`, `title`, `description`) and defers
+  breaking-change *classification* to the schema-diff detector (#45).
+- **Deprecation lifecycle lint + worked example (#153).**
+  `scripts/check_deprecations.py` enforces the one-MAJOR retention math in
+  `docs/DEPRECATIONS.md` and flags any schema field marked `"deprecated": true`
+  lacking a register row. `docs/DEPRECATIONS.md` gains a worked hypothetical
+  lifecycle example.
+- **Generator provenance (#151).** `well-known/contracts.json` now records a
+  `$comment` provenance stamp naming its producing script; the index
+  `schema_version` is bumped 1 → 2.
+- **Date-time format guidance + enforcement (#155).** `docs/CONTRACT_REFERENCE.md`
+  states the RFC 3339 / UTC-`Z` convention for all `date-time` fields. Added
+  `rfc3339-validator` to the dev extras so the JSON Schema `date-time` format is
+  actually checked (it was silently unenforced), plus tests asserting valid
+  timestamps pass and malformed ones fail.
+- **Extension-namespacing convention (#160).** Documented and generically tested
+  the `x_`-prefixed `additionalProperties` convention across all schemas.
+- **Glossary ⟷ schema cross-references (#144).** `docs/GLOSSARY.md` terms link to
+  their `docs/CONTRACT_REFERENCE.md` field definitions.
+- **`CITATION.cff` (#157).** DOI-ready citation metadata at the repository root.
+- **Generator determinism + index-integrity tests (#159, #132).** New tests
+  assert each generator produces byte-identical output across runs and that
+  every `well-known/contracts.json` SHA-256 matches a fresh hash of the on-disk
+  schema, independent of the generator's own `--check`.
+
+### Changed
+
+- **markdownlint tooling reconciled (#140).** The `markdownlint` CI job now uses
+  `markdownlint-cli2` (matching the pre-commit hook and the single
+  `.markdownlint.json` config); `CONTRIBUTING.md` updated to match.
+- **Extended MINOR-breaking exception cross-linked (#134).** The one deliberate
+  stability exception (Extended contracts may break in a MINOR) now has a
+  dedicated anchor in `docs/VERSIONING.md` and is cross-linked from `README.md`,
+  `docs/FAQ.md`, and `docs/CONTRACT_REFERENCE.md`; `README.md`'s previously
+  misleading "backward-compatible within a minor series" line is corrected.
+- **Version references reconciled (#168).** The two remaining
+  in-repo-controllable stale version spots are fixed: the illustrative
+  `CONTRACT_VERSION` snippet in `docs/VERSIONING.md` is now version-agnostic (so
+  it can never drift again), and `CITATION.cff` is added to the
+  `check_version_consistency.py` source set so its version is enforced. The
+  generated `docs/scoreboard.md` still shows an older "Spec contract version"
+  because it is produced by the `Scoreboard` workflow (which does not commit its
+  output) rather than edited by hand; refreshing that committed snapshot
+  automatically is tracked as follow-up under #92/#170.
+
+---
+
 ## [0.8.0] - 2026-07-05
 
 ### Added

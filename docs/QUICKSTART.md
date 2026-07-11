@@ -151,7 +151,7 @@ Extended types can be attached to your own payloads via the contract's `metadata
 ```python
 from weaver_contracts.version import CONTRACT_VERSION, is_compatible
 
-print(CONTRACT_VERSION)                # e.g. "0.2.0"
+print(CONTRACT_VERSION)                # the installed contract version
 print(is_compatible("0.1.0"))          # True — same MAJOR
 print(is_compatible("1.0.0"))          # False — different MAJOR
 ```
@@ -324,6 +324,6 @@ The full multi-agent walkthrough is in [`examples/multi_agent_orchestration.md`]
 ## Next steps
 
 - **Pick your adoption mode:** [ADOPTION_GUIDE.md](ADOPTION_GUIDE.md) lists the seven supported modes and the minimum contracts each requires.
-- **Look up fields:** [CONTRACT_REFERENCE.md](CONTRACT_REFERENCE.md) has the complete field tables for all 16 Core and Extended types.
+- **Look up fields:** [CONTRACT_REFERENCE.md](CONTRACT_REFERENCE.md) has the complete field tables for all 33 Core and Extended types.
 - **Common questions:** [FAQ.md](FAQ.md) covers extending contracts, version mismatches, telemetry, and spec compliance.
 - **Read the worked examples:** [`examples/minimal_e2e_sequence.md`](../examples/minimal_e2e_sequence.md), [`examples/failure_scenarios.md`](../examples/failure_scenarios.md), [`examples/multi_agent_orchestration.md`](../examples/multi_agent_orchestration.md), [`examples/partial_capability_routing.md`](../examples/partial_capability_routing.md).

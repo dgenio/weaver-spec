@@ -20,8 +20,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Validate schema required fields
+      - name: Validate schema required fields (incl. x_weaver_stability)
         run: python scripts/check_schema_fields.py
+
+      - name: Validate schema description/constraint coherence
+        run: python scripts/check_schema_coherence.py
 
       - name: Validate sample payloads are valid JSON
         run: |
@@ -174,6 +177,96 @@ jobs:
       - name: Check the contract version string is consistent everywhere
         run: python scripts/check_version_consistency.py
 
+  validate-docs-counts:
+    name: Validate Docs Counts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check documentation type-counts and version references are current
+        run: python scripts/check_docs_counts.py
+
+  validate-links:
+    name: Validate Links and Anchors
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check internal links, anchors, and schema $ids
+        run: python scripts/check_doc_links.py
+
+  validate-adrs:
+    name: Validate ADR Template
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check ADRs conform to the template and are indexed
+        run: python scripts/check_adr_template.py
+
+  validate-deprecations:
+    name: Validate Deprecation Register
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Check the deprecation register policy
+        run: python scripts/check_deprecations.py
+
+  validate-six-artifacts:
+    name: Validate Six-Artifact Rule
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need the base branch available locally to diff against it.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Enforce the six-artifact rule for structural Core changes
+        # No-ops outside pull_request context (no base ref to diff against).
+        run: |
+          if [ -n "${GITHUB_BASE_REF:-}" ]; then
+            git fetch --no-tags --depth=1 origin "$GITHUB_BASE_REF"
+            python scripts/check_six_artifacts.py --base "origin/$GITHUB_BASE_REF"
+          else
+            python scripts/check_six_artifacts.py
+          fi
+
   validate-walkthroughs:
     name: Validate Walkthrough Payloads
     runs-on: ubuntu-latest
@@ -188,7 +281,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install jsonschema
-        run: pip install jsonschema referencing
+        run: pip install jsonschema referencing rfc3339-validator
 
       - name: Validate inline JSON payloads against schemas
         run: |
@@ -308,12 +401,14 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install markdownlint-cli
-        run: npm install -g markdownlint-cli
+      - name: Install markdownlint-cli2
+        # Pinned to match the markdownlint-cli2 pre-commit hook (#140) so CI and
+        # local linting use the same engine and the same .markdownlint.json.
+        run: npm install -g markdownlint-cli2@0.14.0
 
       - name: Lint Markdown files
         run: |
-          markdownlint \
+          markdownlint-cli2 \
             README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
             'docs/**/*.md' \
             'contracts/**/*.md' \

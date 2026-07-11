@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/handle.schema.json",
   "title": "Handle",
   "description": "An opaque, access-controlled reference to a raw artifact produced by a tool execution. The actual content is stored in the HandleStore and is not included here. Resolution requires authorization.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["handle_id", "capability_id", "artifact_type", "created_at"],
   "properties": {

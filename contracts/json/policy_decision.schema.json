@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/policy_decision.schema.json",
   "title": "PolicyDecision",
   "description": "The authorization verdict produced by agent-kernel's policy engine for a capability invocation request.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["decision_id", "decision", "capability_id", "principal", "timestamp"],
   "properties": {

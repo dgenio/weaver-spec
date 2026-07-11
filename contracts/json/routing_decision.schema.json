@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/routing_decision.schema.json",
   "title": "RoutingDecision",
   "description": "The output of the contextweaver routing phase. Contains one or more ChoiceCards and the selected item once the LLM has responded.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["id", "choice_cards", "timestamp"],
   "properties": {

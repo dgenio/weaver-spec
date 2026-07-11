@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/artifact_safety_report.schema.json",
   "title": "ArtifactSafetyReport",
   "description": "Extended. Output of an artifact safety gate run. The mode field distinguishes an advisory check from a blocking gate; decision is the pass/fail verdict; findings carry severity, message, an optional stable fingerprint, and a remediation hint.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["report_id", "gate_id", "decision", "created_at"],
   "properties": {

@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_feedback.schema.json",
   "title": "ExecutionFeedback",
   "description": "Extended. The observed outcome of executing (or attempting to execute) a selected candidate. Links back to the originating decision and candidate so a router or evaluator can correlate recommendation, execution, and result. Sending feedback is optional — a deterministic router need not consume it. See docs/EXECUTION_BOUNDARY.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["decision_id", "candidate_id", "success", "timestamp"],
   "properties": {

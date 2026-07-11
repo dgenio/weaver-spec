@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/skill_card.schema.json",
   "title": "SkillCard",
   "description": "Extended. A reusable procedure/skill derived from traces and approved for reuse. The lifecycle_state gates activation; steps and preconditions describe how and when to apply the skill.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["skill_id", "name", "description", "created_at"],
   "properties": {

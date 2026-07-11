@@ -143,13 +143,15 @@ python scripts/generate_contracts_index.py --check  # CI uses this to fail on st
 Run from the repository root (not from `contracts/python/`):
 
 ```bash
-npm install -g markdownlint-cli
-markdownlint \
+npm install -g markdownlint-cli2@0.14.0
+markdownlint-cli2 \
   README.md CONTRIBUTING.md CHANGELOG.md CHARTER.md \
   'docs/**/*.md' 'contracts/**/*.md' 'examples/**/*.md' 'packaging/**/*.md' '.github/**/*.md'
 ```
 
-Rules are configured in `.markdownlint.json` at the repo root.
+Rules are configured in `.markdownlint.json` at the repo root. CI, the
+`markdownlint-cli2` pre-commit hook, and this command all use the same engine
+(`markdownlint-cli2`) and the same config (#140).
 
 ---
 

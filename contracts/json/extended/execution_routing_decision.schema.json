@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_routing_decision.schema.json",
   "title": "ExecutionRoutingDecision",
   "description": "Extended. A router's advisory recommendation of an ExecutionCandidate, implementation-neutral with respect to the routing algorithm. Advisory by default: it does NOT grant execution rights — the execution/policy layer still records a PolicyDecision and emits a TraceEvent before running the candidate (invariants I-02, I-07). Distinct from the Core RoutingDecision (the contextweaver ChoiceCard wrapper). See docs/EXECUTION_BOUNDARY.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["decision_id", "candidate"],
   "properties": {

@@ -2,10 +2,12 @@
 """Validate that every JSON Schema in contracts/json/ has the required fields.
 
 A spec-compliant schema in this repository must declare ``$id``, ``title``,
-``description``, and a top-level ``required`` array (per CONTRIBUTING.md
-"Style Guidelines" and contracts/json/README.md "Schema Design Principles").
-This script enforces that contract from both CI and the pre-commit hook so
-the two stay in sync.
+``description``, a top-level ``required`` array (per CONTRIBUTING.md
+"Style Guidelines" and contracts/json/README.md "Schema Design Principles"),
+and an ``x_weaver_stability`` annotation (issue #163) whose value is one of
+``stable`` / ``experimental`` / ``deprecated`` so every contract type carries a
+machine-readable stability level. This script enforces that contract from both
+CI and the pre-commit hook so the two stay in sync.
 
 Run with no arguments to scan ``contracts/json/**/*.schema.json`` (Core at the
 top level and Extended under ``contracts/json/extended/``):
@@ -27,7 +29,8 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_DIR = REPO_ROOT / "contracts" / "json"
-REQUIRED_FIELDS = ("$id", "title", "description", "required")
+REQUIRED_FIELDS = ("$id", "title", "description", "required", "x_weaver_stability")
+STABILITY_LEVELS = ("stable", "experimental", "deprecated")
 
 
 def main() -> int:
@@ -48,6 +51,14 @@ def main() -> int:
         missing = [field for field in REQUIRED_FIELDS if field not in data]
         if missing:
             failures.append(f"{rel}: missing {', '.join(missing)}")
+            continue
+
+        stability = data["x_weaver_stability"]
+        if stability not in STABILITY_LEVELS:
+            failures.append(
+                f"{rel}: x_weaver_stability {stability!r} must be one of "
+                f"{', '.join(STABILITY_LEVELS)}"
+            )
             continue
 
         print(f"OK: {rel}")

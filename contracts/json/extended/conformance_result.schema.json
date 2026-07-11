@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/conformance_result.schema.json",
   "title": "ConformanceResult",
   "description": "Extended. The machine-readable result emitted by the conformance runner (conformance/run.py). It is build-time CI tooling output, not a Weaver runtime contract, but it is a stable inter-repo interchange shape: the self-certification badge (docs/SELF_CERTIFICATION.md) and the public scoreboard (docs/SCOREBOARD.md) consume it, so schematizing it keeps producers and consumers from drifting. See docs/CONFORMANCE.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": [
     "result_version",

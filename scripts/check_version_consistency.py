@@ -57,6 +57,10 @@ SOURCES: dict[str, tuple[str, str]] = {
         "compatibility.yaml",
         r'(?m)^  - "{v}"',
     ),
+    "CITATION.cff": (
+        "CITATION.cff",
+        r'(?m)^version: "{v}"',
+    ),
 }
 
 
@@ -111,6 +115,7 @@ def self_test() -> list[str]:
         "README.md": "Current contract version: **9.9.9**\n",
         "docs/VERSIONING.md": "### Current matrix (contract version 9.9.9)\n",
         "compatibility.yaml": 'contract_versions:\n  - "9.9.9"\n',
+        "CITATION.cff": 'version: "9.9.9"\n',
     }
 
     failures: list[str] = []

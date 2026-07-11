@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/choice_card.schema.json",
   "title": "ChoiceCard",
   "description": "A curated, bounded set of SelectableItem objects presented to the LLM as a structured menu. The LLM selects from this card rather than an unbounded tool list.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["id", "items"],
   "properties": {

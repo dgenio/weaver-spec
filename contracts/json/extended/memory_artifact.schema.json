@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/memory_artifact.schema.json",
   "title": "MemoryArtifact",
   "description": "Extended. A durable or semi-durable agent memory record, distinct from transient conversation context, raw tool output, and traces. Carries its own sensitivity and provenance because memory content may be sensitive.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["memory_id", "memory_type", "content", "source", "created_at"],
   "properties": {

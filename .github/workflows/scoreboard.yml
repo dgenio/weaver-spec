@@ -28,7 +28,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install conformance dependencies
-        run: pip install jsonschema==4.26.0 referencing==0.37.0 PyYAML==6.0.1 jcs==0.2.1 cryptography==48.0.0
+        run: pip install jsonschema==4.26.0 referencing==0.37.0 rfc3339-validator==0.1.4 PyYAML==6.0.1 jcs==0.2.1 cryptography==48.0.0
 
       - name: Build scoreboard
         run: python conformance/scoreboard.py --timeout 10

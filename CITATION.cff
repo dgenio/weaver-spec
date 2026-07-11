@@ -1,0 +1,23 @@
+# Citation metadata for weaver-spec (issue #157).
+# Format: Citation File Format 1.2.0 — https://citation-file-format.github.io/
+cff-version: 1.2.0
+message: "If you use weaver-spec, please cite it using the metadata below."
+title: "weaver-spec: shared contracts and invariants for the Weaver Stack"
+abstract: >-
+  weaver-spec is the documentation-and-contracts source of truth for the Weaver
+  Stack (contextweaver, agent-kernel, ChainWeaver): language-agnostic JSON
+  Schemas, a stdlib-only Python mirror package, invariants, and responsibility
+  boundaries that keep the ecosystem composable and compatible.
+type: software
+authors:
+  - name: "The Weaver Stack maintainers"
+repository-code: "https://github.com/dgenio/weaver-spec"
+url: "https://github.com/dgenio/weaver-spec"
+license: Apache-2.0
+version: "0.9.0"
+keywords:
+  - agent-contracts
+  - json-schema
+  - interoperability
+  - weaver-stack
+  - llm-agents

@@ -44,7 +44,11 @@ Extended contracts provide optional metadata (telemetry, UI hints, risk levels, 
 
 **Authority:** Extended contracts are **schema-led, the same as Core** — the JSON Schema is the source of truth and the dataclass mirrors it (enforced by `test_schema_parity.py`). The difference is the stability promise below, not where the contract is defined.
 
+#### Extended stability exception (MINOR-breaking)
+
 **Stability promise:** Extended contracts may have breaking changes in a MINOR version, provided the change is backward-compatible from a Core perspective. Extended contracts are explicitly versioned separately when they change independently.
+
+This is the single deliberate exception to the "no breaking changes within a MAJOR" rule, and it applies **only** to Extended contracts. Core contracts never break outside a MAJOR bump + ADR. This exception is cross-referenced from [README.md](../README.md#contract-versioning), [docs/FAQ.md](FAQ.md), and [docs/CONTRACT_REFERENCE.md](CONTRACT_REFERENCE.md).
 
 ---
 
@@ -65,10 +69,10 @@ The `v0`, `v1`, etc. prefix tracks the MAJOR version of the contract. When a MAJ
 The Python package version is defined in `contracts/python/src/weaver_contracts/version.py` and must match the contract version:
 
 ```python
-CONTRACT_VERSION = "0.1.0"
+CONTRACT_VERSION = "<MAJOR>.<MINOR>.<PATCH>"  # single source of truth
 ```
 
-The `pyproject.toml` version must be updated to match. Package versions follow the same MAJOR.MINOR.PATCH rules.
+The `pyproject.toml` version must be updated to match. Package versions follow the same MAJOR.MINOR.PATCH rules. `CONTRACT_VERSION` is the single source of truth; `scripts/check_version_consistency.py` (the `validate-version-consistency` CI job) fails if any tracked file states a different version. This illustrative snippet is intentionally version-agnostic so it cannot drift.
 
 ---
 
@@ -104,11 +108,11 @@ This table tracks which versions of the sibling repositories are known-compatibl
 > [!IMPORTANT]
 > A cell may be `verified` or `provisional` only when backed by a real declaration recorded in `compatibility.yaml` (the `declaration` field). Unknown compatibility MUST be recorded as `unverified` — never assume or invent a version claim.
 
-### Current matrix (contract version 0.8.0)
+### Current matrix (contract version 0.9.0)
 
 | Contract Version | contextweaver | agent-kernel | ChainWeaver |
 | ----------------- | -------------- | ------------- | ------------- |
-| 0.8.0 (current) | `unverified` | `unverified` | `unverified` |
+| 0.9.0 (current) | `unverified` | `unverified` | `unverified` |
 
 All `0.x` contract versions share MAJOR version `0` and are mutually compatible (see [Semantic Versioning](#semantic-versioning) and `weaver_contracts.version.is_compatible`). No sibling repository has published a compatibility declaration yet, so every cell is `unverified`.
 

@@ -50,6 +50,12 @@ This repository is **documentation + contracts only**.
 | `scripts/check_version_consistency.py` | Build-time tooling (stdlib only — no YAML/TOML/JSON parser) that asserts every tracked file's version string matches `CONTRACT_VERSION` in `version.py`; run by the `validate-version-consistency` CI job and the `version-consistency` pre-commit hook | When the contract version is bumped, or when adding a file that states the version |
 | `scripts/validate_compatibility.py` | Build-time tooling (stdlib only — no YAML parser) holding the `compatibility.yaml` validation logic + self-test; callers (the `validate-compatibility` CI job and the `compatibility-manifest` pre-commit hook) parse the YAML and call `validate()` | When changing the compatibility manifest's required fields or validation rules |
 | `scripts/validate_meta_package.py` | Build-time tooling (stdlib only — no YAML/TOML parser) holding the `weaver-stack` meta-package consistency logic + self-test; callers (the `validate-meta-package` CI job and the `meta-package` pre-commit hook) parse `compatibility.yaml` + the meta-package `pyproject.toml` and call `validate()` | When changing how the meta-package's pins must track `compatibility.yaml` |
+| `scripts/check_docs_counts.py` | Build-time tooling (stdlib only) that fails when a doc states a Core/Extended type count or version string that no longer matches the schema filesystem / `CONTRACT_VERSION` (#118); run by the `validate-docs-counts` CI job and the `docs-counts` pre-commit hook | When adding/removing a contract type, or when a doc states a derived count |
+| `scripts/check_doc_links.py` | Build-time tooling (stdlib only) that validates relative Markdown links, intra-doc `#anchor` fragments, and schema `$id` consistency with the index (#119); run by the `validate-links` CI job (via `links.yml`) and the `doc-links` pre-commit hook | When adding docs/links/anchors or changing schema `$id`s |
+| `scripts/check_schema_coherence.py` | Build-time tooling (stdlib only) that flags conservative description/constraint contradictions in schemas (#128); run by the `validate-schemas` CI job and the `schema-coherence` pre-commit hook | When adding or editing a schema field's description or constraints |
+| `scripts/check_adr_template.py` | Build-time tooling (stdlib only) asserting every `docs/adr/NNN-*.md` matches the template sections and is listed in the ADR index (#129); run by the `validate-adrs` CI job and the `adr-template` pre-commit hook | When adding or editing an ADR |
+| `scripts/check_deprecations.py` | Build-time tooling (stdlib only) enforcing the deprecation register's one-MAJOR retention rule and schema-field register coverage (#153); run by the `validate-deprecations` CI job and the `deprecation-register` pre-commit hook | When deprecating a field/type or editing `docs/DEPRECATIONS.md` |
+| `scripts/check_six_artifacts.py` | Build-time tooling (stdlib only) that, on a PR diff, requires a structurally-changed Core schema to be accompanied by all six artifacts (#136); annotation-only diffs do not trigger it; run by the `validate-six-artifacts` CI job (CI-only — it needs a base ref to diff) | When changing a Core schema |
 | `packaging/weaver-stack/` | Umbrella meta-package (#80): `pyproject.toml` + `README.md` only, no code. Pins a known-compatible set (base = `weaver_contracts`; `runtime`/`devtools` extras) derived from `compatibility.yaml`. Published to PyPI as `weaver-stack`; never imported by `weaver_contracts`. | When the compatible set, extras, or meta-package version changes |
 | `contracts/COVERAGE.md` | Auto-generated artifact coverage table (JSON Schema / Python class / payload / roundtrip / schema test per type) | Re-read after any contract artifact change; CI fails if stale |
 | `docs/DEPRECATIONS.md` | Deprecation register (≥1 MAJOR retention rule) | Any PR that deprecates or removes a field, type, or constraint |
@@ -197,15 +203,22 @@ pytest --cov --cov-report=term-missing
 # 2. Type checking
 mypy src/
 
-# 3. JSON schema validation (required fields + valid JSON)
+# 3. JSON schema validation (required fields incl. x_weaver_stability + coherence)
 cd ../..
 python scripts/check_schema_fields.py
+python scripts/check_schema_coherence.py
 
 # 4. Contracts index freshness — regenerate first if any contracts/json/ file changed
 python scripts/generate_contracts_index.py --check
 
 # 4b. Contract version string consistency (single source: version.py)
 python scripts/check_version_consistency.py
+
+# 4c. Documentation hygiene: type-counts/version refs, links/anchors, ADRs, deprecations
+python scripts/check_docs_counts.py
+python scripts/check_doc_links.py
+python scripts/check_adr_template.py
+python scripts/check_deprecations.py
 
 # 5. Markdown lint
 # See CONTRIBUTING.md "Markdown Lint" section for the canonical command.
@@ -214,7 +227,11 @@ python scripts/check_version_consistency.py
 python conformance/run.py
 ```
 
-Or, if pre-commit is installed (recommended): `pre-commit run --all-files` runs checks 3–5 automatically. Add `pre-commit install --hook-type pre-push` to also gate check 1 on push.
+Or, if pre-commit is installed (recommended): `pre-commit run --all-files` runs the
+schema/docs/link checks automatically. Add `pre-commit install --hook-type pre-push`
+to also gate the Python tests on push. The six-artifact gate
+(`scripts/check_six_artifacts.py`, #136) runs in CI only, since it needs a base ref to
+diff a PR against.
 
 ---
 

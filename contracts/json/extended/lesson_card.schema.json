@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/lesson_card.schema.json",
   "title": "LessonCard",
   "description": "Extended. A reusable lesson derived from traces and approved for reuse. Not a raw trace, raw memory, or generic prompt fragment. The lifecycle_state gates activation: a lesson should pass review before becoming active.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["lesson_id", "title", "body", "created_at"],
   "properties": {

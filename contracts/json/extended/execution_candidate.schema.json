@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/execution_candidate.schema.json",
   "title": "ExecutionCandidate",
   "description": "Extended. Something that can be selected for execution: a tool, flow, capability, agent, or workflow. Implementation-neutral identifier-plus-metadata shape used by the selection ↔ execution boundary contracts. When candidate_type is `flow` the candidate may carry a `compiled_flow` detail. See docs/EXECUTION_BOUNDARY.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["candidate_id", "candidate_type"],
   "properties": {

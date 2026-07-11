@@ -21,6 +21,15 @@ If this document ever disagrees with a schema or dataclass, the schema or datacl
 - **Type** uses JSON Schema vocabulary for Core (`string`, `object`, `array<X>`, `string | null`, `enum{…}`, `date-time` for ISO 8601) and Python typing vocabulary for Extended (`str`, `Optional[X]`, `List[X]`, `Dict[str, str]`).
 - Required ID fields (e.g., `SelectableItem.id`, `ChoiceCard.id`, `RoutingDecision.id`, `Capability.id`, `CapabilityToken.token_id`, `PolicyDecision.decision_id`, `Frame.frame_id`, `Handle.handle_id`, `TraceEvent.event_id`) carry `minLength: 1`. Optional ID-like fields (e.g., `SelectableItem.capability_id`, `RoutingDecision.selected_item_id`, `TraceEvent.capability_id`) are plain `string` or `string | null` without `minLength`. IDs are not required to be UUIDs; slug-style identifiers are common in sample payloads.
 - All Core schemas set `additionalProperties: true`, so adopters may add namespaced fields (e.g., `x_myorg_*`) without breaking validation.
+- Each schema carries a top-level `x_weaver_stability` annotation (`stable` / `experimental` / `deprecated`). All currently-shipped types are `stable`.
+
+### Date-time fields
+
+Every field typed `date-time` (e.g. `created_at`, `issued_at`, `expires_at`, `timestamp`) MUST be an **[RFC 3339](https://www.rfc-editor.org/rfc/rfc3339) timestamp** — the JSON Schema `date-time` format, which is the internet profile of ISO 8601. Producers SHOULD emit UTC with a `Z` offset (e.g. `2026-07-10T12:00:00Z`); a numeric offset such as `+00:00` is also valid. Fractional seconds are permitted. The format is validated by the conformance runner and the test suite (`test_datetime_format.py`), which install `rfc3339-validator` so the `date-time` format is actually enforced rather than skipped.
+
+### Extension fields (`x_` namespacing)
+
+Because Core schemas set `additionalProperties: true`, adopters and siblings may attach their own keys without breaking validation. Such keys MUST be namespaced with an `x_` prefix and SHOULD include a vendor segment — `x_<org>_<field>` (e.g. `x_myorg_trace_url`) — to avoid collisions with future spec fields. The spec reserves the unprefixed namespace: a future contract field will never begin with `x_`. Reserved spec-level extension keys already in use include `x_weaver_stability` (per-type stability) and `x_weaver_signature` (the CapabilityToken detached signature). This convention is checked generically by `test_extension_namespacing.py`.
 
 ---
 
@@ -180,7 +189,7 @@ The token must either be single-use **or** carry an expiry. This is invariant I-
 
 ---
 
-## Extended types (23)
+## Extended types (24)
 
 Extended types are optional. None is required for spec compliance. Each has a JSON Schema in [`contracts/json/extended/`](../contracts/json/extended/) (the source of truth) mirrored by a dataclass in [`contracts/python/src/weaver_contracts/extended.py`](../contracts/python/src/weaver_contracts/extended.py). Per [VERSIONING.md](VERSIONING.md), Extended contracts may have breaking changes in MINOR versions.
 

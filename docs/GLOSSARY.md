@@ -2,9 +2,13 @@
 
 Canonical definitions for all terms used in the Weaver spec. When these terms appear in code, schemas, or documentation, they carry the meaning defined here.
 
+For the complete field-by-field tables (types, required/optional status, constraints), each contract term below links to its entry in [CONTRACT_REFERENCE.md](CONTRACT_REFERENCE.md).
+
 ---
 
 ## SelectableItem
+
+**Field reference:** [CONTRACT_REFERENCE.md#selectableitem](CONTRACT_REFERENCE.md#selectableitem)
 
 A single option that can be presented to an LLM for selection. Represents one possible action, tool, or capability in the context of a routing decision.
 
@@ -15,6 +19,8 @@ A single option that can be presented to an LLM for selection. Represents one po
 ---
 
 ## ChoiceCard
+
+**Field reference:** [CONTRACT_REFERENCE.md#choicecard](CONTRACT_REFERENCE.md#choicecard)
 
 A curated, bounded set of `SelectableItem` objects presented to the LLM as a structured menu. The LLM selects from the ChoiceCard rather than from an unbounded tool list. A ChoiceCard typically contains 3–7 items.
 
@@ -28,6 +34,8 @@ A curated, bounded set of `SelectableItem` objects presented to the LLM as a str
 
 ## RoutingDecision
 
+**Field reference:** [CONTRACT_REFERENCE.md#routingdecision](CONTRACT_REFERENCE.md#routingdecision)
+
 The output of the contextweaver routing phase. Contains one or more `ChoiceCard` objects and the selected item (if the LLM has already responded) or a pending state (if awaiting LLM response).
 
 **Key fields:** `id`, `choice_cards` (list of ChoiceCard), `selected_item_id` (nullable), `timestamp`.
@@ -38,6 +46,8 @@ The output of the contextweaver routing phase. Contains one or more `ChoiceCard`
 
 ## Capability
 
+**Field reference:** [CONTRACT_REFERENCE.md#capability](CONTRACT_REFERENCE.md#capability)
+
 A named, versioned unit of executable functionality. Represents a tool, service call, or computation that can be invoked through agent-kernel. Capabilities have stable IDs and declared input/output schemas.
 
 **Key fields:** `id`, `name`, `version`, `description`, `input_schema` (JSON Schema reference), `output_schema` (JSON Schema reference).
@@ -47,6 +57,8 @@ A named, versioned unit of executable functionality. Represents a tool, service 
 ---
 
 ## CapabilityToken (Token)
+
+**Field reference:** [CONTRACT_REFERENCE.md#capabilitytoken](CONTRACT_REFERENCE.md#capabilitytoken)
 
 A signed, scoped authorization credential that grants the bearer permission to invoke one or more specific capabilities. Issued by agent-kernel's authorization subsystem. Must have an explicit scope and expiry or single-use flag.
 
@@ -60,6 +72,8 @@ A signed, scoped authorization credential that grants the bearer permission to i
 
 ## PolicyDecision
 
+**Field reference:** [CONTRACT_REFERENCE.md#policydecision](CONTRACT_REFERENCE.md#policydecision)
+
 The authorization verdict produced by agent-kernel's policy engine for a given capability invocation request. Contains the decision (allow/deny), the reason, and the capability and principal involved.
 
 **Key fields:** `decision` (allow | deny), `capability_id`, `principal`, `reason`, `timestamp`.
@@ -71,6 +85,8 @@ The authorization verdict produced by agent-kernel's policy engine for a given c
 ---
 
 ## Frame
+
+**Field reference:** [CONTRACT_REFERENCE.md#frame](CONTRACT_REFERENCE.md#frame)
 
 A safe, filtered view of a tool execution result. Produced by the agent-kernel firewall after processing raw tool output. A Frame is what contextweaver and the LLM see. It contains a summary or structured representation of the result, never raw output.
 
@@ -84,6 +100,8 @@ A safe, filtered view of a tool execution result. Produced by the agent-kernel f
 
 ## Handle
 
+**Field reference:** [CONTRACT_REFERENCE.md#handle](CONTRACT_REFERENCE.md#handle)
+
 An opaque, access-controlled reference to a raw artifact produced by a tool execution. The actual content is stored in the HandleStore and is not included in the Handle itself. A Handle can be resolved only by an authorized principal through agent-kernel.
 
 **Key fields:** `handle_id`, `capability_id`, `artifact_type`, `created_at`, `expires_at`, `access_policy`.
@@ -95,6 +113,8 @@ An opaque, access-controlled reference to a raw artifact produced by a tool exec
 ---
 
 ## TraceEvent
+
+**Field reference:** [CONTRACT_REFERENCE.md#traceevent](CONTRACT_REFERENCE.md#traceevent)
 
 An immutable audit log entry recording a single significant event in the execution lifecycle. Used for observability, debugging, and compliance.
 

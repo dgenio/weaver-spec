@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/evaluation_artifact.schema.json",
   "title": "EvaluationArtifact",
   "description": "Extended. A statistical / offline model-evaluation report carried with explicit semantics so agents cannot misuse a headline score. The support_state and recommendation_kind fields encode that a high-risk evaluation is not deployment evidence.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["artifact_id", "producer", "created_at"],
   "properties": {

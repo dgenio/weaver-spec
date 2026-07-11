@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weaver_contracts"
-version = "0.8.0"
+version = "0.9.0"
 description = "Minimal Python contracts for the Weaver Stack (contextweaver, agent-kernel, ChainWeaver)"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -32,6 +32,10 @@ dev = [
     "pytest>=7.4",
     "jsonschema>=4.18",
     "referencing>=0.30",
+    # Activates JSON Schema `date-time` format checking (#155): jsonschema's
+    # FORMAT_CHECKER only validates `date-time` when this companion is present.
+    # Dev/test + conformance only — never a runtime dependency of weaver_contracts.
+    "rfc3339-validator>=0.1.4",
     "mypy>=1.0",
     "pytest-cov>=4.0",
     "pre-commit>=3.5",

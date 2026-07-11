@@ -38,7 +38,7 @@ jobs:
           allow-prereleases: true
 
       - name: Install conformance dependencies
-        run: pip install jsonschema referencing PyYAML jcs cryptography
+        run: pip install jsonschema referencing rfc3339-validator PyYAML jcs cryptography
 
       - name: Run conformance runner
         run: python conformance/run.py

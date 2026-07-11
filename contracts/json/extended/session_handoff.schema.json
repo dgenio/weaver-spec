@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/session_handoff.schema.json",
   "title": "SessionHandoff",
   "description": "Extended. A compact continuity pack carried between agent sessions. Summarizes the state needed to resume work and references (does not inline) durable memory.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["handoff_id", "from_session_id", "created_at", "summary"],
   "properties": {

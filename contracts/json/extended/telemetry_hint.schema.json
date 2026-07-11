@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/telemetry_hint.schema.json",
   "title": "TelemetryHint",
   "description": "Extended. Optional telemetry metadata that can be attached to any event or contract for observability enrichment. All fields are optional; an empty object is valid.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": [],
   "properties": {

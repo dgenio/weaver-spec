@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/capability.schema.json",
   "title": "Capability",
   "description": "A named, versioned unit of executable functionality registered in agent-kernel. Capabilities have stable IDs and declared input/output schema references.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["id", "name", "version", "description"],
   "properties": {

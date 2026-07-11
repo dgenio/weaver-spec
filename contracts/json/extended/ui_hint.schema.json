@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/ui_hint.schema.json",
   "title": "UIHint",
   "description": "Extended. Optional rendering hints for UI layers that display ChoiceCards or SelectableItems. All fields are optional; an empty object is valid.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": [],
   "properties": {

@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/trace_event.schema.json",
   "title": "TraceEvent",
   "description": "An immutable audit log entry recording a single significant event in the execution lifecycle. Produced by agent-kernel.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["event_id", "event_type", "timestamp"],
   "properties": {

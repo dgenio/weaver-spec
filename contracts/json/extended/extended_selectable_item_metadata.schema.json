@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_selectable_item_metadata.schema.json",
   "title": "ExtendedSelectableItemMetadata",
   "description": "Extended. Optional UI and risk hints for a SelectableItem: a UI hint, a risk assessment, an estimated duration, and a confirmation requirement.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": [],
   "properties": {

@@ -57,6 +57,34 @@ Items that were deprecated and have since been removed. Kept here as an audit re
 
 ---
 
+## Worked example (illustrative — not a live deprecation)
+
+This walks the full lifecycle of a **hypothetical** field, `Frame.legacy_summary`,
+so contributors can see exactly what each step looks like. Nothing below is a
+real deprecation; it is documentation only and is intentionally **not** in the
+Active table above (so the register lint does not treat it as live).
+
+1. **Deprecate in `0.9.0`.** The PR adds a row to Active deprecations:
+
+   ```text
+   | `Frame.legacy_summary` | frame.schema.json | 0.9.0 | 1.0.0 | Use `summary` instead. | — |
+   ```
+
+   In the same PR it marks the field `"deprecated": true` with a note in its
+   `description`, adds a `# Deprecated in 0.9.0; remove in 1.0.0` comment on the
+   Python field, and adds a CHANGELOG entry. Because `0.9.0` is a `0.x`
+   deprecation, the earliest eligible removal is the next MAJOR boundary,
+   `1.0.0` — `scripts/check_deprecations.py` fails the PR if the row claims an
+   earlier `Eligible to remove`.
+
+2. **Retain through `1.0.0`.** The field stays present and validating for at
+   least one full MAJOR. Adopters migrate to `summary` during this window.
+
+3. **Remove in `1.0.0` via ADR.** A breaking-change ADR (see
+   [CONTRIBUTING.md](../CONTRIBUTING.md#adr-process-for-breaking-contract-changes))
+   authorizes removal. The removal PR deletes the field, sets `Removed in` to
+   `1.0.0`, and moves the row from Active to the Removed table.
+
 ## Why this register exists
 
 `docs/VERSIONING.md` defines the deprecation policy in prose ("remains in the Core for at least one full major version"). Without a register, adopters cannot audit which fields are headed for removal and reviewers cannot enforce the retention rule mechanically. This document is the machine-auditable companion to that policy.

@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/extended_frame_metadata.schema.json",
   "title": "ExtendedFrameMetadata",
   "description": "Extended. Optional enriched metadata for a Frame, beyond the Core contract: redaction policy, telemetry hint, schema fingerprint, confidence score, and source capability version.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": [],
   "properties": {

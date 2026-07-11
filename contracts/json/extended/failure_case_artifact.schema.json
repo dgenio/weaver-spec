@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/failure_case_artifact.schema.json",
   "title": "FailureCaseArtifact",
   "description": "Extended. A small, language-neutral record of a replayable failure discovered by fuzzing, property-based testing, replay, or trace analysis. It captures which property/invariant failed, what is needed to reproduce it (seed, generator config, trace reference), whether it was minimized, and its lifecycle status. It references large artifacts (traces) rather than inlining them. A FailureCaseArtifact is reproducible evidence, NOT proof of a bug by itself; triage decides whether a real defect exists. Distinct from a TraceBundle (which inlines a full audit chain) and from a ReviewArtifact (a generic review/trace interchange shape). See docs/ARTIFACT_CONTRACTS.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["failure_case_id", "created_at", "source_project", "property_name", "status"],
   "properties": {

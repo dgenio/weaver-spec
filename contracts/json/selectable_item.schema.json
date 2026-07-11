@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/selectable_item.schema.json",
   "title": "SelectableItem",
   "description": "A single option that can be presented to an LLM for selection within a ChoiceCard. Represents one possible action, tool, or capability.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["id", "label", "description"],
   "properties": {

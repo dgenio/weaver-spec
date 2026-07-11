@@ -99,7 +99,7 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 Contracts are split into two tiers:
 
 - **Core** — minimal, stable, required by all adopters. Changes require a major version bump and an ADR.
-- **Extended** — optional metadata (telemetry, UI hints, risk levels). Evolves faster; backward-compatible within a minor series.
+- **Extended** — optional metadata (telemetry, UI hints, risk levels). Evolves faster: unlike Core, Extended contracts may have **breaking changes in a MINOR version** (the one deliberate exception to the no-breaking-within-MAJOR rule). See the [Extended stability exception](docs/VERSIONING.md#extended-stability-exception-minor-breaking).
 
 ---
 
@@ -132,7 +132,7 @@ examples/
 
 The spec and contracts follow semantic versioning. See [docs/VERSIONING.md](docs/VERSIONING.md) for the full compatibility promise.
 
-Current contract version: **0.8.0**
+Current contract version: **0.9.0**
 
 ---
 

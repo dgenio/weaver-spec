@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/otel_trace_mapping.schema.json",
   "title": "OtelTraceMapping",
   "description": "Extended. Mapping of a Weaver TraceEvent onto an OpenTelemetry span — carries the OTel trace/span identifiers and the GenAI semantic-convention attributes that downstream observability tools consume. The full field-by-field mapping is documented in docs/OTEL_MAPPING.md, pinned to the OTel semconv snapshot referenced there.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["trace_id", "span_id", "span_kind"],
   "properties": {

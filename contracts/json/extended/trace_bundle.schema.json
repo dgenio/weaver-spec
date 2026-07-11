@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/trace_bundle.schema.json",
   "title": "TraceBundle",
   "description": "Extended. A tamper-evident audit-chain envelope that gathers one end-to-end request's Core artifacts into a single document: the RoutingDecision, every PolicyDecision, every Frame, every Handle, and every TraceEvent. The bundle is canonicalized (RFC 8785 JCS) so it can be hashed and, optionally, signed with the same detached-signature shape as a CapabilityToken (CapabilityTokenSignature). It does not redefine any invariant: Frames remain free of raw output (I-01) and each PolicyDecision is still expected to have a matching TraceEvent (I-02). Distinct from a FailureCaseArtifact (which references rather than inlines a trace). See docs/TRACE_BUNDLE.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["bundle_id", "routing_decision", "policy_decisions", "frames", "handles", "trace_events"],
   "properties": {

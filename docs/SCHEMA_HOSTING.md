@@ -73,7 +73,7 @@ The index structure:
 }
 ```
 
-The `extended` array is currently empty; it will be populated when JSON Schemas for the Extended types are introduced (see the open issue tracking that work).
+The `extended` array lists every Extended-type JSON Schema under `contracts/json/extended/`, in the same content-addressed form as the `core` array.
 
 The index is checked in CI: the `validate-contracts-index` job in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the generator with `--check` and fails the build if the on-disk file is stale relative to the schemas. PRs that change any file under `contracts/json/` must regenerate the index in the same PR:
 
@@ -87,6 +87,4 @@ python scripts/generate_contracts_index.py
 
 - **Serve the schemas at `weaver-spec.dev`.** Wire the domain to a content host (e.g. GitHub Pages) so the documented `$id` URLs resolve. Tracked separately.
 - **Mirror to [schemastore.org](https://www.schemastore.org/).** Submit the schemas to the public schemastore catalog so JSON Schema-aware editors discover them automatically.
-- **Extended schemas.** Populate the `extended` array of the index when Extended type schemas are introduced.
-
 None of these is required to close the policy described above.

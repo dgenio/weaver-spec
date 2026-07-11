@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/review_artifact.schema.json",
   "title": "ReviewArtifact",
   "description": "Extended. A minimal, language-neutral interchange shape for trace/review artifacts exchanged between Weaver-stack projects (context build records, execution records, policy decisions, review notes, safety reports). An interchange shape, not a storage system.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["artifact_id", "artifact_type", "source_project", "created_at"],
   "properties": {

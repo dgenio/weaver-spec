@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/capability_token.schema.json",
   "title": "CapabilityToken",
   "description": "A signed, scoped authorization credential that grants the bearer permission to invoke specific capabilities. Issued by agent-kernel. Must be scoped and have an expiry or single-use flag.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["token_id", "principal", "scope", "issued_at"],
   "properties": {

@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/frame.schema.json",
   "title": "Frame",
   "description": "A safe, filtered view of a tool execution result. Produced by the agent-kernel firewall. This is what contextweaver and the LLM see. Never contains raw tool output.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["frame_id", "capability_id", "summary", "created_at"],
   "properties": {

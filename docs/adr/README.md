@@ -25,3 +25,13 @@ Where `NNN` is a zero-padded three-digit sequence number (e.g., `001`, `002`) an
 ## Using the template
 
 Copy [`template.md`](template.md) to a new file using the naming convention above and fill in each section. Do not leave placeholder text in the final ADR.
+
+## Index
+
+Every ADR must be listed here (enforced by `scripts/check_adr_template.py`).
+
+| ADR | Title | Status |
+| --- | ----- | ------ |
+| [001](001-capability-token-signing.md) | CapabilityToken canonical form (RFC 8785 JCS) and signing spec | accepted |
+| [002](002-context-firewall-frame-seam.md) | The context-firewall vs Frame-firewall seam | accepted |
+| [003](003-raw-passthrough-override.md) | Wire representation and conformance check for the `raw_passthrough` override | proposed |

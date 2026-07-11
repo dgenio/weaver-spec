@@ -3,6 +3,7 @@
   "$id": "https://weaver-spec.dev/contracts/v0/extended/compiled_flow.schema.json",
   "title": "CompiledFlow",
   "description": "Extended. A compiled flow (e.g. a ChainWeaver flow) exposed as a Weaver ecosystem item that can be routed to and executed like a capability. References (does not inline) its input/output schemas, lists the capability IDs it depends on internally, and carries sensitivity/side-effect metadata derived from those tools. A pre-compiled flow does not bypass execution authorization: a flow step that invokes a tool still goes through the kernel authorization/audit path (invariant I-07). See docs/EXECUTION_BOUNDARY.md.",
+  "x_weaver_stability": "stable",
   "type": "object",
   "required": ["flow_id"],
   "properties": {
