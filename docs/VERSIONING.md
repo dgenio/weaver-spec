@@ -62,10 +62,15 @@ The `v0`, `v1`, etc. prefix tracks the MAJOR version of the contract. When a MAJ
 
 ## Python Package Versioning
 
-The Python package version is defined in `contracts/python/src/weaver_contracts/version.py` and must match the contract version:
+The Python package version is defined in
+`contracts/python/src/weaver_contracts/version.py` and must match the contract
+version. Do not copy a literal example version into documentation; read the
+canonical value instead:
 
 ```python
-CONTRACT_VERSION = "0.1.0"
+from weaver_contracts.version import CONTRACT_VERSION
+
+print(CONTRACT_VERSION)
 ```
 
 The `pyproject.toml` version must be updated to match. Package versions follow the same MAJOR.MINOR.PATCH rules.
@@ -112,7 +117,7 @@ This table tracks which versions of the sibling repositories are known-compatibl
 
 All `0.x` contract versions share MAJOR version `0` and are mutually compatible (see [Semantic Versioning](#semantic-versioning) and `weaver_contracts.version.is_compatible`). No sibling repository has published a compatibility declaration yet, so every cell is `unverified`.
 
-The single source of truth for the contract version string is `weaver_contracts.version.CONTRACT_VERSION`. Every other file that states the version (this document, `README.md`, `pyproject.toml`, `well-known/contracts.json`, `CHANGELOG.md`, `compatibility.yaml`) must match it; `scripts/check_version_consistency.py` (the `validate-version-consistency` CI job) enforces this and fails on drift.
+The single source of truth for the contract version string is `weaver_contracts.version.CONTRACT_VERSION`. Every other file that states the version (this document, `README.md`, `pyproject.toml`, `well-known/contracts.json`, `CHANGELOG.md`, `compatibility.yaml`, and the committed conformance-scoreboard snapshot) must match it; `scripts/check_version_consistency.py` (the `validate-version-consistency` CI job) enforces this and fails on drift.
 
 ### How a sibling repository declares compatibility
 
