@@ -21,20 +21,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Mirror the package `python-tests` matrix (#152). The runner leans on
-        # jsonschema / referencing / jcs / cryptography, whose behaviour can vary
-        # by interpreter, so the security-relevant path is exercised on every
-        # supported version rather than a single one.
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-          # Matches the package `python-tests` job: 3.14 may still resolve as a
-          # prerelease on the runner, so allow it rather than fail to set up.
           allow-prereleases: true
 
       - name: Install conformance dependencies
