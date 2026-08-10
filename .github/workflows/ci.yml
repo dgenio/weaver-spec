@@ -13,16 +13,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Validate schema required fields
         run: python scripts/check_schema_fields.py
-
       - name: Validate sample payloads are valid JSON
         run: |
           python -c "
@@ -44,36 +41,26 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Install PyYAML
         run: pip install pyyaml
-
       - name: Validate compatibility.yaml structure and matrix consistency
         run: |
           python << 'PYEOF'
           import sys
           from pathlib import Path
-
           import yaml
-
           sys.path.insert(0, "scripts")
           from validate_compatibility import self_test, validate
-
-          # The validator's own rejection paths are guarded by a self-test, so a
-          # future edit that weakens a check fails CI even though the live
-          # manifest still parses.
           problems = self_test()
           for problem in problems:
               print(f"FAIL (self-test): {problem}", file=sys.stderr)
           if problems:
               sys.exit(1)
-
           manifest = yaml.safe_load(Path("compatibility.yaml").read_text(encoding="utf-8"))
           versioning_md = Path("docs/VERSIONING.md").read_text(encoding="utf-8")
           errors = validate(manifest, versioning_md)
@@ -81,12 +68,8 @@ jobs:
               for e in errors:
                   print(f"FAIL: {e}", file=sys.stderr)
               sys.exit(1)
-
           count = len(manifest["repositories"])
-          print(
-              f"OK: compatibility.yaml valid — {count} repositories, status vocabulary "
-              "and version consistency enforced; validator self-test passed."
-          )
+          print(f"OK: compatibility.yaml valid — {count} repositories, status vocabulary and version consistency enforced; validator self-test passed.")
           PYEOF
 
   validate-meta-package:
@@ -95,41 +78,29 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Install PyYAML and build
         run: pip install pyyaml build
-
       - name: Check weaver-stack pins are consistent with compatibility.yaml
         run: |
           python << 'PYEOF'
           import sys
           import tomllib
           from pathlib import Path
-
           import yaml
-
           sys.path.insert(0, "scripts")
           from validate_meta_package import self_test, validate
-
-          # The validator's own rejection paths are guarded by a self-test, so a
-          # future edit that weakens a check fails CI even though the live pair
-          # still passes.
           problems = self_test()
           for problem in problems:
               print(f"FAIL (self-test): {problem}", file=sys.stderr)
           if problems:
               sys.exit(1)
-
           manifest = yaml.safe_load(Path("compatibility.yaml").read_text(encoding="utf-8"))
-          pyproject = tomllib.loads(
-              Path("packaging/weaver-stack/pyproject.toml").read_text(encoding="utf-8")
-          )
+          pyproject = tomllib.loads(Path("packaging/weaver-stack/pyproject.toml").read_text(encoding="utf-8"))
           errors = validate(manifest, pyproject)
           for e in errors:
               print(f"FAIL: {e}", file=sys.stderr)
@@ -137,7 +108,6 @@ jobs:
               sys.exit(1)
           print("OK: weaver-stack meta-package is consistent with compatibility.yaml.")
           PYEOF
-
       - name: Build the meta-package (sdist + wheel)
         working-directory: packaging/weaver-stack
         run: python -m build
@@ -148,13 +118,11 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Check well-known/contracts.json is up to date
         run: python scripts/generate_contracts_index.py --check
 
@@ -164,13 +132,11 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Check the contract version string is consistent everywhere
         run: python scripts/check_version_consistency.py
 
@@ -180,16 +146,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Install jsonschema
         run: pip install jsonschema referencing
-
       - name: Validate inline JSON payloads against schemas
         run: |
           python << 'PYEOF'
@@ -198,29 +161,16 @@ jobs:
           from jsonschema import Draft202012Validator
           from referencing import Registry, Resource
           from referencing.jsonschema import DRAFT202012
-
           schemas_by_name = {}
           registry = Registry()
           for p in Path('contracts/json').rglob('*.schema.json'):
               name = p.stem.removesuffix('.schema')
               schema = json.loads(p.read_text(encoding='utf-8'))
               schemas_by_name[name] = schema
-              registry = registry.with_resource(
-                  uri=schema['$id'],
-                  resource=Resource(contents=schema, specification=DRAFT202012),
-              )
-
+              registry = registry.with_resource(uri=schema['$id'], resource=Resource(contents=schema, specification=DRAFT202012))
           fence = chr(96) * 3
-          pattern = re.compile(
-              r'<!-- schema: (\S+) -->\s*' + fence + r'json\s*(.*?)\s*' + fence,
-              re.DOTALL,
-          )
-
-          md_files = sorted(
-              set(glob.glob('examples/**/*.md', recursive=True))
-              | set(glob.glob('docs/**/*.md', recursive=True))
-          )
-
+          pattern = re.compile(r'<!-- schema: (\S+) -->\s*' + fence + r'json\s*(.*?)\s*' + fence, re.DOTALL)
+          md_files = sorted(set(glob.glob('examples/**/*.md', recursive=True)) | set(glob.glob('docs/**/*.md', recursive=True)))
           failures = []
           total = 0
           for f in md_files:
@@ -236,15 +186,10 @@ jobs:
                   except json.JSONDecodeError as e:
                       failures.append(f'{f} ({schema_name}): JSON parse error: {e}')
                       continue
-                  v = Draft202012Validator(
-                      schemas_by_name[schema_name],
-                      registry=registry,
-                      format_checker=Draft202012Validator.FORMAT_CHECKER,
-                  )
+                  v = Draft202012Validator(schemas_by_name[schema_name], registry=registry, format_checker=Draft202012Validator.FORMAT_CHECKER)
                   for err in sorted(v.iter_errors(payload), key=lambda e: list(e.absolute_path)):
                       path = '/'.join(str(x) for x in err.absolute_path) or '<root>'
                       failures.append(f'{f} ({schema_name}) at {path}: {err.message}')
-
           print(f'Validated {total} inline payload(s) across {len(md_files)} Markdown file(s).')
           if failures:
               for line in failures:
@@ -265,32 +210,24 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-
       - name: Import smoke test with no third-party dependencies
         working-directory: contracts/python
         run: |
-          # weaver_contracts is stdlib-only at runtime: a bare install (no
-          # [dev] extras) must import cleanly on every supported Python.
           pip install .
           python -c "import weaver_contracts; print(weaver_contracts.__name__, 'imported OK')"
-
       - name: Install package with dev dependencies
         working-directory: contracts/python
         run: pip install -e ".[dev]"
-
       - name: Run type checks
         working-directory: contracts/python
         run: mypy src/
-
       - name: Run tests with coverage
         working-directory: contracts/python
         run: pytest --cov --cov-report=term-missing -v
@@ -301,16 +238,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"
-
       - name: Install markdownlint-cli
         run: npm install -g markdownlint-cli
-
       - name: Lint Markdown files
         run: |
           markdownlint \
@@ -327,16 +261,13 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Install yamllint
         run: pip install yamllint==1.35.1
-
       - name: Lint issue templates and workflows
         run: |
           yamllint -c .yamllint.yml \
@@ -352,13 +283,11 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
-
       - name: Check contracts/COVERAGE.md is up to date
         run: python scripts/generate_coverage_table.py --check
 
@@ -376,38 +305,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Mirror the package `python-tests` matrix (#152): the reference impl
-        # exercises the same crypto/JCS/jsonschema path as the conformance
-        # runner, so run it on every supported interpreter.
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
-          # Matches the package `python-tests` job: 3.14 may still resolve as a
-          # prerelease on the runner, so allow it rather than fail to set up.
           allow-prereleases: true
-
       - name: Install package with dev dependencies
         working-directory: contracts/python
         run: pip install -e ".[dev]"
-
       - name: "Run the reference implementation (issue #76)"
         run: python examples/reference_impl/reference_impl.py
-
-      # The badge is a committed, deterministic artifact; regenerate and
-      # staleness-check it once (on the baseline interpreter) rather than on
-      # every matrix leg.
       - name: "Regenerate scoreboard badge from a real conformance result (#77)"
         if: matrix.python-version == '3.11'
         run: |
           python conformance/run.py \
             --emit-result /tmp/conformance-result.json \
             --emit-badge docs/badges/weaver-spec.json
-
       - name: Fail if the committed self-cert badge is stale
         if: matrix.python-version == '3.11'
         run: git diff --exit-code docs/badges/weaver-spec.json
