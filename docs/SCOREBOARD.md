@@ -1,8 +1,12 @@
 # Conformance Scoreboard — Participation
 
-The [public scoreboard](scoreboard.md) shows, for each Weaver Stack repo,
-whether its published artifacts pass the conformance suite. Participation is
-**opt-in** and costs one file plus one published JSON document.
+The [checked-in scoreboard](scoreboard.md) is a timestamped snapshot of a
+successful Scoreboard workflow run. For the **latest** sibling
+reachability/conformance result, use the most recent `Scoreboard` GitHub Actions
+run: the workflow writes the generated table to its job summary and uploads
+`scoreboard.md` plus badge JSON as the `conformance-scoreboard` artifact.
+
+Participation is **opt-in** and costs one file plus one published JSON document.
 
 > [!NOTE]
 > The scoreboard is a **report, not a gate**. A repo that publishes nothing is
@@ -24,10 +28,12 @@ whether its published artifacts pass the conformance suite. Participation is
    python conformance/run.py --bundle <fetched-bundle.json>
    ```
 
-3. [`conformance/scoreboard.py`](../conformance/scoreboard.py) renders
-   [`scoreboard.md`](scoreboard.md) and a shields.io endpoint badge per repo
-   under [`docs/badges/`](badges). The build is published as a workflow artifact
-   and written to the job summary.
+3. [`conformance/scoreboard.py`](../conformance/scoreboard.py) renders a current
+   `scoreboard.md` in the workflow workspace and a shields.io endpoint badge per
+   repo under `docs/badges/`. The build is uploaded as an artifact and written to
+   the job summary. The repository's committed [`scoreboard.md`](scoreboard.md)
+   is intentionally labelled with its generation timestamp so it cannot be
+   mistaken for a live status endpoint.
 
 ## Participate
 
@@ -58,15 +64,15 @@ whether its published artifacts pass the conformance suite. Participation is
 
 ## Hosting the rendered scoreboard (optional)
 
-The workflow uploads `scoreboard.md` + `docs/badges/` as an artifact and writes
-the table to the run's job summary, so it works with no extra setup. To serve it
-as a web page, enable **GitHub Pages** for this repo (Settings → Pages) and point
-it at `docs/`; the badge endpoints are then consumable via
-`https://img.shields.io/endpoint?url=<raw badge URL>`. Enabling Pages is a
-repository-admin action and is intentionally left out of the workflow.
+The workflow uploads generated `scoreboard.md` + `docs/badges/` as an artifact
+and writes the table to the run's job summary, so it works with no extra setup.
+To serve a continuously refreshed web page, add an explicit deployment step or
+site pipeline; simply enabling Pages over the repository's committed `docs/`
+directory serves the timestamped committed snapshot, not each scheduled workflow
+artifact automatically.
 
 ## Related
 
 - [CONFORMANCE.md](CONFORMANCE.md) — what the conformance suite checks.
 - [SELF_CERTIFICATION.md](SELF_CERTIFICATION.md) — the per-repo badge + flow.
-- [scoreboard.md](scoreboard.md) — the generated scoreboard (do not edit by hand).
+- [scoreboard.md](scoreboard.md) — timestamped committed snapshot.
