@@ -22,6 +22,7 @@ def _consistent(version: str = "1.2.3") -> dict[str, str]:
         "README.md": f"Current contract version: **{version}**\n",
         "docs/VERSIONING.md": f"### Current matrix (contract version {version})\n",
         "compatibility.yaml": f'contract_versions:\n  - "{version}"\n',
+        "docs/scoreboard.md": f"- **Spec contract version:** `v{version}`\n",
     }
 
 
