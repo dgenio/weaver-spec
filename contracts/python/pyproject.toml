@@ -27,7 +27,10 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 
-[project.optional-dependencies]
+# Local contributor/CI tooling only. PEP 735 dependency groups are not emitted
+# as wheel optional-dependency metadata, keeping this runtime package truly
+# stdlib-only for downstream users.
+[dependency-groups]
 dev = [
     "pytest>=7.4",
     "jsonschema>=4.18",
@@ -36,11 +39,7 @@ dev = [
     "pytest-cov>=4.0",
     "pre-commit>=3.5",
     "yamllint>=1.35",
-    # TOML reader for the packaging-metadata test; stdlib `tomllib` exists only
-    # on 3.11+, so back-fill it on 3.10. Dev/test only — not a runtime dep.
     "tomli>=2.0; python_version < '3.11'",
-    # Conformance runner (conformance/run.py) extras — build-time/CI only,
-    # never imported by weaver_contracts.
     "PyYAML>=6.0",
     "jcs>=0.2.1",
     "cryptography>=41.0",
