@@ -1,0 +1,48 @@
+version: 2
+updates:
+  # The specification itself is not bot-managed. Only the reference Python
+  # contract package and CI/tooling dependencies receive routine maintenance.
+  - package-ecosystem: pip
+    directory: "/contracts/python"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 3
+    cooldown:
+      default-days: 7
+    groups:
+      python-tooling-nonmajor:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: [minor, patch]
+      python-tooling-security-nonmajor:
+        applies-to: security-updates
+        patterns: ["*"]
+        update-types: [minor, patch]
+    labels: [dependencies]
+    commit-message:
+      prefix: "chore(deps)"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Etc/UTC
+    open-pull-requests-limit: 3
+    cooldown:
+      default-days: 7
+    groups:
+      actions-nonmajor:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: [minor, patch]
+      actions-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    labels: [dependencies]
+    commit-message:
+      prefix: "chore(ci)"
