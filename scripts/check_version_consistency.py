@@ -57,6 +57,10 @@ SOURCES: dict[str, tuple[str, str]] = {
         "compatibility.yaml",
         r'(?m)^  - "{v}"',
     ),
+    "docs/scoreboard.md": (
+        "docs/scoreboard.md",
+        r"Spec contract version:\*\* `v{v}`",
+    ),
 }
 
 
@@ -111,6 +115,7 @@ def self_test() -> list[str]:
         "README.md": "Current contract version: **9.9.9**\n",
         "docs/VERSIONING.md": "### Current matrix (contract version 9.9.9)\n",
         "compatibility.yaml": 'contract_versions:\n  - "9.9.9"\n',
+        "docs/scoreboard.md": "- **Spec contract version:** `v9.9.9`\n",
     }
 
     failures: list[str] = []
