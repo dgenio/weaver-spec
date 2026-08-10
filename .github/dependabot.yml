@@ -1,7 +1,8 @@
 version: 2
 updates:
-  # The specification itself is not bot-managed. Only the reference Python
-  # contract package and CI/tooling dependencies receive routine maintenance.
+  # The normative specification is never bot-managed. The reference Python
+  # package is a published library, so routine releases are compatibility-test
+  # inputs rather than reasons to rewrite its public dependency contract.
   - package-ecosystem: pip
     directory: "/contracts/python"
     schedule:
@@ -9,21 +10,14 @@ updates:
       day: monday
       time: "06:00"
       timezone: Etc/UTC
-    open-pull-requests-limit: 3
-    cooldown:
-      default-days: 7
+    open-pull-requests-limit: 0
     groups:
-      python-tooling-nonmajor:
-        applies-to: version-updates
-        patterns: ["*"]
-        update-types: [minor, patch]
-      python-tooling-security-nonmajor:
+      python-security:
         applies-to: security-updates
         patterns: ["*"]
-        update-types: [minor, patch]
     labels: [dependencies]
     commit-message:
-      prefix: "chore(deps)"
+      prefix: "fix(deps)"
 
   - package-ecosystem: github-actions
     directory: "/"
