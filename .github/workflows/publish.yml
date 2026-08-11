@@ -4,106 +4,233 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing immutable release tag to retry (vX.Y.Z or weaver-stack-vX.Y.Z)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 jobs:
-  build:
-    name: Build distribution
+  release-plan:
+    name: Verify release identity
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
+    outputs:
+      tag: ${{ steps.target.outputs.tag }}
+      target: ${{ steps.target.outputs.target }}
+      version: ${{ steps.target.outputs.version }}
+      distribution: ${{ steps.target.outputs.distribution }}
+      project_dir: ${{ steps.target.outputs.project_dir }}
+      commit_sha: ${{ steps.identity.outputs.commit_sha }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Resolve requested tag
+        id: release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          DISPATCH_TAG: ${{ inputs.tag }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag="$RELEASE_TAG"
+          else
+            tag="$DISPATCH_TAG"
+          fi
+          if [ -z "$tag" ]; then
+            echo "ERROR: release tag is required" >&2
+            exit 2
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check out exact release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
 
-      - name: Install build
-        run: pip install build
+      - name: Prove HEAD is the requested immutable tag
+        id: identity
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          head_sha="$(git rev-parse HEAD)"
+          tag_sha="$(git rev-list -n 1 "$TAG")"
+          if [ "$head_sha" != "$tag_sha" ]; then
+            echo "ERROR: checkout HEAD $head_sha does not match tag $TAG -> $tag_sha" >&2
+            exit 1
+          fi
+          echo "Validated release source: $TAG -> $head_sha"
+          echo "commit_sha=$head_sha" >> "$GITHUB_OUTPUT"
 
-      - name: Build package
+      - name: Validate tag family and package version
+        id: target
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          python scripts/validate_release_target.py \
+            --tag "$TAG" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Release plan summary
+        env:
+          TAG: ${{ steps.target.outputs.tag }}
+          TARGET: ${{ steps.target.outputs.target }}
+          VERSION: ${{ steps.target.outputs.version }}
+          DIST: ${{ steps.target.outputs.distribution }}
+          SHA: ${{ steps.identity.outputs.commit_sha }}
+        run: |
+          {
+            echo "### Verified release plan"
+            echo ""
+            echo "- tag: \`$TAG\`"
+            echo "- commit: \`$SHA\`"
+            echo "- target: \`$TARGET\`"
+            echo "- distribution: \`$DIST\`"
+            echo "- version: \`$VERSION\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build-contracts:
+    name: Build and verify weaver_contracts
+    if: needs.release-plan.outputs.target == 'contracts'
+    needs: release-plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out verified release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ needs.release-plan.outputs.tag }}
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Verify checked-out commit
+        env:
+          EXPECTED_SHA: ${{ needs.release-plan.outputs.commit_sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: Install build, metadata, and contract test dependencies
+        run: |
+          pip install build twine
+          pip install -e "./contracts/python[dev]"
+
+      - name: Run package tests on tagged source
+        working-directory: contracts/python
+        run: pytest
+
+      - name: Run conformance suite on tagged source
+        run: python conformance/run.py
+
+      - name: Build distribution
         working-directory: contracts/python
         run: python -m build
 
-      - name: Upload dist artifact
+      - name: Validate distribution metadata
+        run: python -m twine check contracts/python/dist/*
+
+      - name: Upload verified contract distribution
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dist
+          name: dist-contracts-${{ needs.release-plan.outputs.version }}
           path: contracts/python/dist/
+          if-no-files-found: error
 
-  publish:
-    name: Publish to PyPI
-    needs: build
+  publish-contracts:
+    name: Publish weaver_contracts to PyPI
+    if: needs.release-plan.outputs.target == 'contracts'
+    needs: [release-plan, build-contracts]
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/weaver_contracts/
+      url: https://pypi.org/project/weaver-contracts/
     permissions:
       id-token: write
       attestations: write
-
     steps:
-      - name: Download dist artifact
+      - name: Download verified contract distribution
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist
+          name: dist-contracts-${{ needs.release-plan.outputs.version }}
           path: dist/
 
-      - name: Publish to PyPI
+      - name: Publish weaver_contracts
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           attestations: true
 
   build-meta:
-    name: Build meta-package distribution
+    name: Build and verify weaver-stack
+    if: needs.release-plan.outputs.target == 'meta'
+    needs: release-plan
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'weaver-stack-v') }}
     permissions:
       contents: read
-
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Check out verified release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ needs.release-plan.outputs.tag }}
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
 
-      - name: Install build
-        run: pip install build
+      - name: Verify checked-out commit
+        env:
+          EXPECTED_SHA: ${{ needs.release-plan.outputs.commit_sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
 
-      - name: Build the weaver-stack meta-package
+      - name: Install build and meta-package test dependencies
+        run: pip install build twine pytest PyYAML
+
+      - name: Validate live compatibility manifest against meta-package
+        run: pytest contracts/python/tests/test_meta_package.py
+
+      - name: Build meta-package distribution
         working-directory: packaging/weaver-stack
         run: python -m build
 
-      - name: Upload meta-package dist artifact
+      - name: Validate meta-package distribution metadata
+        run: python -m twine check packaging/weaver-stack/dist/*
+
+      - name: Upload verified meta-package distribution
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dist-meta
+          name: dist-meta-${{ needs.release-plan.outputs.version }}
           path: packaging/weaver-stack/dist/
+          if-no-files-found: error
 
   publish-meta:
-    name: Publish meta-package to PyPI
-    needs: build-meta
+    name: Publish weaver-stack to PyPI
+    if: needs.release-plan.outputs.target == 'meta'
+    needs: [release-plan, build-meta]
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'weaver-stack-v') }}
     environment:
       name: pypi
       url: https://pypi.org/project/weaver-stack/
     permissions:
       id-token: write
       attestations: write
-
     steps:
-      - name: Download meta-package dist artifact
+      - name: Download verified meta-package distribution
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist-meta
+          name: dist-meta-${{ needs.release-plan.outputs.version }}
           path: dist/
 
-      - name: Publish weaver-stack to PyPI
+      - name: Publish weaver-stack
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           attestations: true
