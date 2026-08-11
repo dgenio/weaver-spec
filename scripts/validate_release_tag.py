@@ -3,7 +3,8 @@
 
 This is build-time, stdlib-only tooling. It deliberately validates source
 metadata only; the publish workflow separately proves that the requested ref is
-an existing Git tag and checks out that exact tag before calling this script.
+an existing Git tag, resolves that tag to an exact commit SHA, and binds all
+build jobs to that verified SHA before calling this script again.
 """
 
 from __future__ import annotations
@@ -22,8 +23,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS_PYPROJECT = Path("contracts/python/pyproject.toml")
 STACK_PYPROJECT = Path("packaging/weaver-stack/pyproject.toml")
 
-_CONTRACT_TAG = re.compile(r"^v(?P<version>\d+\.\d+\.\d+)$")
-_STACK_TAG = re.compile(r"^weaver-stack-v(?P<version>\d+\.\d+\.\d+)$")
+_SEMVER_CORE = r"(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)"
+_CONTRACT_TAG = re.compile(rf"^v(?P<version>{_SEMVER_CORE})$")
+_STACK_TAG = re.compile(rf"^weaver-stack-v(?P<version>{_SEMVER_CORE})$")
 
 
 class ReleaseValidationError(ValueError):
@@ -56,7 +58,11 @@ def _project_version(path: Path) -> str:
     return value
 
 
-def validate_release(tag: str, target: str = "auto", repo_root: Path = REPO_ROOT) -> tuple[str, str]:
+def validate_release(
+    tag: str,
+    target: str = "auto",
+    repo_root: Path = REPO_ROOT,
+) -> tuple[str, str]:
     """Validate tag family and package metadata; return resolved target/version."""
     resolved_target, expected_version = classify_tag(tag)
     if target != "auto" and target != resolved_target:
