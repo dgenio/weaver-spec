@@ -20,6 +20,12 @@ on:
       - "tests/test_schema_site.py"
       - ".github/workflows/schema-site.yml"
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy the generated artifact to GitHub Pages (requires Pages/custom-domain setup)"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -53,7 +59,7 @@ jobs:
 
   deploy:
     name: Deploy schema site
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
     needs: build
     runs-on: ubuntu-latest
     permissions:
