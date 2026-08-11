@@ -92,5 +92,3 @@ visible instead of relying on prose claims.
 - [Conformance](CONFORMANCE.md) — corpus, invariants, signatures, and downstream
   CI use.
 - [Contract Reference](CONTRACT_REFERENCE.md) — current fields and tiers.
-- [Adoption-stage guardrails](ADOPTION_GUARDRAILS.md) — evidence gates and the
-  pre-1.0 scope reset (available on the adoption-guardrails PR until merged).
