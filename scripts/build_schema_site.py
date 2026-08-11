@@ -24,12 +24,10 @@ INDEX_PATH = REPO_ROOT / "well-known" / "contracts.json"
 CANONICAL_HOST = "weaver-spec.dev"
 
 
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def _indexed_sha256(path: Path) -> str:
+    """Hash schema bytes exactly as generate_contracts_index.py does."""
+    normalized = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
 
 
 def _entries(index: dict[str, object]):
@@ -74,7 +72,7 @@ def build(output: Path, repo_root: Path = REPO_ROOT) -> int:
         if not source.is_file():
             raise ValueError(f"schema source does not exist: {entry['path']}")
 
-        actual_hash = _sha256(source)
+        actual_hash = _indexed_sha256(source)
         if actual_hash != entry["sha256"]:
             raise ValueError(
                 f"schema hash mismatch for {entry['path']}: "
