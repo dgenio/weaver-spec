@@ -4,38 +4,133 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable release tag to retry (vX.Y.Z or weaver-stack-vX.Y.Z)
+        required: true
+        type: string
+
+# A publication is a retryable operation over an immutable release identity,
+# never an instruction to build whatever happens to be on main.
+env:
+  RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
 
 jobs:
-  build:
-    name: Build distribution
+  validate-request:
+    name: Validate immutable release identity
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      target: ${{ steps.identity.outputs.target }}
+
+    steps:
+      - name: Check out the exact requested tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Prove checkout is an existing immutable tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git show-ref --verify --quiet "refs/tags/${RELEASE_TAG}" || {
+            echo "ERROR: ${RELEASE_TAG} is not an existing Git tag" >&2
+            exit 1
+          }
+          tag_sha="$(git rev-list -n 1 "${RELEASE_TAG}")"
+          head_sha="$(git rev-parse HEAD)"
+          test "${tag_sha}" = "${head_sha}" || {
+            echo "ERROR: checkout HEAD ${head_sha} does not match tag ${RELEASE_TAG} -> ${tag_sha}" >&2
+            exit 1
+          }
+          echo "Validated immutable tag ${RELEASE_TAG} at ${head_sha}"
+
+      - name: Resolve package target
+        id: identity
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [[ "${RELEASE_TAG}" == weaver-stack-v* ]]; then
+            target=stack
+          elif [[ "${RELEASE_TAG}" == v* ]]; then
+            target=contracts
+          elif [[ "${EVENT_NAME}" == workflow_dispatch ]]; then
+            echo "ERROR: manual recovery requires vX.Y.Z or weaver-stack-vX.Y.Z" >&2
+            exit 1
+          else
+            # Other GitHub Release families are not Python-package releases.
+            # Succeed without granting either publish path authority.
+            target=none
+          fi
+          echo "target=${target}" >> "${GITHUB_OUTPUT}"
+          echo "Resolved ${RELEASE_TAG} -> ${target}"
+
+      - name: Set up Python
+        if: steps.identity.outputs.target != 'none'
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+
+      - name: Validate tag family and package version
+        if: steps.identity.outputs.target != 'none'
+        run: python scripts/validate_release_tag.py --tag "${RELEASE_TAG}" --target "${{ steps.identity.outputs.target }}"
+
+  build-contracts:
+    name: Build and test weaver_contracts from tag
+    needs: validate-request
+    if: needs.validate-request.outputs.target == 'contracts'
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Check out exact contract release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
 
-      - name: Install build
-        run: pip install build
+      - name: Install release build and test tooling
+        run: |
+          python -m pip install build twine
+          python -m pip install -e "contracts/python[dev]"
+
+      - name: Revalidate tag and package metadata on build checkout
+        run: python scripts/validate_release_tag.py --tag "${RELEASE_TAG}" --target contracts
+
+      - name: Test exact tagged contract source
+        run: |
+          python -m pytest contracts/python/tests
+          python conformance/run.py
 
       - name: Build package
         working-directory: contracts/python
         run: python -m build
 
-      - name: Upload dist artifact
+      - name: Validate distribution metadata
+        run: python -m twine check contracts/python/dist/*
+
+      - name: Upload contract distribution
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dist
+          name: dist-contracts-${{ env.RELEASE_TAG }}
           path: contracts/python/dist/
+          if-no-files-found: error
 
-  publish:
-    name: Publish to PyPI
-    needs: build
+  publish-contracts:
+    name: Publish weaver_contracts to PyPI
+    needs: [validate-request, build-contracts]
+    if: needs.validate-request.outputs.target == 'contracts' && needs.build-contracts.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -45,50 +140,65 @@ jobs:
       attestations: write
 
     steps:
-      - name: Download dist artifact
+      - name: Download exact tagged contract distribution
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist
+          name: dist-contracts-${{ env.RELEASE_TAG }}
           path: dist/
 
-      - name: Publish to PyPI
+      - name: Publish to PyPI with provenance attestations
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           attestations: true
 
   build-meta:
-    name: Build meta-package distribution
+    name: Build and validate weaver-stack from tag
+    needs: validate-request
+    if: needs.validate-request.outputs.target == 'stack'
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'weaver-stack-v') }}
     permissions:
       contents: read
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Check out exact meta-package release tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 1
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.11"
 
-      - name: Install build
-        run: pip install build
+      - name: Install release build tooling
+        run: python -m pip install build twine pyyaml
 
-      - name: Build the weaver-stack meta-package
+      - name: Revalidate tag and package metadata on build checkout
+        run: python scripts/validate_release_tag.py --tag "${RELEASE_TAG}" --target stack
+
+      - name: Validate compatibility-derived meta-package pins
+        run: python scripts/validate_meta_package.py
+
+      - name: Build meta-package
         working-directory: packaging/weaver-stack
         run: python -m build
 
-      - name: Upload meta-package dist artifact
+      - name: Validate distribution metadata
+        run: python -m twine check packaging/weaver-stack/dist/*
+
+      - name: Upload meta-package distribution
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: dist-meta
+          name: dist-meta-${{ env.RELEASE_TAG }}
           path: packaging/weaver-stack/dist/
+          if-no-files-found: error
 
   publish-meta:
-    name: Publish meta-package to PyPI
-    needs: build-meta
+    name: Publish weaver-stack to PyPI
+    needs: [validate-request, build-meta]
+    if: needs.validate-request.outputs.target == 'stack' && needs.build-meta.result == 'success'
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' && startsWith(github.event.release.tag_name, 'weaver-stack-v') }}
     environment:
       name: pypi
       url: https://pypi.org/project/weaver-stack/
@@ -97,13 +207,13 @@ jobs:
       attestations: write
 
     steps:
-      - name: Download meta-package dist artifact
+      - name: Download exact tagged meta-package distribution
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: dist-meta
+          name: dist-meta-${{ env.RELEASE_TAG }}
           path: dist/
 
-      - name: Publish weaver-stack to PyPI
+      - name: Publish weaver-stack to PyPI with provenance attestations
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           attestations: true
