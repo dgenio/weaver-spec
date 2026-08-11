@@ -1,0 +1,68 @@
+name: Schema Site
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "contracts/json/**"
+      - "well-known/contracts.json"
+      - "scripts/build_schema_site.py"
+      - "scripts/generate_contracts_index.py"
+      - "tests/test_schema_site.py"
+      - ".github/workflows/schema-site.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "contracts/json/**"
+      - "well-known/contracts.json"
+      - "scripts/build_schema_site.py"
+      - "scripts/generate_contracts_index.py"
+      - "tests/test_schema_site.py"
+      - ".github/workflows/schema-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "schema-site-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build immutable schema site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Verify the content-addressed contract index
+        run: python scripts/generate_contracts_index.py --check
+      - name: Test schema-site generation
+        run: python tests/test_schema_site.py
+      - name: Build schema site
+        run: python scripts/build_schema_site.py --output _schema_site
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _schema_site
+          include-hidden-files: true
+
+  deploy:
+    name: Deploy schema site
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
