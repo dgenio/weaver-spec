@@ -42,7 +42,16 @@ def test_classify_contract_and_stack_tag_families():
 
 @pytest.mark.parametrize(
     "tag",
-    ["0.8.0", "release-v0.8.0", "weaver-stack-0.7.0", "v0.8", "v0.8.0-rc1"],
+    [
+        "0.8.0",
+        "release-v0.8.0",
+        "weaver-stack-0.7.0",
+        "v0.8",
+        "v0.8.0-rc1",
+        "v0.8.0+build",
+        "v01.2.3",
+        "weaver-stack-v00.7.0",
+    ],
 )
 def test_rejects_unsupported_or_ambiguous_tag_families(tag: str):
     with pytest.raises(ReleaseValidationError, match="unsupported release tag family"):
@@ -69,3 +78,11 @@ def test_wrong_tag_family_cannot_publish_other_target(tmp_path: Path):
         validate_release("v0.8.0", target="stack", repo_root=repo)
     with pytest.raises(ReleaseValidationError, match="belongs to 'stack'"):
         validate_release("weaver-stack-v0.7.0", target="contracts", repo_root=repo)
+
+
+def test_live_contract_metadata_matches_intended_v080_identity():
+    assert validate_release("v0.8.0") == ("contracts", "0.8.0")
+
+
+def test_live_meta_metadata_matches_current_stack_v070_identity():
+    assert validate_release("weaver-stack-v0.7.0") == ("stack", "0.7.0")
