@@ -67,20 +67,59 @@ generation), so the verification path is exercised end-to-end. The illustrative
 sample in `examples/sample_payloads/trace_bundle_signed.json` keeps its
 documented placeholder signature and is reported as *skipped*.
 
-## Adopting it in a sibling repo
+## Adopting it in another repository
 
-The suite ships as a reusable workflow. Add one job to your CI, pinned to a
-released tag:
+The suite ships as a reusable workflow. With the conventional published artifact
+at `.well-known/conformance.json`, an external repository can add one job:
 
 ```yaml
 jobs:
   weaver-conformance:
-    uses: dgenio/weaver-spec/.github/workflows/conformance.yml@v0.6.0
+    uses: dgenio/weaver-spec/.github/workflows/conformance.yml@<immutable-ref>
 ```
 
-This runs the spec repo's own corpus against the published schemas. To assert
-conformance of *your* emitted artifacts, point the runner at your payloads via a
-local `corpus.yaml` (same shape) and your own keyring.
+Replace `<immutable-ref>` with a reviewed release tag or exact commit SHA. Do
+**not** use a mutable branch for a gating compatibility claim.
+
+The called workflow deliberately checks out two repositories separately:
+
+1. the **caller repository**, which owns the submitted conformance bundle; and
+2. the immutable `weaver-spec` source used to run the verifier.
+
+It then validates the caller's `.well-known/conformance.json` through the
+external-bundle path. A pass therefore attests to the artifact the caller
+published; it does not merely re-run this repository's own corpus.
+
+If your artifact lives elsewhere, pass the path explicitly:
+
+```yaml
+jobs:
+  weaver-conformance:
+    uses: dgenio/weaver-spec/.github/workflows/conformance.yml@<immutable-ref>
+    with:
+      bundle-path: path/to/conformance.json
+      spec-ref: <immutable-weaver-spec-ref>
+```
+
+`bundle-path` is resolved inside the caller checkout and paths that escape that
+repository are rejected.
+
+> [!IMPORTANT]
+> The source tree currently declares contract version `0.8.0`, but there is no
+> matching `v0.8.0` GitHub release/tag yet. Until the release-integrity work in
+> [#202](https://github.com/dgenio/weaver-spec/issues/202) closes that gap, the
+> reusable workflow pins its default external validator to the exact immutable
+> 0.8.0 source commit rather than pretending `main` is a release. Once a matching
+> release exists, prefer that tag.
+
+This repository's own CI calls the same workflow in automatic self-test mode;
+because the caller is `dgenio/weaver-spec`, it preserves the full spec-corpus
+matrix across supported Python versions. The tested downstream template lives in
+[`examples/conformance/sample-sibling/`](../examples/conformance/sample-sibling/).
+
+A conformance pass is **not** a security or production-readiness certification.
+It means only that the submitted artifact satisfies the schemas/invariants
+checked by the selected immutable verifier version.
 
 ## Checking a single external bundle
 
@@ -160,4 +199,5 @@ orphaned entry fails CI rather than silently skipping a check.
 - [SELF_CERTIFICATION.md](SELF_CERTIFICATION.md) — the "Weaver-compatible" badge.
 - [SCOREBOARD.md](SCOREBOARD.md) — the public conformance scoreboard.
 - [examples/reference_impl/](../examples/reference_impl/) — runnable reference.
+- [examples/conformance/sample-sibling/](../examples/conformance/sample-sibling/) — tested downstream-workflow template.
 - [AGENTS.md](../AGENTS.md) — repo scope rule covering `conformance/`.
