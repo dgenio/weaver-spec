@@ -1,16 +1,61 @@
 name: Conformance
 
-# Reusable conformance suite (issues #43, #74). Sibling repos call it with:
+# Reusable downstream conformance gate.
+#
+# External repositories can use the well-known convention with one job call:
 #
 #   jobs:
 #     weaver-conformance:
-#       uses: dgenio/weaver-spec/.github/workflows/conformance.yml@v0.6.0
+#       uses: dgenio/weaver-spec/.github/workflows/conformance.yml@<immutable-ref>
 #
-# It is also invoked from this repo's ci.yml. See docs/CONFORMANCE.md.
+# By default an external caller's `.well-known/conformance.json` is validated
+# against the immutable spec checkout declared by `spec-ref` below.
+#
+# When this workflow is called by dgenio/weaver-spec itself in `mode: auto`, it
+# runs the spec corpus as a self-test across all supported Python versions. A
+# same-repo smoke test can force the downstream path with `mode: external`.
 
 on:
   workflow_call:
+    inputs:
+      mode:
+        description: "auto, self, or external"
+        required: false
+        type: string
+        default: "auto"
+      bundle-path:
+        description: "Caller-repo path to the conformance TraceBundle"
+        required: false
+        type: string
+        default: ".well-known/conformance.json"
+      spec-ref:
+        description: "Immutable weaver-spec ref used to validate external bundles"
+        required: false
+        type: string
+        # Current 0.8.0 contract source. Replace with the matching release tag
+        # once the release-integrity gap in #202 is resolved.
+        default: "f99558e8b701c9f34b6e7e338940e52603a7f540"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "auto, self, or external"
+        required: false
+        type: choice
+        options:
+          - auto
+          - self
+          - external
+        default: auto
+      bundle-path:
+        description: "Caller-repo path to the conformance TraceBundle"
+        required: false
+        type: string
+        default: ".well-known/conformance.json"
+      spec-ref:
+        description: "Immutable weaver-spec ref used to validate external bundles"
+        required: false
+        type: string
+        default: "f99558e8b701c9f34b6e7e338940e52603a7f540"
 
 jobs:
   conformance:
@@ -21,9 +66,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ${{ fromJSON((inputs.mode == 'self' || (inputs.mode == 'auto' && github.repository == 'dgenio/weaver-spec')) && '["3.10","3.11","3.12","3.13","3.14"]' || '["3.11"]') }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Validate mode
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          case "$MODE" in
+            auto|self|external) ;;
+            *) echo "Invalid conformance mode: $MODE" >&2; exit 2 ;;
+          esac
+
+      - name: Check out self-test repository
+        if: inputs.mode == 'self' || (inputs.mode == 'auto' && github.repository == 'dgenio/weaver-spec')
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Check out caller repository
+        if: inputs.mode == 'external' || (inputs.mode == 'auto' && github.repository != 'dgenio/weaver-spec')
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          path: caller
+
+      - name: Check out immutable spec for external validation
+        if: inputs.mode == 'external' || (inputs.mode == 'auto' && github.repository != 'dgenio/weaver-spec')
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: dgenio/weaver-spec
+          ref: ${{ inputs.spec-ref }}
+          path: weaver-spec
+          persist-credentials: false
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -31,8 +102,47 @@ jobs:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
 
-      - name: Install conformance dependencies
-        run: pip install jsonschema referencing PyYAML jcs cryptography
+      - name: Install self-test dependencies
+        if: inputs.mode == 'self' || (inputs.mode == 'auto' && github.repository == 'dgenio/weaver-spec')
+        working-directory: contracts/python
+        run: pip install -e ".[dev]"
 
-      - name: Run conformance runner
+      - name: Install external-validation dependencies
+        if: inputs.mode == 'external' || (inputs.mode == 'auto' && github.repository != 'dgenio/weaver-spec')
+        working-directory: weaver-spec/contracts/python
+        run: pip install -e ".[dev]"
+
+      - name: Run spec corpus self-test
+        if: inputs.mode == 'self' || (inputs.mode == 'auto' && github.repository == 'dgenio/weaver-spec')
         run: python conformance/run.py
+
+      - name: Resolve caller bundle safely
+        if: inputs.mode == 'external' || (inputs.mode == 'auto' && github.repository != 'dgenio/weaver-spec')
+        env:
+          BUNDLE_PATH: ${{ inputs.bundle-path }}
+        run: |
+          python - <<'PY'
+          import os
+          import shutil
+          from pathlib import Path
+
+          root = Path("caller").resolve()
+          requested = (root / os.environ["BUNDLE_PATH"]).resolve()
+          try:
+              requested.relative_to(root)
+          except ValueError as exc:
+              raise SystemExit(f"bundle-path escapes caller repository: {requested}") from exc
+          if not requested.is_file():
+              raise SystemExit(
+                  "caller conformance bundle not found: "
+                  f"{requested}. Publish .well-known/conformance.json or pass bundle-path."
+              )
+          shutil.copyfile(requested, "/tmp/weaver-caller-conformance.json")
+          PY
+
+      - name: Validate caller bundle
+        if: inputs.mode == 'external' || (inputs.mode == 'auto' && github.repository != 'dgenio/weaver-spec')
+        run: |
+          python weaver-spec/conformance/run.py \
+            --bundle /tmp/weaver-caller-conformance.json \
+            --keyring weaver-spec/conformance/keyring/test_keyring.json
