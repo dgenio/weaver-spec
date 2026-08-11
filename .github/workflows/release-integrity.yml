@@ -1,0 +1,57 @@
+name: Release Integrity
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "contracts/python/pyproject.toml"
+      - "packaging/weaver-stack/pyproject.toml"
+      - "scripts/validate_release_target.py"
+      - "tests/test_release_target.py"
+      - ".github/workflows/publish.yml"
+      - ".github/workflows/release-integrity.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "contracts/python/pyproject.toml"
+      - "packaging/weaver-stack/pyproject.toml"
+      - "scripts/validate_release_target.py"
+      - "tests/test_release_target.py"
+      - ".github/workflows/publish.yml"
+      - ".github/workflows/release-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate release tag/package identity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Run release-target unit tests
+        run: python tests/test_release_target.py
+      - name: Dry-run current contract package identity
+        run: python scripts/validate_release_target.py --tag v0.8.0
+      - name: Dry-run current meta-package identity
+        run: python scripts/validate_release_target.py --tag weaver-stack-v0.7.0
+      - name: Prove wrong tag family/version is rejected
+        run: |
+          if python scripts/validate_release_target.py --tag v0.7.0; then
+            echo "ERROR: mismatched contract tag unexpectedly passed" >&2
+            exit 1
+          fi
+          if python scripts/validate_release_target.py --tag weaver-stack-v0.8.0; then
+            echo "ERROR: mismatched meta-package tag unexpectedly passed" >&2
+            exit 1
+          fi
+          if python scripts/validate_release_target.py --tag release-v0.8.0; then
+            echo "ERROR: unsupported tag family unexpectedly passed" >&2
+            exit 1
+          fi
