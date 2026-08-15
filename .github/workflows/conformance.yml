@@ -92,7 +92,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: dgenio/weaver-spec
-          ref: ${{ inputs.spec-ref }}
+          ref: ${{ inputs['spec-ref'] }}
           path: weaver-spec
           persist-credentials: false
 
@@ -119,7 +119,7 @@ jobs:
       - name: Resolve caller bundle safely
         if: inputs.mode == 'external' || (inputs.mode == 'auto' && github.repository != 'dgenio/weaver-spec')
         env:
-          BUNDLE_PATH: ${{ inputs.bundle-path }}
+          BUNDLE_PATH: ${{ inputs['bundle-path'] }}
         run: |
           python - <<'PY'
           import os
