@@ -1,0 +1,32 @@
+name: Downstream Conformance Smoke
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/conformance.yml"
+      - ".github/workflows/downstream-conformance-smoke.yml"
+      - "examples/conformance/sample-sibling/**"
+      - "conformance/**"
+      - "contracts/json/**"
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/conformance.yml"
+      - ".github/workflows/downstream-conformance-smoke.yml"
+      - "examples/conformance/sample-sibling/**"
+      - "conformance/**"
+      - "contracts/json/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sample-downstream:
+    name: Sample caller bundle
+    uses: ./.github/workflows/conformance.yml
+    with:
+      mode: external
+      bundle-path: examples/conformance/sample-sibling/.well-known/conformance.json
+      spec-ref: f99558e8b701c9f34b6e7e338940e52603a7f540
