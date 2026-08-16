@@ -155,10 +155,30 @@ jobs:
       name: pypi
       url: https://pypi.org/project/weaver_contracts/
     permissions:
+      contents: read
       id-token: write
       attestations: write
 
     steps:
+      - name: Re-check immutable contract tag before OIDC publication
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Prove contract tag still targets verified commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag_sha="$(git rev-list -n 1 "${RELEASE_TAG}")"
+          verified_sha="${{ needs.validate-request.outputs.commit_sha }}"
+          test "${tag_sha}" = "${verified_sha}" || {
+            echo "ERROR: ${RELEASE_TAG} moved after validation: expected ${verified_sha}, now ${tag_sha}" >&2
+            exit 1
+          }
+
       - name: Download exact tagged contract distribution
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
@@ -226,10 +246,30 @@ jobs:
       name: pypi
       url: https://pypi.org/project/weaver-stack/
     permissions:
+      contents: read
       id-token: write
       attestations: write
 
     steps:
+      - name: Re-check immutable meta-package tag before OIDC publication
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Prove meta-package tag still targets verified commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag_sha="$(git rev-list -n 1 "${RELEASE_TAG}")"
+          verified_sha="${{ needs.validate-request.outputs.commit_sha }}"
+          test "${tag_sha}" = "${verified_sha}" || {
+            echo "ERROR: ${RELEASE_TAG} moved after validation: expected ${verified_sha}, now ${tag_sha}" >&2
+            exit 1
+          }
+
       - name: Download exact tagged meta-package distribution
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
