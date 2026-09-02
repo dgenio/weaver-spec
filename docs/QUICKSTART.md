@@ -21,7 +21,10 @@ This guide does **not** add any runtime dependencies to your application beyond 
 
 - For the Python path: Python 3.10 or newer (tested on 3.10–3.14).
 - For the JS/TS path: Node.js 18 or newer, with `ajv` for validation.
-- A clone of this repository (for direct schema access) **or** the published JSON Schema files served at the `$id` URIs declared in each schema.
+- A clone of this repository, the committed offline bundle at
+  [`contracts/bundles/weaver-contracts.bundle.json`](../contracts/bundles/weaver-contracts.bundle.json),
+  **or** a vendored copy of the schemas from a release tag. The declared `$id`
+  URIs are identifiers and are not yet guaranteed to resolve over HTTPS.
 
 ---
 
@@ -96,6 +99,18 @@ To deserialize, parse the JSON and re-hydrate the dataclasses by hand (or use yo
 ### Validate a payload against a JSON Schema
 
 The JSON Schemas in [`contracts/json/`](../contracts/json/) are the language-agnostic source of truth. Use any Draft 2020-12 validator.
+
+For offline consumers, the repository also commits a single compound schema
+document at
+[`contracts/bundles/weaver-contracts.bundle.json`](../contracts/bundles/weaver-contracts.bundle.json).
+It contains every indexed Core and Extended schema while preserving each
+schema's canonical `$id`, so cross-schema references can resolve without network
+access. The bundle is generated distribution output, not a second source of
+truth; verify it against the schema index with:
+
+```bash
+python scripts/generate_schema_bundle.py --check
+```
 
 `routing_decision.schema.json` `$ref`s `choice_card.schema.json`, which in turn `$ref`s `selectable_item.schema.json`. With a plain `jsonschema.validate(...)` call, those references would trigger remote URL resolution and fail offline. Pre-load every Core schema into a `referencing.Registry` so validation stays local — this is the same pattern the repository's CI uses (`Draft202012Validator` + `iter_errors`, with format checking enabled):
 

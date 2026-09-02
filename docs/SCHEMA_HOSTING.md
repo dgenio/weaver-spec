@@ -26,9 +26,38 @@ The `$id` URI is currently an **identifier**, not a guaranteed-resolvable URL.
 
 - The `weaver-spec.dev` domain is the canonical namespace claimed by this project. It is **not** currently serving the schemas at a stable HTTPS endpoint.
 - Cross-schema `$ref` resolution in this repository uses a local store (see [`contracts/python/tests/test_json_schema_alignment.py`](../contracts/python/tests/test_json_schema_alignment.py)) that maps `$id` strings to local schema files.
-- Adopters who need live resolution must bundle the schemas from this repository (via a release tag) or vendor them through their own build.
+- Adopters who need offline resolution can use the committed compound bundle at
+  [`contracts/bundles/weaver-contracts.bundle.json`](../contracts/bundles/weaver-contracts.bundle.json)
+  or vendor the individual schemas from a release tag.
 
 Serving the schemas at the documented URL is a planned follow-up; the URL pattern above is the contract.
+
+---
+
+## Offline compound bundle
+
+The repository commits a generated Draft 2020-12 compound schema document at
+[`contracts/bundles/weaver-contracts.bundle.json`](../contracts/bundles/weaver-contracts.bundle.json).
+It embeds every Core and Extended schema listed in `well-known/contracts.json`
+under `$defs` while preserving the schema's original `$id`. A validator can
+therefore discover the embedded resources and resolve existing absolute `$ref`
+values without reaching the network.
+
+The bundle is a distribution artifact, not a canonical contract source. The
+content-addressed index and individual files under `contracts/json/` remain
+authoritative. Regenerate and verify the bundle from the repository root:
+
+```bash
+python scripts/generate_contracts_index.py --check
+python scripts/generate_schema_bundle.py
+python scripts/generate_schema_bundle.py --check
+python tests/test_schema_bundle.py
+```
+
+The read-only [`Schema Bundle` workflow](../.github/workflows/schema-bundle.yml)
+runs the same freshness and conformance checks and publishes the verified file
+as a workflow artifact. A versioned release asset and checksum remain release
+follow-up work; the committed path is the supported offline source today.
 
 ---
 
@@ -73,7 +102,8 @@ The index structure:
 }
 ```
 
-The `extended` array is currently empty; it will be populated when JSON Schemas for the Extended types are introduced (see the open issue tracking that work).
+Both the `core` and `extended` arrays are included in the generated bundle. Each
+entry's indexed path, `$id`, and SHA-256 digest is verified before embedding.
 
 The index is checked in CI: the `validate-contracts-index` job in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the generator with `--check` and fails the build if the on-disk file is stale relative to the schemas. PRs that change any file under `contracts/json/` must regenerate the index in the same PR:
 
@@ -87,6 +117,7 @@ python scripts/generate_contracts_index.py
 
 - **Serve the schemas at `weaver-spec.dev`.** Wire the domain to a content host (e.g. GitHub Pages) so the documented `$id` URLs resolve. Tracked separately.
 - **Mirror to [schemastore.org](https://www.schemastore.org/).** Submit the schemas to the public schemastore catalog so JSON Schema-aware editors discover them automatically.
-- **Extended schemas.** Populate the `extended` array of the index when Extended type schemas are introduced.
+- **Release distribution.** Publish the verified bundle as a versioned release
+  asset with a checksum in addition to the committed repository path.
 
 None of these is required to close the policy described above.

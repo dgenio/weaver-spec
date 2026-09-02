@@ -42,6 +42,30 @@ Breaking changes are allowed in MINOR versions for Extended contracts.
 
 ---
 
+## Offline schema bundle workflow
+
+The committed offline distribution artifact lives at
+`contracts/bundles/weaver-contracts.bundle.json`. It is derived from the
+content-addressed `well-known/contracts.json` index and must never be edited by
+hand.
+
+When a Core or Extended JSON Schema changes, regenerate the index first and the
+bundle second, then commit both generated files in the same PR:
+
+```bash
+python scripts/generate_contracts_index.py
+python scripts/generate_schema_bundle.py
+python scripts/generate_schema_bundle.py --check
+python tests/test_schema_bundle.py
+```
+
+The `Schema Bundle` workflow is read-only. It checks the committed bundle for
+byte-for-byte freshness, validates the conformance corpus through the bundle,
+and uploads the verified file as a workflow artifact. It never commits generated
+output back to a contributor branch.
+
+---
+
 ## Breaking change workflow (ADR process)
 
 Breaking changes to Core contracts must not be submitted as direct PRs. Follow the ADR process defined in `CONTRIBUTING.md`:
@@ -70,7 +94,7 @@ If the change affects a contract that a sibling repo produces or consumes, coord
 
 ## Local validation commands
 
-Run all six before submitting any PR. CI enforces all six.
+Run every applicable check before submitting a PR. CI enforces the same checks.
 
 ```bash
 # 1. Python tests (with coverage)
@@ -88,6 +112,9 @@ python -c "import json; [json.load(open(f)) for f in __import__('glob').glob('co
 # 4. Contracts index freshness (regenerate first if you changed any schema)
 python scripts/generate_contracts_index.py --check
 
+# 4a. Offline schema bundle freshness
+python scripts/generate_schema_bundle.py --check
+
 # 4b. Contract version string consistency (single source: version.py)
 python scripts/check_version_consistency.py
 
@@ -96,12 +123,16 @@ python scripts/check_version_consistency.py
 
 # 6. Conformance suite (corpus + executable invariants + TraceBundle signatures)
 python conformance/run.py
+
+# 7. Validate the conformance corpus through the offline bundle
+python tests/test_schema_bundle.py
 ```
 
-If step 4 fails, regenerate the index and commit the result:
+If step 4 or 4a fails, regenerate the index and bundle, then commit both results:
 
 ```bash
 python scripts/generate_contracts_index.py
+python scripts/generate_schema_bundle.py
 ```
 
 ---
