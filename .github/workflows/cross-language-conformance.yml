@@ -1,0 +1,71 @@
+name: Cross-language Conformance
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "contracts/json/**"
+      - "conformance/**"
+      - ".github/workflows/cross-language-conformance.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "contracts/json/**"
+      - "conformance/**"
+      - ".github/workflows/cross-language-conformance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-reference:
+    name: Python reference verdict
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Install conformance dependencies
+        run: pip install -e "./contracts/python[dev]"
+      - name: Run Python reference
+        run: python conformance/run.py
+
+  javascript-reference:
+    name: JavaScript reference verdict
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      - name: Install JavaScript reference dependencies
+        working-directory: conformance/javascript
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run JavaScript reference
+        working-directory: conformance/javascript
+        run: npm run conformance
+
+  agreement:
+    name: Cross-language agreement
+    needs: [python-reference, javascript-reference]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require both references to agree on PASS
+        env:
+          PYTHON_RESULT: ${{ needs.python-reference.result }}
+          JAVASCRIPT_RESULT: ${{ needs.javascript-reference.result }}
+        run: |
+          if [ "$PYTHON_RESULT" != "success" ] || [ "$JAVASCRIPT_RESULT" != "success" ]; then
+            echo "Conformance implementations disagree or failed:" >&2
+            echo "Python: $PYTHON_RESULT" >&2
+            echo "JavaScript: $JAVASCRIPT_RESULT" >&2
+            exit 1
+          fi
+          echo "Python and JavaScript reference implementations agree on the current corpus."
