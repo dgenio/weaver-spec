@@ -1,0 +1,19 @@
+{
+  "name": "weaver-conformance-javascript-reference",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Non-published JavaScript reference implementation of the Weaver conformance corpus.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "conformance": "node run.mjs"
+  },
+  "dependencies": {
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "canonicalize": "2.1.0",
+    "yaml": "2.8.1"
+  }
+}
