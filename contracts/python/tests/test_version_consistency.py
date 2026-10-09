@@ -18,6 +18,7 @@ def _consistent(version: str = "1.2.3") -> dict[str, str]:
     return {
         "pyproject.toml": f'version = "{version}"\n',
         "well-known/contracts.json": f'{{\n  "contract_version": "{version}"\n}}\n',
+        "contracts/bundles/weaver-contracts.bundle.json": f'{{"x_weaver_contract_version": "{version}"}}\n',
         "CHANGELOG.md": f"## [Unreleased]\n\n## [{version}] - 2026-01-01\n",
         "README.md": f"Current contract version: **{version}**\n",
         "docs/VERSIONING.md": f"### Current matrix (contract version {version})\n",
