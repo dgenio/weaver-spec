@@ -56,7 +56,7 @@ test("ES256 rejects a tampered signed bundle", () => {
 test("ES256 fails closed for an invalid public_key_b64url point", () => {
   const { bundle, keyring } = signedFixture();
   keyring.set("fixture-p256", { alg: "es256", public_key_b64url: "AA" });
-  assert.match(verifyTraceBundleIntegrity(bundle, keyring).join(" "), /signature verification error/);
+  assert.match(verifyTraceBundleIntegrity(bundle, keyring).join(" "), /not a P-256 point/);
 });
 
 test("ES256 reports an absent shared-format key field", () => {
