@@ -41,6 +41,10 @@ SOURCES: dict[str, tuple[str, str]] = {
         "well-known/contracts.json",
         r'"contract_version": "{v}"',
     ),
+    "contracts/bundles/weaver-contracts.bundle.json": (
+        "contracts/bundles/weaver-contracts.bundle.json",
+        r'"x_weaver_contract_version": "{v}"',
+    ),
     "CHANGELOG.md": (
         "CHANGELOG.md",
         r"(?m)^## \[{v}\]",
@@ -111,6 +115,7 @@ def self_test() -> list[str]:
     consistent = {
         "pyproject.toml": 'version = "9.9.9"\n',
         "well-known/contracts.json": '{\n  "contract_version": "9.9.9"\n}\n',
+        "contracts/bundles/weaver-contracts.bundle.json": '{"x_weaver_contract_version": "9.9.9"}\n',
         "CHANGELOG.md": "## [Unreleased]\n\n## [9.9.9] - 2026-01-01\n",
         "README.md": "Current contract version: **9.9.9**\n",
         "docs/VERSIONING.md": "### Current matrix (contract version 9.9.9)\n",
