@@ -47,6 +47,9 @@ jobs:
       - name: Install JavaScript reference dependencies
         working-directory: conformance/javascript
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run JavaScript signature regression
+        working-directory: conformance/javascript
+        run: npm test
       - name: Run JavaScript reference
         working-directory: conformance/javascript
         run: npm run conformance
