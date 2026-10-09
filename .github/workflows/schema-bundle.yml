@@ -1,0 +1,53 @@
+name: Schema Bundle
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "contracts/json/**"
+      - "contracts/bundles/**"
+      - "well-known/contracts.json"
+      - "conformance/**"
+      - "scripts/generate_schema_bundle.py"
+      - "tests/test_schema_bundle.py"
+      - ".github/workflows/schema-bundle.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "contracts/json/**"
+      - "contracts/bundles/**"
+      - "well-known/contracts.json"
+      - "conformance/**"
+      - "scripts/generate_schema_bundle.py"
+      - "tests/test_schema_bundle.py"
+      - ".github/workflows/schema-bundle.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Generate and validate offline bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Verify the content-addressed contract index
+        run: python scripts/generate_contracts_index.py --check
+      - name: Verify committed offline schema bundle
+        run: python scripts/generate_schema_bundle.py --check
+      - name: Install validation dependencies
+        run: pip install -e "./contracts/python[dev]"
+      - name: Validate conformance corpus through bundle
+        run: python tests/test_schema_bundle.py
+      - name: Upload verified bundle
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: weaver-contracts-schema-bundle
+          path: contracts/bundles/weaver-contracts.bundle.json
+          if-no-files-found: error

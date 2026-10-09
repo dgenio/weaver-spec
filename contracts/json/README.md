@@ -52,6 +52,23 @@ Extended schemas currently published:
 See [`../../docs/ARTIFACT_CONTRACTS.md`](../../docs/ARTIFACT_CONTRACTS.md) for the
 cross-project artifact vocabulary.
 
+## Offline bundle
+
+Offline adopters can load the committed compound schema document at
+[`../bundles/weaver-contracts.bundle.json`](../bundles/weaver-contracts.bundle.json).
+It embeds every schema listed in `well-known/contracts.json` and preserves each
+canonical `$id`, allowing Draft 2020-12 implementations to resolve cross-schema
+references without network access.
+
+The bundle is generated distribution output; edit the schemas in this directory
+and regenerate it from the repository root:
+
+```bash
+python scripts/generate_contracts_index.py
+python scripts/generate_schema_bundle.py
+python scripts/generate_schema_bundle.py --check
+```
+
 ## Usage
 
 Validate a payload against a schema using any JSON Schema Draft 2020-12 compatible library.
