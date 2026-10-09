@@ -173,7 +173,7 @@ function loadKeyring() {
   return new Map((keyring.keys ?? []).map((entry) => [entry.kid, entry]));
 }
 
-function verifyTraceBundleIntegrity(bundle, keyring) {
+export function verifyTraceBundleIntegrity(bundle, keyring) {
   const signature = bundle.signature;
   if (!signature) return [];
   const violations = [];
@@ -220,16 +220,31 @@ function verifyTraceBundleIntegrity(bundle, keyring) {
       });
       verified = crypto.verify(null, Buffer.from(canonical, "utf8"), publicKey, signatureBytes);
     } else if (signature.alg === "es256") {
-      // The shared test keyring currently contains no ES256 key. Keep the
-      // algorithm path explicit; a future ES256 key fixture must provide a PEM,
-      // DER SPKI, or JWK representation rather than inventing key encoding here.
-      if (!key.public_key_pem) {
-        return [`ES256 key ${signature.kid} has no public_key_pem for JavaScript verification`];
+      // Match the Python runner: public_key_b64url is a SEC1-encoded P-256
+      // point (compressed or uncompressed), not a PEM or DER SPKI key.
+      if (!key.public_key_b64url) {
+        return [`ES256 key ${signature.kid} has no public_key_b64url`];
       }
+      const encodedPoint = Buffer.from(key.public_key_b64url, "base64url");
+      const point = crypto.ECDH.convertKey(
+        encodedPoint, "prime256v1", undefined, undefined, "uncompressed",
+      );
+      if (point.length !== 65 || point[0] !== 4) {
+        return [`ES256 key ${signature.kid} is not a P-256 point`];
+      }
+      const publicKey = crypto.createPublicKey({
+        key: {
+          kty: "EC",
+          crv: "P-256",
+          x: point.subarray(1, 33).toString("base64url"),
+          y: point.subarray(33, 65).toString("base64url"),
+        },
+        format: "jwk",
+      });
       verified = crypto.verify(
         "sha256",
         Buffer.from(canonical, "utf8"),
-        { key: key.public_key_pem, dsaEncoding: "ieee-p1363" },
+        { key: publicKey, dsaEncoding: "ieee-p1363" },
         signatureBytes,
       );
     }
@@ -355,4 +370,6 @@ function run() {
   return 0;
 }
 
-process.exitCode = run();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  process.exitCode = run();
+}
