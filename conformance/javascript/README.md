@@ -36,10 +36,11 @@ The current implementation covers:
 - cryptographic verification of the shared Ed25519 signed fixture when the key
   is present in the common test keyring.
 
-An unknown signing key is reported with the same conformance-report semantics as
-the Python runner: it is not treated as verified, but its absence from the local
-keyring does not by itself turn an otherwise valid conformance report into a
-security gate.
+An unknown signing key skips cryptographic verification (without emitting a
+separate result line), as in the Python conformance report. A missing key is
+**not** evidence of a verified signature, but does not by itself turn an otherwise
+valid conformance report into a security gate. ES256 keys, when present, use the
+same `public_key_b64url` SEC1 P-256 point format as the Python runner.
 
 ## Run locally
 
