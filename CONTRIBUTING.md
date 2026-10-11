@@ -2,6 +2,14 @@
 
 Thank you for helping improve the Weaver specification. This repo is **documentation + contracts**, so contributions have a direct impact on all downstream implementations.
 
+> [!IMPORTANT]
+> `weaver-spec` is in an adoption-validation phase before v1. Read
+> [docs/ADOPTION_GUARDRAILS.md](docs/ADOPTION_GUARDRAILS.md) before proposing a
+> new normative contract. New Core concepts are currently frozen unless they are
+> justified by independent interoperability evidence or are required to fix an
+> existing correctness/compatibility problem. The policy discussion is tracked by
+> [#206](https://github.com/dgenio/weaver-spec/issues/206).
+
 ---
 
 ## Pull Request Template
@@ -22,9 +30,42 @@ The template is pre-filled automatically when you open a PR on GitHub.
 | Change type | Process |
 | ------------- | --------- |
 | Typo / clarification in docs | PR with description |
-| New doc section or additive contract field | PR with description + update CHANGELOG |
-| **Breaking contract change** | ADR process (see below) + major version bump |
-| New JSON Schema or Python type (non-breaking) | PR + minor version bump + sample payload |
+| New doc section or additive contract field | PR with description + update CHANGELOG; normative additions also pass the adoption gate below |
+| **Breaking contract change** | ADR process (see below) + major version bump; the adoption gate also applies if the change expands or graduates normative semantics |
+| New JSON Schema or Python type (non-breaking) | Experimental/Extended by default; Core additions are frozen pending external evidence |
+
+---
+
+## Adoption Evidence Gate for Normative Expansion
+
+During the current adoption phase, architectural usefulness inside the dgenio
+repositories is **not sufficient evidence** for new stable/Core surface. Before a
+proposal can add, graduate, or materially expand a normative concept, the issue
+must document:
+
+1. At least two independently designed systems that need substantially the same
+   semantics.
+2. At least one external project or organization outside `dgenio` willing to
+   consume or test the representation.
+3. Why MCP, A2A, OpenTelemetry, OAuth/OIDC/JOSE, OpenAPI, or another established
+   standard does not already own the concern.
+4. The concrete information loss or integration cost removed by the contract.
+5. Conformance examples/vectors derived from the independently observed cases.
+
+If this evidence is not available, keep the proposal experimental/research and do
+not describe Core graduation as committed roadmap work. Reference implementations
+(`contextweaver`, `agent-kernel`, and `ChainWeaver`) prove feasibility and
+compatibility but do not count as independent external adoption.
+
+Changes limited to correcting an existing contract, repairing compatibility, or
+preserving a published promise do not need to manufacture new adoption evidence.
+They must state which exception applies and still follow the normal compatibility
+and ADR rules.
+
+The standards-overlap audit is tracked by
+[#205](https://github.com/dgenio/weaver-spec/issues/205), and the full operating
+policy/kill criteria are summarized in
+[docs/ADOPTION_GUARDRAILS.md](docs/ADOPTION_GUARDRAILS.md).
 
 ---
 
@@ -40,6 +81,8 @@ Use the ADR template at [`docs/adr/template.md`](docs/adr/template.md) when docu
    - What you want to change and why.
    - Which contracts are affected.
    - Migration path for adopters.
+   - For normative expansion, the independent-adoption evidence required above;
+     correctness/compatibility fixes should state the applicable exception.
 
 2. **Discussion period** — at least 3 business days for feedback from the community.
 

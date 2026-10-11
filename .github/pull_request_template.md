@@ -9,9 +9,31 @@
 <!-- Check all that apply. -->
 
 - [ ] Docs only (no contract changes)
-- [ ] Additive contract change (new optional field or new type — non-breaking)
-- [ ] Breaking contract change (requires ADR — see [CONTRIBUTING.md](CONTRIBUTING.md))
+- [ ] Experimental / research contract work (not a stable/Core commitment)
+- [ ] Additive normative contract change (must pass the adoption-evidence gate)
+- [ ] Breaking contract change (requires an ADR; adoption evidence applies to normative expansion)
 - [ ] CI / tooling change
+
+---
+
+## Adoption evidence for normative expansion
+
+<!--
+Required for any PR that adds, graduates, or materially expands stable/Core semantics.
+Mark N/A only for docs/tooling/experimental work that does not expand normative commitments.
+See docs/ADOPTION_GUARDRAILS.md.
+-->
+
+- [ ] Two independently designed systems need substantially the same semantics — or N/A
+- [ ] At least one external project/organization outside `dgenio` will consume or test the representation — or N/A
+- [ ] The issue explains why MCP, A2A, OpenTelemetry, OAuth/OIDC/JOSE, OpenAPI, or another established standard does not already own the concern — or N/A
+- [ ] The concrete information loss / integration cost removed by the contract is documented — or N/A
+- [ ] Conformance examples/vectors cover independently observed cases — or N/A
+- [ ] This work is consistent with the standards-ownership audit (#205) and Core freeze (#206) — or N/A
+
+### Evidence / external implementation links
+
+<!-- Link the issue, independent implementations, design-partner evidence, or upstream standards analysis. Do not count dgenio sibling repos as independent adoption. -->
 
 ---
 
@@ -55,4 +77,4 @@
 
 ## Process
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution process, including the ADR process for breaking changes.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ADOPTION_GUARDRAILS.md](docs/ADOPTION_GUARDRAILS.md) for the full contribution process, adoption-evidence gate, and ADR process for breaking changes.

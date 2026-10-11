@@ -5,6 +5,18 @@
 [![Weaver-compatible](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/dgenio/weaver-spec/main/docs/badges/weaver-spec.json)](docs/SELF_CERTIFICATION.md)
 [![Read the Weaver Stack overview on Towards AI](https://img.shields.io/badge/Read_the_overview-Towards_AI-black?logo=medium&logoColor=white)](https://pub.towardsai.net/the-weaver-stack-one-contract-layer-for-safe-llm-agents-7f733cad5eac)
 
+> [!IMPORTANT]
+> **Pre-1.0 adoption reset:** the project is revalidating which contracts should be
+> portable/stable before expanding Core. New Core concepts are frozen pending the
+> [standards-ownership audit](https://github.com/dgenio/weaver-spec/issues/205)
+> and [external-evidence gate](https://github.com/dgenio/weaver-spec/issues/206).
+> External promotion of the `Weaver` standards brand is also under a
+> [naming/namespace review](https://github.com/dgenio/weaver-spec/issues/204).
+> See [Adoption-stage guardrails](docs/ADOPTION_GUARDRAILS.md) and the
+> [adoption reset epic](https://github.com/dgenio/weaver-spec/issues/211).
+
+---
+
 > **Part of the [Weaver Stack](docs/WEAVER_STACK.md)**
 >
 > | Repo | Role |
@@ -23,6 +35,8 @@ This repository is the single source of truth for the vocabulary, invariants, re
 ## What This Repo Is For
 
 `weaver-spec` is **documentation + contracts**, not a runtime library. It defines the interfaces that the Weaver repositories share. Each repo can be adopted independently; `weaver-spec` defines the contracts that make them interoperable when used together.
+
+The current contract set is also being tested for broader, implementation-neutral interoperability. During this pre-1.0 phase, the project explicitly prefers a smaller justified surface over preserving contracts that duplicate MCP, A2A, OpenTelemetry, or established security standards. Reference implementations prove feasibility; independent external implementations are the evidence required for broader standardization claims.
 
 ### Ecosystem map
 
@@ -48,7 +62,7 @@ Pick the path that matches what you are integrating today. None requires adoptin
 | Add capability authorization, firewalling, and audit to an existing tool runner. | `agent-kernel` alone. Provide your own routing that returns a `RoutingDecision`. | [docs/BOUNDARIES.md](docs/BOUNDARIES.md), [docs/LIFECYCLE.md](docs/LIFECYCLE.md) phases 2–3. |
 | Deterministic multi-step flows over any safe execution backend. | `ChainWeaver` alone, against any backend that honors the `CapabilityToken` + `RoutingDecision` contracts. | [docs/LIFECYCLE.md](docs/LIFECYCLE.md) phase 5, [examples/multi_agent_orchestration.md](examples/multi_agent_orchestration.md). |
 | Read or pin the shared contracts without adopting any sibling repo. | Reference the JSON Schemas in `contracts/json/` directly, or `pip install weaver_contracts` for Python types. | [docs/QUICKSTART.md](docs/QUICKSTART.md), [contracts/json/](contracts/json/). |
-| Propose a Core contract change. | Open an issue, then follow the ADR process. | [CONTRIBUTING.md](CONTRIBUTING.md), [docs/VERSIONING.md](docs/VERSIONING.md). |
+| Propose a Core contract change. | Start with the adoption-evidence gate, then open an issue and follow the ADR process. | [docs/ADOPTION_GUARDRAILS.md](docs/ADOPTION_GUARDRAILS.md), [CONTRIBUTING.md](CONTRIBUTING.md). |
 
 This repo is the contract layer for all of the above. You do not need to adopt every sibling to benefit; you do need to honor the contracts at any boundary you cross.
 
@@ -58,6 +72,7 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 
 | What you need | Where to look |
 | --------------- | --------------- |
+| Adoption-stage scope and evidence gates | [docs/ADOPTION_GUARDRAILS.md](docs/ADOPTION_GUARDRAILS.md) |
 | What is the Weaver Stack? (explainer) | [docs/WEAVER_STACK.md](docs/WEAVER_STACK.md) |
 | Ecosystem overview | [docs/VISION.md](docs/VISION.md) |
 | Ecosystem boundary map | [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md) |
@@ -96,18 +111,19 @@ This repo is the contract layer for all of the above. You do not need to adopt e
 
 ## How Contracts Are Structured
 
-Contracts are split into two tiers:
+Contracts are currently split into two tiers:
 
-- **Core** — minimal, stable, required by all adopters. Changes require a major version bump and an ADR.
-- **Extended** — optional metadata (telemetry, UI hints, risk levels). Evolves faster; backward-compatible within a minor series.
+- **Core** — the shared required vocabulary in the current contract set. Core membership is not automatic evidence of stability during the adoption audit; #205/#207 will determine which concepts remain universal versus profile-specific before v1.
+- **Extended** — optional or experimental metadata and artifact contracts. Extended does not imply a path to Core; graduation requires external evidence under the adoption guardrails.
 
 ---
 
 ## How to Propose Spec Changes
 
-1. Open an issue describing the problem and proposed change.
-2. For **breaking contract changes**, follow the lightweight ADR process in [CONTRIBUTING.md](CONTRIBUTING.md): issue → PR → contract version bump.
-3. For doc-only or additive changes, a PR with a clear description is sufficient.
+1. For new or materially expanded normative semantics, first read [docs/ADOPTION_GUARDRAILS.md](docs/ADOPTION_GUARDRAILS.md) and document the external interoperability evidence.
+2. Open an issue describing the problem and proposed change.
+3. For **breaking contract changes**, follow the lightweight ADR process in [CONTRIBUTING.md](CONTRIBUTING.md): issue → PR → contract version bump.
+4. For doc-only changes or experiments that do not expand stable/Core commitments, a PR with a clear description is sufficient.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.
 
